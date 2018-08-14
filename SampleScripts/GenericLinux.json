@@ -1,0 +1,373 @@
+{
+  "Id": "ExampleLinuxScript",
+  "BackEnd": "Scriptable",
+  "CheckSystem": {
+    "Parameters": [
+      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22 } },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20 } },
+      { "Address": { "Type": "String", "Required": true } },
+      { "FuncUserName": { "Type": "String", "Required": true } },
+      { "FuncPassword": { "Type": "Secret", "Required": false } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
+      { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "sudo" } },
+      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+      { "HostKey": { "Type": "Secret", "Required": false } },
+      { "RequestTerminal": { "Type": "Boolean", "Required": false, "DefaultValue": true } }
+    ],
+    "Do": [
+      { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": [ "%FuncUserName%", "%FuncPassword%", "%UserKey::$%" ] } },
+      { "Function": { "Name": "SetUpEnvironment", "ResultVariable": "ValidateResult" } },
+      { "Function": { "Name": "ValidateAccount", "ResultVariable": "ValidateResult" } },
+      { "Function": { "Name": "LogoutSsh", "ResultVariable": "LogoutResult" } },
+      { "Return": { "Value": "%ValidateResult%" } }
+    ]
+  },
+  "CheckPassword": {
+    "Parameters": [
+      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22} },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20} },
+      { "Address": { "Type": "String", "Required": true } },
+      { "FuncUserName": { "Type": "String", "Required": true } },
+      { "FuncPassword": { "Type": "Secret", "Required": false } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
+      { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "sudo" } },
+      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+      { "HostKey": { "Type": "Secret", "Required": false } },
+      { "RequestTerminal": { "Type": "Boolean", "Required": false, "DefaultValue": true } }
+    ],
+    "Do": [
+      { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": ["%FuncUserName%", "%FuncPassword%", "%UserKey::$%"] } },
+      { "Function": { "Name": "SetUpEnvironment", "ResultVariable": "ValidateResult" } },
+      { "Function": { "Name": "ValidatePassword", "ResultVariable": "ValidationResult" } },
+      { "Function": { "Name": "LogoutSsh", "ResultVariable": "LogoutResult" } },
+      { "Return": { "Value": "%ValidationResult%" } }
+    ]
+  },
+  "ChangePassword": {
+    "Parameters": [
+      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22} },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20} },
+      { "Address": { "Type": "String", "Required": true } },
+      { "FuncUserName": { "Type": "String", "Required": true } },
+      { "FuncPassword": { "Type": "Secret", "Required": false } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "NewPassword": { "Type": "Secret", "Required": true } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
+      { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "sudo" } },
+      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+      { "HostKey": { "Type": "Secret", "Required": false } },
+      { "RequestTerminal": { "Type": "Boolean", "Required": false, "DefaultValue": true } }
+    ],
+    "Do": [
+      { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": [ "%FuncUserName%", "%FuncPassword%", "%UserKey::$%" ] } },
+      { "Function": { "Name": "ChangeUserPassword", "ResultVariable": "ChangeUserPasswordResult" } },
+      { "Function": { "Name": "LogoutSsh", "ResultVariable": "LogoutResult" } },
+      { "Return": { "Value": "%ChangeUserPasswordResult%" } }
+    ]
+  },
+  "LoginSsh": {
+    "Parameters": [
+      { "UserName": { "Type": "String", "Required": true } },
+      { "Password": { "Type": "Secret", "Required": false } },
+      { "LoginKey": { "Type": "Secret", "Required": false } }
+    ],
+    "Do": [
+      { "Status": { "Type": "Connecting", "Percent": 30,
+          "Message": { "Name": "AssetConnectingWithAddress", "Parameters": [ "%AssetName%", "%Address%" ] } }
+      },
+      { "SetItem": { "Name": "Global:ConnectErrorMessage", "Value": "" } },
+      { "Comment": { "Text": "ConnectErrorMessage is the global variable that will receive any error message from the Connect call. This variable name is fixed." } },
+      { "Connect": {
+          "ConnectionObjectName": "Global:ConnectSsh",
+          "Type": "Ssh",
+          "Port": "%Port%",
+          "NetworkAddress": "%Address%",
+          "Login": "%UserName%",
+          "Password": "%Password::$%",
+          "RequestTerminal": "%RequestTerminal%",
+          "UserKey": "%LoginKey::$%",
+          "CheckHostKey": "%CheckHostKey%",
+          "Hostkey": "%HostKey::$%",
+          "Timeout": "%Timeout%",
+          "OnError": { "Do": [{ "Throw": { "Value": "SSH Connection Error: %ConnectErrorMessage%" } }]
+          }
+        }
+      },
+      { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "LoginCheckBuffer" } },
+      { "Condition": {
+          "If": "Regex.IsMatch(LoginCheckBuffer, @\"(You are required to change your password)|(Your password has expired)|(Check for other error messages here)\")",
+          "Then": {
+            "Do": [
+              { "Function": { "Name": "LogoutSsh" } },
+              { "Return": { "Value": false } }
+            ]
+          }
+        }
+      },
+      { "Return": { "Value": true } }
+    ]
+  },
+  "LogoutSsh": {
+    "Do": [
+      { "Disconnect": { "ConnectionObjectName": "ConnectSsh" } },
+      { "Return": { "Value": true } }
+    ]
+  },
+  "SetUpEnvironment": {
+    "Do": [
+      { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "unset TERM; stty -echo; LANG=C; LC_ALL=C; SUDO_PROMPT='SUDO password for %p:'; export LANG LC_ALL SUDO_PROMPT; echo \"INIT_CHECK=$?\"" } },
+      { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "FlushBuffer" } },
+      { "Return": { "Value": true } }
+    ]
+  },
+  "ValidateAccount": {
+    "Do": [
+      { "Status": { "Type": "Checking", "Percent": "60",
+          "Message": { "Name": "AssetTestingConnectionWithAddress", "Parameters": [ "%AssetName%", "%Address%" ] } }
+      },
+      { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%DelegationPrefix% egrep -q '^(%FuncUserName%):' /etc/shadow; echo \"CHECKSYS=$?\"" } },
+      { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "ReturnStatus" } },
+      { "Condition": {
+          "If": "Regex.IsMatch(ReturnStatus, @\"SUDO password for\")",
+          "Then": {
+            "Do": [
+              { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%FuncPassword%" } },
+              { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "ReturnStatus" } }
+            ]
+          }
+        }
+      },
+      { "Switch": {
+          "MatchValue": "%ReturnStatus%",
+          "Cases": [
+            {
+              "CaseValue": "CHECKSYS=0",
+              "Do": [
+                { "Return": { "Value": true } }
+              ]
+            },
+            {
+              "CaseValue": "(incorrect password attempts)|(Sorry, try again)|(Check for other error messages here)",
+              "Do": [
+                { "Status": { "Type": "Checking", "Percent": 80,
+                    "Message": { "Name": "InsufficientDelegationPrivileges", "Parameters": [ "%DelegationPrefix%" ] } }
+                }
+              ]
+            },
+            {
+              "CaseValue": "(CHECKSYS=[1-9]+.*)|(Permission denied)",
+              "Do": [
+                { "Status": { "Type": "Checking", "Percent": 80,
+                    "Message": { "Name": "InsufficientPrivilegesAccessPassword" } }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      { "Return": { "Value": "false" } }
+    ]
+  },
+  "ValidatePassword": {
+    "Do": [
+      { "Status": { "Type": "Checking", "Percent": 50,
+          "Message": { "Name": "LookingUpUser", "Parameters": [ "%AccountUserName%" ] } }
+      },
+      { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "grep -q '^%AccountUserName%:' /etc/passwd; echo \"CHECKUSER=$?\"" } },
+      { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "ReturnStatus" } },
+      { "Switch": {
+          "MatchValue": "%ReturnStatus%",
+          "Cases": [
+            { "CaseValue": "CHECKUSER=[1-9]+.*",
+              "Do": [
+                { "Status": { "Type": "Checking", "Percent": 80,
+                    "Message": { "Name": "AccountNotFound", "Parameters": [ "%AccountUserName%" ] } }
+                },
+                { "Return": { "Value": false } }
+              ]
+            },
+            { "CaseValue": "CHECKUSER=0",
+              "Do": [
+                { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%DelegationPrefix% grep '^%AccountUserName%:' /etc/shadow" } },
+                { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "AccountEntry" } },
+                { "Condition": {
+                    "If": "Regex.IsMatch(AccountEntry, @\"SUDO password for\")",
+                    "Then": {
+                      "Do": [
+                        {
+                          "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%FuncPassword%" } },
+                        { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "AccountEntry" } }
+                      ]
+                    }
+                  }
+                },
+                { "Switch": {
+                    "MatchValue": "%AccountEntry%",
+                    "Cases": [
+                      { "CaseValue": "%AccountUserName%:[^:]*.*:[^:].*:",
+                        "Do": [
+                          {
+                            "Status": { "Type": "Checking", "Percent": 75,
+                              "Message": { "Name": "VerifyingPassword" } }
+                          },
+                          { "CompareShadowHash": { "Password": "%AccountPassword%", "SaltedHash": "%AccountEntry%", "ResultVariable": "PasswordHashMatched" } },
+                          { "Condition": {
+                              "If": "PasswordHashMatched == \"True\"",
+                              "Then": {
+                                "Do": [
+                                  { "Return": { "Value": true } }
+                                ]
+                              }
+                            }
+                          },
+                          { "Return": { "Value": false } }
+                        ]
+                      },
+                      { "CaseValue": "(incorrect password attempts)|(Sorry, try again)|(Check for other error messages here)",
+                        "Do": [
+                          { "Status": { "Type": "Checking", "Percent": 80,
+                              "Message": { "Name": "InsufficientDelegationPrivileges", "Parameters": [ "%DelegationPrefix%" ] } }
+                          },
+                          { "Return": { "Value": false } }
+                        ]
+                      },
+                      { "CaseValue": "Permission denied",
+                        "Do": [
+                          { "Status": { "Type": "Checking", "Percent": 80,
+                              "Message": { "Name": "InsufficientPrivilegesAccessPassword" } }
+                          },
+                          { "Return": { "Value": false } }
+                        ]
+                      }
+                    ],
+                    "DefaultCase": {
+                      "Do": [
+                        { "Return": { "Value": false } }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      { "Return": { "Value": false } }
+    ]
+  },
+  "ChangeUserPassword": {
+    "Do": [
+      { "Status": { "Type": "Changing", "Percent": 50,
+          "Message": { "Name": "ChangingPassword", "Parameters": [ "%AccountUserName%" ] } }
+      },
+      { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "grep -q '^%AccountUserName%:' /etc/passwd; echo \"CHECKUSER=$?\"" } },
+      { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "ReturnStatus" } },
+      { "Switch": {
+          "MatchValue": "%ReturnStatus%",
+          "Cases": [
+            { "CaseValue": "CHECKUSER=[1-9]+.*",
+              "Do": [
+                { "Status": { "Type": "Checking", "Percent": 80,
+                    "Message": { "Name": "AccountNotFound", "Parameters": [ "%AccountUserName%" ] } }
+                },
+                { "Return": { "Value": false } }
+              ]
+            },
+            { "CaseValue": "CHECKUSER=0",
+              "Do": [
+                { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%DelegationPrefix% passwd %AccountUserName%; echo \"CHGPASS=$?\"" } },
+                { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } },
+                { "Condition": {
+                    "If": "Regex.IsMatch(PasswdAttempt, @\"SUDO password for\")",
+                    "Then": {
+                      "Do": [
+                        { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%FuncPassword%" } },
+                        { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } }
+                      ]
+                    }
+                  }
+                },
+                { "Condition": {
+                    "If": "Regex.IsMatch(PasswdAttempt, @\"[cC]urrent.*[Pp]assword\")",
+                    "Then": {
+                      "Do": [
+                        { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%AccountPassword%" } },
+                        { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } }
+                      ]
+                    }
+                  }
+                },
+                { "Condition": {
+                    "If": "Regex.IsMatch(PasswdAttempt, @\".*[Nn]ew.*[Pp]assword:\")",
+                    "Then": {
+                      "Do": [
+                        { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%NewPassword%" } },
+                        { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } }
+                      ]
+                    }
+                  }
+                },
+                { "Condition": {
+                    "If": "Regex.IsMatch(PasswdAttempt, @\".*[Nn]ew.*[Pp]assword:\")",
+                    "Then": {
+                      "Do": [
+                        { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%NewPassword%" } },
+                        { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } }
+                      ]
+                    }
+                  }
+                },
+                { "Switch": {
+                    "MatchValue": "%PasswdAttempt%",
+                    "Cases": [
+                      { "CaseValue": "CHGPASS=0",
+                        "Do": [
+                          { "Return": { "Value": true } }
+                        ]
+                      },
+                      { "CaseValue": "(CHGPASS=[1-9]+.*)|(BAD PASSWORD)|(Have exhausted maximum number of retries)",
+                        "Do": [
+                          {
+                            "Status": { "Type": "Changing", "Percent": 80,
+                              "Message": { "Name": "PasswordChangeFailed", "Parameters": [ "%AccountUserName%" ] } }
+                          }
+                        ]
+                      },
+                      {
+                        "CaseValue": "(incorrect password attempts)|(Sorry, try again)|(Check for other error messages here)",
+                        "Do": [
+                          { "Status": { "Type": "Changing", "Percent": 80,
+                              "Message": { "Name": "InsufficientDelegationPrivileges", "Parameters": [ "%DelegationPrefix%" ] } }
+                          }
+                        ]
+                      },
+                      { "CaseValue": "(Only root can specify a user name)|(Permission denied)|(may not view or modify password information)",
+                        "Do": [
+                          {
+                            "Status": { "Type": "Changing", "Percent": 80,
+                              "Message": { "Name": "InsufficientPrivilegesAccessPassword" } }
+                          }
+                        ]
+                      },
+                      { "CaseValue": "(BAD PASSWORD)|(Have exhausted maximum number of retries)",
+                        "Do": [
+                          { "Status": { "Type": "Changing", "Percent": 80,
+                              "Message": { "Name": "PasswordTooWeak", "Parameters": [ "%AccountUserName%" ] } }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      { "Return": { "Value": false } }
+    ]
+  }
+}
