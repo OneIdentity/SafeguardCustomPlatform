@@ -1,19 +1,19 @@
 {
   "Id": "ExampleLinuxScript",
   "BackEnd": "Scriptable",
+  "SystemParameters": [
+    { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22 } },
+    { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20 } },
+    { "Address": { "Type": "String", "Required": true } },
+    { "FuncUserName": { "Type": "String", "Required": true } },
+    { "FuncPassword": { "Type": "Secret", "Required": false } },
+    { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
+    { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "sudo" } },
+    { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+    { "HostKey": { "Type": "String", "Required": false } },
+    { "RequestTerminal": { "Type": "Boolean", "Required": false, "DefaultValue": true } }
+  ],
   "CheckSystem": {
-    "Parameters": [
-      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22 } },
-      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20 } },
-      { "Address": { "Type": "String", "Required": true } },
-      { "FuncUserName": { "Type": "String", "Required": true } },
-      { "FuncPassword": { "Type": "Secret", "Required": false } },
-      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
-      { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "sudo" } },
-      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
-      { "HostKey": { "Type": "Secret", "Required": false } },
-      { "RequestTerminal": { "Type": "Boolean", "Required": false, "DefaultValue": true } }
-    ],
     "Do": [
       { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": [ "%FuncUserName%", "%FuncPassword%", "%UserKey::$%" ] } },
       { "Function": { "Name": "SetUpEnvironment", "ResultVariable": "ValidateResult" } },
@@ -23,20 +23,6 @@
     ]
   },
   "CheckPassword": {
-    "Parameters": [
-      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22} },
-      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20} },
-      { "Address": { "Type": "String", "Required": true } },
-      { "FuncUserName": { "Type": "String", "Required": true } },
-      { "FuncPassword": { "Type": "Secret", "Required": false } },
-      { "AccountUserName": { "Type": "String", "Required": true } },
-      { "AccountPassword": { "Type": "Secret", "Required": true } },
-      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
-      { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "sudo" } },
-      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
-      { "HostKey": { "Type": "Secret", "Required": false } },
-      { "RequestTerminal": { "Type": "Boolean", "Required": false, "DefaultValue": true } }
-    ],
     "Do": [
       { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": ["%FuncUserName%", "%FuncPassword%", "%UserKey::$%"] } },
       { "Function": { "Name": "SetUpEnvironment", "ResultVariable": "ValidateResult" } },
@@ -46,21 +32,6 @@
     ]
   },
   "ChangePassword": {
-    "Parameters": [
-      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22} },
-      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20} },
-      { "Address": { "Type": "String", "Required": true } },
-      { "FuncUserName": { "Type": "String", "Required": true } },
-      { "FuncPassword": { "Type": "Secret", "Required": false } },
-      { "AccountUserName": { "Type": "String", "Required": true } },
-      { "AccountPassword": { "Type": "Secret", "Required": true } },
-      { "NewPassword": { "Type": "Secret", "Required": true } },
-      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
-      { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "sudo" } },
-      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
-      { "HostKey": { "Type": "Secret", "Required": false } },
-      { "RequestTerminal": { "Type": "Boolean", "Required": false, "DefaultValue": true } }
-    ],
     "Do": [
       { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": [ "%FuncUserName%", "%FuncPassword%", "%UserKey::$%" ] } },
       { "Function": { "Name": "ChangeUserPassword", "ResultVariable": "ChangeUserPasswordResult" } },
@@ -78,22 +49,27 @@
       { "Status": { "Type": "Connecting", "Percent": 30,
           "Message": { "Name": "AssetConnectingWithAddress", "Parameters": [ "%AssetName%", "%Address%" ] } }
       },
-      { "SetItem": { "Name": "Global:ConnectErrorMessage", "Value": "" } },
-      { "Comment": { "Text": "ConnectErrorMessage is the global variable that will receive any error message from the Connect call. This variable name is fixed." } },
-      { "Connect": {
-          "ConnectionObjectName": "Global:ConnectSsh",
-          "Type": "Ssh",
-          "Port": "%Port%",
-          "NetworkAddress": "%Address%",
-          "Login": "%UserName%",
-          "Password": "%Password::$%",
-          "RequestTerminal": "%RequestTerminal%",
-          "UserKey": "%LoginKey::$%",
-          "CheckHostKey": "%CheckHostKey%",
-          "Hostkey": "%HostKey::$%",
-          "Timeout": "%Timeout%",
-          "OnError": { "Do": [{ "Throw": { "Value": "SSH Connection Error: %ConnectErrorMessage%" } }]
-          }
+      { "Try": {
+          "Do": [
+            {
+              "Connect": {
+                "ConnectionObjectName": "Global:ConnectSsh",
+                "Type": "Ssh",
+                "Port": "%Port%",
+                "NetworkAddress": "%Address%",
+                "Login": "%UserName%",
+                "Password": "%Password::$%",
+                "RequestTerminal": "%RequestTerminal%",
+                "UserKey": "%LoginKey::$%",
+                "CheckHostKey": "%CheckHostKey%",
+                "Hostkey": "%HostKey::$%",
+                "Timeout": "%Timeout%"
+              }
+            }
+          ],
+          "Catch": [
+            { "Throw": { "Value": "SSH Connection Error: %Exception%" } }
+          ]
         }
       },
       { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "LoginCheckBuffer" } },
@@ -215,7 +191,7 @@
                           },
                           { "CompareShadowHash": { "Password": "%AccountPassword%", "SaltedHash": "%AccountEntry%", "ResultVariable": "PasswordHashMatched" } },
                           { "Condition": {
-                              "If": "PasswordHashMatched == \"True\"",
+                              "If": "PasswordHashMatched == true",
                               "Then": {
                                 "Do": [
                                   { "Return": { "Value": true } }
