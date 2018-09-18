@@ -1,19 +1,20 @@
 {
   "Id": "ExampleLinuxScript",
   "BackEnd": "Scriptable",
-  "SystemParameters": [
-    { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22 } },
-    { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20 } },
-    { "Address": { "Type": "String", "Required": true } },
-    { "FuncUserName": { "Type": "String", "Required": true } },
-    { "FuncPassword": { "Type": "Secret", "Required": false } },
-    { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
-    { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "sudo" } },
-    { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
-    { "HostKey": { "Type": "String", "Required": false } },
-    { "RequestTerminal": { "Type": "Boolean", "Required": false, "DefaultValue": true } }
-  ],
   "CheckSystem": {
+    "Parameters": [
+      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22 } },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20 } },
+      { "Address": { "Type": "String", "Required": true } },
+      { "FuncUserName": { "Type": "String", "Required": true } },
+      { "FuncPassword": { "Type": "Secret", "Required": false } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
+      { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "sudo" } },
+      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+      { "HostKey": { "Type": "String", "Required": false } },
+      { "RequestTerminal": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+      { "UserKey": { "Type": "Secret", "Required": false } }
+   ],
     "Do": [
       { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": [ "%FuncUserName%", "%FuncPassword%", "%UserKey::$%" ] } },
       { "Function": { "Name": "SetUpEnvironment", "ResultVariable": "ValidateResult" } },
@@ -23,6 +24,21 @@
     ]
   },
   "CheckPassword": {
+    "Parameters": [
+      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22} },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20} },
+      { "Address": { "Type": "String", "Required": true } },
+      { "FuncUserName": { "Type": "String", "Required": true } },
+      { "FuncPassword": { "Type": "Secret", "Required": false } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
+      { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "sudo" } },
+      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+      { "HostKey": { "Type": "String", "Required": false } },
+      { "RequestTerminal": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+      { "UserKey": { "Type": "Secret", "Required": false } }
+   ],
     "Do": [
       { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": ["%FuncUserName%", "%FuncPassword%", "%UserKey::$%"] } },
       { "Function": { "Name": "SetUpEnvironment", "ResultVariable": "ValidateResult" } },
@@ -32,11 +48,39 @@
     ]
   },
   "ChangePassword": {
+    "Parameters": [
+      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22} },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20} },
+      { "Address": { "Type": "String", "Required": true } },
+      { "FuncUserName": { "Type": "String", "Required": true } },
+      { "FuncPassword": { "Type": "Secret", "Required": false } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "NewPassword": { "Type": "Secret", "Required": true } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
+      { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "sudo" } },
+      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+      { "HostKey": { "Type": "String", "Required": false } },
+      { "RequestTerminal": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+      { "UserKey": { "Type": "Secret", "Required": false } }
+    ],
     "Do": [
       { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": [ "%FuncUserName%", "%FuncPassword%", "%UserKey::$%" ] } },
       { "Function": { "Name": "ChangeUserPassword", "ResultVariable": "ChangeUserPasswordResult" } },
       { "Function": { "Name": "LogoutSsh", "ResultVariable": "LogoutResult" } },
       { "Return": { "Value": "%ChangeUserPasswordResult%" } }
+    ]
+  },
+  "DiscoverSshHostKey": {
+    "Parameters": [
+      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22} },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20} },
+      { "Address": { "Type": "String", "Required": true } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } }
+      ],
+      "Do": [
+      { "Function": { "Name": "DiscoverHostKeyForAsset" } },
+      { "Return": { "Value": true } }
     ]
   },
   "LoginSsh": {
@@ -345,5 +389,53 @@
       },
       { "Return": { "Value": false } }
     ]
-  }
+  },
+  "DiscoverHostKeyForAsset": {
+      "Do": [
+        { "Status": { "Type": "Connecting", "Percent": 30,
+            "Message": { "Name": "AssetConnectingWithAddress", "Parameters": [ "%AssetName%", "%Address%" ] }}
+        },
+        {
+          "Try": {
+            "Do": [
+              {
+                "DiscoverSshHostKey": {
+                  "HostKeyVariableName": "HostKey",
+                  "SoftwareVersionVariableName": "GLOBAL:ServerSoftwareName",
+                  "Port": "%Port%",
+                  "NetworkAddress": "%Address%",
+                  "Timeout": "%Timeout%",
+                  "DiscoverHostKey": true,
+                  "Type": "Ssh"
+                }
+              },
+              { "WriteResponseObject": { "Value": "%HostKey::$%" } }
+            ],
+            "Catch": [
+              {
+                "Condition": {
+                  "If": "string.IsNullOrEmpty(Exception)",
+                  "Then": {
+                    "Do": [
+                      { "Status": { "Type": "Connecting", "Percent": 95,
+                          "Message": { "Name": "AssetConnectFailedWithAddress","Parameters": [ "%AssetName%", "%Address%" ] } }
+                      },
+                      { "Throw": { "Value": "SSH Connection Error" } }
+                    ]
+                  },
+                  "Else": {
+                    "Do": [
+                      { "Status": { "Type": "Connecting", "Percent": 95,
+                          "Message": { "Name": "AssetConnectFailedWithReasonAndAddress", "Parameters": [ "%AssetName%", "%Address%", "%Exception%" ] } }
+                      },
+                      { "Throw": { "Value": "%Exception%" } }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+   }
 }
