@@ -76,8 +76,7 @@
       { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22} },
       { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20} },
       { "Address": { "Type": "String", "Required": true } },
-      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
-      { "EnableAllCiphers": { "Type": "Boolean", "Required": false, "DefaultValue": false } }
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } }
       ],
       "Do": [
       { "Function": { "Name": "DiscoverHostKeyForAsset" } },
