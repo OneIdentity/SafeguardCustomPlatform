@@ -15,8 +15,7 @@
       { "WorkstationId": { "Type": "String", "Required": false, "DefaultValue": "" } }
     ],
     "Do": [
-      { "SetItem": { "Name": "FuncUserName", "Value": "%{ FuncUserName.ToUpper() }%" } },
-      { "Function": { "Name": "LoginFuncRacf", "ResultVariable": "LoginResult" } },
+      { "Function": { "Name": "LoginFuncRacf", "ResultVariable": "LoginResult" }, "Parameters": ["%FuncUserName%"] },
       { "Condition": {
           "If": "!LoginResult",
           "Then": {
@@ -81,15 +80,13 @@
     ],
     "Do": [
       { "Status": { "Type": "Checking", "Percent": 20, "Message": { "Name": "VerifyingPassword" } } },
-      { "SetItem": { "Name": "AccountUserName", "Value": "%{ AccountUserName.ToUpper() }%" } },
-      { "SetItem": {"Name": "FuncUserName", "Value": "%{ FuncUserName.ToUpper() }%" } },
-      { "Function": { "Name": "LoginFuncRacf", "ResultVariable": "LoginResult" } },
+      { "Function": { "Name": "LoginFuncRacf", "ResultVariable": "LoginResult" }, "Parameters": [ "%{ FuncUserName.ToUpper() }%" ]  },
       { "Condition": { "If": "!LoginResult", "Then": { "Do": [ { "Throw": { "Value": "Account %FuncUserName% not found" } } ] } } },
       { "Function": { "Name": "LogoutRacf" } },
-      { "Function": { "Name": "LoginUserRacf", "ResultVariable": "LoginResult" } },
+      { "Function": { "Name": "LoginUserRacf", "ResultVariable": "LoginResult" },  "Parameters": [ "%{ AccountUserName.ToUpper() }%" ] },
       { "Condition": { "If": "!LoginResult", "Then": { "Do": [ { "Return": { "Value": "False" } } ] } } },
       { "Function": { "Name": "LogoutRacf" } },
-      { "Return": { "Value": "True" } }
+      { "Return": { "Value": true } }
     ]
   },
 
@@ -127,12 +124,12 @@
         "Condition": {
           "If": "Regex.IsMatch(AluCmdBuffer,@\"(.*READY[ \n]*$)\")",
           "Then": {
-            "Do": [ { "SetItem": { "Name": "PwdChangeResult", "Value": "true" } } ]
+            "Do": [ { "SetItem": { "Name": "PwdChangeResult", "Value": true } } ]
           },
           "Else": {
             "Do": [
               { "Function": { "Name": "LogoutRacf" } },
-              { "SetItem": { "Name": "PwdChangeResult", "Value": "false" } }
+              { "SetItem": { "Name": "PwdChangeResult", "Value": true } }
             ]
           }
         }
