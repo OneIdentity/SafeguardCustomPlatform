@@ -19,7 +19,7 @@
       { "Condition": {
           "If": "!LoginResult",
           "Then": {
-            "Do": [ { "Return": { "Value": true } } ]
+            "Do": [ { "Throw": { "Value": "Account %FuncUserName% not found" } } ]
           }
         }
       },
@@ -116,8 +116,7 @@
       },
       { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "ALU %AccountUserName% PASSWORD(%NewPassword%) NOEXPIRED\n\f","ContainsSecret": true } },
       { "Receive": { "ConnectionObjectName": "Tn3270Connection", "BufferName": "AluCmdBuffer", "ContainsSecret": true } },
-      { "SetItem": { "Name": "Global:PwdChangeResult", "Value": false } },
-      { "SetItem": { "Name": "Global:InvalidPassword", "Value": false } },
+      { "SetItem": { "Name": "PwdChangeResult", "Value": false } },
       { "Condition": {
           "If": "Regex.IsMatch(AluCmdBuffer,@\"(.*READY[ \n]*$)\")",
           "Then": {"Do": [ { "SetItem": { "Name": "PwdChangeResult", "Value": true } } ] },
