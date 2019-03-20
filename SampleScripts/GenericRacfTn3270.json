@@ -1,7 +1,7 @@
 ﻿{
   "id": "RacfTn3270",
   "BackEnd": "Scriptable",
-
+  
   "CheckSystem": {
     "Parameters": [
       { "Address": { "Type": "String", "Required": true } },
@@ -15,63 +15,29 @@
       { "WorkstationId": { "Type": "String", "Required": false, "DefaultValue": "" } }
     ],
     "Do": [
-      { "Function": { "Name": "LoginFuncRacf", "ResultVariable": "LoginResult" } },
+      { "SetItem": { "Name": "FuncUserName", "Value": "%{ FuncUserName.ToUpper() }%" } },
+      { "Status": { "Type": "Checking",
+        "Message": {
+          "Name": "AssetTestingConnection",
+          "Parameters": [ "%Address%" ]  },
+        "Percent": "50" } },
+      { "Function": { "Name": "LoginRacf", 
+                      "ResultVariable": "LoginResult", 
+                      "Parameters": [ "%FuncUserName%", "%FuncPassword%", true, false] } },
       { "Condition": {
-          "If": "!LoginResult",
-          "Then": {
-            "Do": [ { "Throw": { "Value": "Account %FuncUserName% not found" } } ]
-          }
-        }
-      },
-      {
-        "Status": {
-          "Type": "Checking",
-          "Message": {
-            "Name": "AssetTestingConnection",
-            "Parameters": ["%Address%"]
-          },
-          "Percent": "50"
-        }
-      },
-      { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "LU\n\f" } },
-      { "Receive": { "ConnectionObjectName": "Tn3270Connection", "BufferName": "LuCmdBuffer" } },
-      {
-        "Condition": {
-          "If": "Regex.IsMatch(LuCmdBuffer, $\"^(.*USER={FuncUserName}.*)\")",
-          "Then": {
-            "Do": [
-              {
-                "Status": {
-                  "Type": "Checking",
-                  "Message": {
-                    "Name": "InsufficientPrivilegesAccessPassword"
-                  },
-                  "Percent": "95"
-                }
-              },
-              { "Function": { "Name": "LogoutRacf" } },
-              { "Return": { "Value": false } }
-            ]
-          },
-          "Else": {
-            "Do": [
-              { "Function": { "Name": "LogoutRacf" } },
-              { "Return": { "Value": true } }
-            ]
-          }
-        }
-      }
+        "If": "LoginResult",
+        "Then": { "Do": [ {"Function": { "Name": "LogoutRacf"} } ] } } }, 
+      { "Return": {"Value": "%LoginResult%"} }
     ]
   },
-
+      
+  
   "CheckPassword": {
     "Parameters": [
-      { "Address": { "Type": "String", "Required": true } }, 
+      { "Address": { "Type": "String", "Required": true } },
       { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
-      { "FuncUserName": { "Type": "String", "Required": true } },
-      { "FuncPassword": { "Type": "Secret", "Required": true } },
       { "AccountUserName": { "Type": "String", "Required": true } },
-      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true  } },
       { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 23 } },
       { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 30 } },
       { "UseSsl": { "Type": "boolean", "Required": false, "DefaultValue": true } },
@@ -80,16 +46,27 @@
     ],
     "Do": [
       { "Status": { "Type": "Checking", "Percent": 20, "Message": { "Name": "VerifyingPassword" } } },
-      { "Function": { "Name": "LoginFuncRacf", "ResultVariable": "LoginResult" } },
-      { "Condition": { "If": "!LoginResult", "Then": { "Do": [ { "Throw": { "Value": "Account %FuncUserName% not found" } } ] } } },
-      { "Function": { "Name": "LogoutRacf" } },
-      { "Function": { "Name": "LoginUserRacf", "ResultVariable": "LoginResult" } },
-      { "Condition": { "If": "!LoginResult", "Then": { "Do": [ { "Return": { "Value": false } } ] } } },
+      { "SetItem": { "Name": "AccountUserName", "Value": "%{ AccountUserName.ToUpper() }%" } },
+      { "Function": { "Name": "LoginRacf", 
+                      "ResultVariable": "LoginResult", 
+                      "Parameters": [ "%AccountUserName%", "%AccountPassword%", false, false ] } },
+      {
+        "Condition": {
+          "If": "!LoginResult",
+          "Then": {
+            "Do": [
+              { "Comment": { "Text": "Able to connect, unable to log in" } },
+              { "Return": { "Value": false } }
+            ]
+          }
+        }
+      },
+      { "Comment": { "Text": "We've logged in successfully" } },
       { "Function": { "Name": "LogoutRacf" } },
       { "Return": { "Value": true } }
     ]
   },
-
+  
   "ChangePassword": {
     "Parameters": [
       { "Address": { "Type": "String", "Required": true } },
@@ -105,188 +82,264 @@
       { "WorkstationId": { "Type": "String", "Required": false, "DefaultValue": "" } }
     ],
     "Do": [
-      { "Function": { "Name": "LoginFuncRacf", "ResultVariable": "LoginResult" } },
-      { "Condition": { "If": "!LoginResult", "Then": { "Do": [ { "Return": { "Value": false } } ] } } },
-      { "Status": {
-          "Type": "Changing",
-          "Message": {"Name": "ChangingPassword",
-            "Parameters": [ "%AccountUserName%" ] },
-          "Percent": "50"
+      { "SetItem": { "Name": "FuncUserName", "Value": "%{ FuncUserName.ToUpper() }%" } },
+      { "SetItem": { "Name": "AccountUserName", "Value": "%{ AccountUserName.ToUpper() }%" } },
+      { "Comment": "Calling LoginRacf without password and with VerifyAccountOnly=true just checks that the account exists" },
+      { "Function": { "Name": "LoginRacf", 
+                      "ResultVariable": "LoginResult", 
+                      "Parameters": [ "%AccountUserName%", "", false, true ] } },
+      {
+        "Condition": {
+          "If": "!LoginResult",
+          "Then": {
+            "Do": [
+              { "Return": { "Value": false } } ]
+          }
         }
       },
-      { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "ALU %AccountUserName% PASSWORD(%NewPassword%) NOEXPIRED\n\f","ContainsSecret": true } },
-      { "Receive": { "ConnectionObjectName": "Tn3270Connection", "BufferName": "AluCmdBuffer", "ContainsSecret": true } },
-      { "SetItem": { "Name": "PwdChangeResult", "Value": false } },
+      { "Function": { "Name": "LoginRacf",
+                      "ResultVariable": "LoginResult",
+                      "Parameters": [ "%FuncUserName%", "%FuncPassword%", true, false ] } },
       { "Condition": {
-          "If": "Regex.IsMatch(AluCmdBuffer,@\"(.*READY[ \n]*$)\")",
-          "Then": {"Do": [ { "SetItem": { "Name": "PwdChangeResult", "Value": true } } ] },
-          "Else": {"Do": [ { "Function": { "Name": "LogoutRacf" } }, { "SetItem": { "Name": "PwdChangeResult", "Value": true } } ] }
+          "If": "!LoginResult",
+          "Then": {
+            "Do": [
+              { "Comment": { "Text": "Able to connect, unable to log in" } },
+              { "Return": { "Value": false } } ]
+          }
         }
       },
-      { "Return": { "Value": "%PwdChangeResult%" } }
-    ]
-  },
-
-
-  "Functions": [
-          {
-            "Name": "LoginFuncRacf",
-            "Do": [
-              { "Function": { "Name": "ConnectTn3270", "ResultVariable": "ConnectResult", "Parameters": [ "%FuncUserName%" ] } },
-              { "Status": { "Type": "Checking", "Percent": 40, "Message": { "Name": "SystemLoginCheck", "Parameters": [ "%Address%" ] } } },
-              { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "LOGON %FuncUserName%\n\f" } },
-              { "Receive": { "ConnectionObjectName": "Tn3270Connection", "BufferName": "LoginCheckBuffer"  } },
-              { "Condition": {
-                  "If": "Regex.IsMatch(LoginCheckBuffer,@\".*TSO/E LOGON.*\")",
-                  "Then": {
-                    "Do": [
-                      { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "%FuncPassword%\n\f", "ContainsSecret": true } },
-                      { "Receive": { "ConnectionObjectName": "Tn3270Connection", "BufferName": "LoginCheckBuffer" } },
-                      { "Condition": {
-                          "If": "Regex.IsMatch(LoginCheckBuffer, @\"(.*LAST ACCESS AT.*)|(.*%FuncUserName%.*LOGON IN PROGRESS.*)\")",
-                          "Then": { "Do": [ { "Return": { "Value": true } } ] },
-                          "Else": {
-                            "Do": [
-                              { "Status": { "Type": "Checking", "Percent": 95, "Message": { "Name": "FuncAccountLoginFailed", "Parameters": [ "%FuncUserName%" ] } } },
-                              { "Function": { "Name": "LogoutRacf" } },
-                              { "Return": { "Value": false } }
-                            ]
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  "Else": {
-                    "Do": [
-                      { "Status": {"Type": "Checking", "Percent": 95, "Message": { "Name": "FuncAccountLoginFailed", "Parameters": [ "%FuncUserName%" ] } } },
-                      { "Function": { "Name": "LogoutRacf" } },
-                      { "Return": { "Value": false } }
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "Name": "LoginUserRacf",
-            "Do": [
-              { "Function": { "Name": "ConnectTn3270", "ResultVariable": "ConnectResult", "Parameters": [ "%AccountUserName%" ] } },
-              { "Status": { "Type": "Checking", "Percent": 40, "Message": { "Name": "SystemLoginCheck", "Parameters": [ "%Address%" ] } } },
-              { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "LOGON %AccountUserName%\n\f" } },
-              { "Receive": { "ConnectionObjectName": "Tn3270Connection", "BufferName": "LoginCheckBuffer" } },
-              { "Condition": {
-                  "If": "Regex.IsMatch(LoginCheckBuffer,@\".*TSO/E LOGON.*\")",
-                  "Then": {
-                    "Do": [
-                      { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "%AccountPassword%\n\f","ContainsSecret": true } },
-                      { "Receive": { "ConnectionObjectName": "Tn3270Connection", "BufferName": "LoginCheckBuffer" } },
-                      {
-                        "Condition": {
-                          "If": "Regex.IsMatch(LoginCheckBuffer, @\"(.*LAST ACCESS AT.*)|(.*%AccountUserName%.*LOGON IN PROGRESS.*)\")",
-                          "Then": { "Do": [ { "Return": { "Value": true } } ]
-                          },
-                          "Else": {
-                            "Do": [
-                              {
-                                "Status": {
-                                  "Type": "Checking",
-                                  "Percent": 95,
-                                  "Message": {
-                                    "Name": "AccountLoginFailed",
-                                    "Parameters": [ "%AccountUserName%" ]
-                                  }
-                                }
-                              },
-                              { "Function": { "Name": "LogoutRacf" } },
-                              { "Return": { "Value": false } }
-                            ]
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  "Else": {
-                    "Do": [
-                      {
-                        "Status": {
-                          "Type": "Checking",
-                          "Percent": 95,
-                          "Message": {
-                            "Name": "AccountLoginFailed",
-                            "Parameters": [ "%AccountUserName%" ]
-                          }
-                        }
-                      },
-                      { "Function": { "Name": "LogoutRacf" } },
-                      { "Return": { "Value": false } }
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "Name": "ConnectTn3270",
-            "Parameters": [ { "LoginUserName": { "Type": "String", "Required": true } } ],
-            "Do": [
-              { "Status": { "Type": "Connecting", "Percent": 30, "Message": { "Name": "AssetConnectingWithAddress", "Parameters": [ "%AssetName%", "%Address%" ] } } },
-              { "Try": {
-                  "Do": [
+      { "SetItem": { "Name": "InvalidPassword", "Value": false } },
+      {
+        "Try": {
+          "Do": [               
+              { "Comment": { "Text": "We've logged in successfully" } },
+              { "Status": { "Type": "Changing",
+                          "Message": { "Name": "ChangingPassword", "Parameters": [ "%AccountUserName%" ] },
+                          "Percent": "50" } },
+              { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "ALU %AccountUserName% PASSWORD(%NewPassword%) NOEXPIRED\n\f", "ContainsSecret": true } },
+              { "Receive": { "ConnectionObjectName": "Tn3270Connection", "BufferName": "AluCmdBuffer", "ContainsSecret": true } },
+              { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "\\aCLEAR" } },
+              { "SetItem": { "Name": "PwdChangeResult", "Value": false } },
+              
+              { "Switch": { "MatchValue": "%AluCmdBuffer%",
+                  "Cases": [
                     {
-                      "Connect": {
-                        "ConnectionObjectName": "GLOBAL:Tn3270Connection",
-                        "Type": "Tn3270",
-                        "Port": "%Port::$%",
-                        "NetworkAddress": "%Address%",
-                        "Login": "%LoginUserName%",
-                        "Timeout": "%Timeout%",
-                        "WorkstationId": "%WorkstationId::$%",
-                        "UseSsl": "%UseSsl%",
-                        "SkipServerCertValidation": "%SkipServerCertValidation%"
-                      }
+                      "CaseValue": "(.*USERID %FuncUserName%.*NOT AUTHORIZED TO USE.*)|(.* UNABLE TO LOCATE %AccountUserName%.*)",
+                      "Do": [ { "Status": { "Type": "Changing", 
+                                            "Message": { "Name": "AccountNotFound", "Parameters": [ "%AccountUserName%" ] }, 
+                                            "Percent": "90" } }]
+                    },
+                    {
+                      "CaseValue": "INVALID PASSWORD",
+                      "Do": [ { "Status": { "Type": "Changing",
+                                            "Message": {
+                                              "Name": "InvalidPasswordForAccount",
+                                              "Parameters": [ "%AccountUserName%" ] },
+                                            "Percent": "90" } },
+                            { "SetItem": { "Name": "InvalidPassword", "Value": true } } ]
+                    },
+                    {
+                      "CaseValue": "(.*READY[ \n]*$)",
+                      "Do": [ { "SetItem": { "Name": "PwdChangeResult", "Value": true } } ]
                     }
                   ],
-                  "Catch": [
-                    {
-                      "Condition": {
-                        "If": "string.IsNullOrEmpty(Exception)",
-                        "Then": { 
-                          "Do": [ { "Status": { "Type": "Connecting", "Percent": 95, "Message": { "Name": "AssetConnectFailedWithAddress", "Parameters": [ "%AssetName%", "%Address%" ] } } } ]
-                        },
-                        "Else": {
-                          "Do": [ 
-                            { 
-                              "Status": {
-                                "Type": "Connecting", 
-                                "Percent": 95, 
-                                "Message": { "Name": "AssetConnectFailedWithReasonAndAddress", "Parameters": [ "%AssetName%", "%Address%", "%Exception%" ] } }
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    { "Throw": { "Value": "Tn3270 Connection Error" } }
-                  ]
+                  "DefaultCase": {
+                    "Do": [ { "Status": { "Type": "Changing",
+                                          "Message": { "Name": "PasswordChangeFailed", "Parameters": [ "%AccountUserName%" ] },
+                                          "Percent": "90" } } ]
+                  }
                 }
               },
-              { "Return": { "Value": true } }
-            ]
-          },
-          {
-            "Name": "LogoutRacf",
+              { "Condition": {
+                  "If": "InvalidPassword",
+                  "Then": {
+                    "Do": [
+                      { "Comment": {"Text": "Provided an invalid password: too short, long, etc.  RACF awaits a valid password, disconnect don't use LogoutRacf which sends LOGOFF" } },
+                      { "Disconnect": { "ConnectionObjectName": "Tn3270Connection" } }
+                    ]
+                  }
+                }
+              },
+              { "Return": { "Value": "%PwdChangeResult%" } }
+            ],   
+          "Finally": {
             "Do": [
-              {
-                "Try": {
-                  "Do": [
-                    { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "LOGOFF\n\f" } },
-                    { "Disconnect": { "ConnectionObjectName": "Tn3270Connection" } }
-                  ],
-                  "Catch": [ { "Comment": { "Text": "Ignore exceptions logging out" } } ]
+              { "Condition": {
+                  "If": "!InvalidPassword",
+                  "Then": {
+                    "Do": [{ "Function": { "Name": "LogoutRacf" } } ]
+                  }
                 }
-              },
-              { "Return": { "Value": true } }
+              }
             ]
           }
-        ]
-      }    
-
+        }
+      }
+    ]
+  },
+  "Functions": [
+    {
+      "Name": "LoginRacf",
+      "Parameters": [
+        { "UserName": { "Type": "String", "Required": true } },
+        { "Password": { "Type": "Secret", "Required": true } },
+        { "IsFuncAccount": { "Type": "boolean", "Required": true } },
+        { "VerifyAccountOnly": { "Type": "boolean", "DefaultValue": false, "Required": false } } 
+      ],
+      "Do": [
+        { "Function": { "Name": "ConnectTn3270", "ResultVariable": "ConnectResult", "Parameters": [ "%UserName%" ] } },
+        { "Status": { "Type": "Checking",
+                      "Percent": 40,
+                      "Message": { "Name": "SystemLoginCheck", "Parameters": ["%Address%"] } } },
+        { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "LOGON %UserName%\n\f" } },
+        { "Receive": { "ConnectionObjectName": "Tn3270Connection", "BufferName": "LoginCheckBuffer",
+                        "ExpectRegex": "(.*INVALID USERID.*%UserName%.*)|((.*USERID %UserName%.*NOT AUTHORIZED TO USE.*)|(.*TSO/E LOGON.*)|(.*USERID %UserName%.*NOT AUTHORIZED TO USE.*)" } },
+        { "Switch": { "MatchValue": "%LoginCheckBuffer%",
+            "Cases": [
+              { "CaseValue": "((?i).*INVALID USERID.*%UserName%.*)|((?i).*USERID %UserName%.*NOT AUTHORIZED TO USE.*)",
+                "Do": [ 
+                  { "Status": { "Type": "Checking",
+                                      "Percent": 95,
+                                      "Message": { "Name": "AccountNotFound", "Parameters": ["%UserName%"] } } },
+                  { "Function": { "Name": "LogoutRacf" } },
+                  { "Throw": { "Value": "Account %UserName% not found" } }
+                ]
+              },
+              { "CaseValue": ".*TSO/E LOGON.*",
+                "Do": [
+                  { "Condition": {
+                      "If": "VerifyAccountOnly",
+                      "Then": { "Do": [  { "Function": { "Name": "LogoutRacf" } },
+                                          { "Return": { "Value": true } } ]
+                      },
+                      "Else": { "Do": [
+                          { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "%Password%\n\f", "ContainsSecret": true } },
+                          { "Receive": { "ConnectionObjectName": "Tn3270Connection", "BufferName": "LoginCheckBuffer", "ContainsSecret": true } },
+                          { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "\\aCLEAR" } },
+                          { "Switch": { "MatchValue": "%LoginCheckBuffer%",
+                              "Cases": [
+                                { "CaseValue": "(.*LAST ACCESS AT.*)|(.*%UserName%.*LOGON IN PROGRESS.*)",
+                                  "Do": [ { "Return": { "Value": true } } ] }
+                              ],
+                              "DefaultCase": {
+                                "Do": [
+                                  { "Function": { "Name": "LogoutRacf" } },
+                                  { "Return": { "Value": false } }
+                                ]
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "CaseValue": "(.*USERID %UserName%.*NOT AUTHORIZED TO USE.*)",
+                "Do": [
+                  { "Condition": {
+                      "If": "IsFuncAccount",
+                      "Then": {
+                        "Do": [ { "Status": {
+                                    "Type": "Checking",
+                                    "Percent": 95,
+                                    "Message": { "Name": "FuncAccountLoginFailed", "Parameters": ["%UserName%"] } } }
+                        ]
+                      },
+                      "Else": {
+                        "Do": [ { "Status": {
+                                    "Type": "Checking",
+                                    "Percent": 95,
+                                    "Message": { "Name": "AccountLoginFailed", "Parameters": ["%UserName%"] } } }
+                        ]
+                      }
+                    }
+                  },
+                  { "Function": { "Name": "LogoutRacf" } },
+                  { "Return": { "Value": false } }
+                ]
+              }
+            ],
+            "DefaultCase": {
+              "Do": [
+                { "Function": { "Name": "LogoutRacf" } },
+                { "Return": { "Value": false } }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "Name": "ConnectTn3270",
+      "Parameters": [
+        { "LoginUserName": { "Type": "String", "Required": true } }
+      ],
+      "Do": [ 
+        { "Status": {
+                  "Type": "Connecting",
+                  "Percent": 30,
+                  "Message": { "Name": "AssetConnectingWithAddress", "Parameters": [ "%AssetName%", "%Address%" ] } } },
+        { "Try": {
+            "Do": [
+              { "Connect": {
+                  "ConnectionObjectName": "GLOBAL:Tn3270Connection",
+                  "Type": "Tn3270",
+                  "Port": "%Port::$%",
+                  "NetworkAddress": "%Address%",
+                  "Login": "%LoginUserName%",
+                  "Timeout": "%Timeout%",
+                  "WorkstationId": "%WorkstationId::$%",
+                  "UseSsl": "%UseSsl%",
+                  "SkipServerCertValidation": "%SkipServerCertValidation%" } }
+            ],
+            "Catch": [
+              {
+                "Condition": {
+                  "If": "string.IsNullOrEmpty(Exception)",
+                  "Then": {
+                    "Do": [ { "Status": {
+                                "Type": "Connecting",
+                                "Percent": 95,
+                                "Message": { "Name": "AssetConnectFailedWithAddress", "Parameters": [ "%AssetName%", "%Address%" ] } } } ]
+                  },
+                  "Else": {
+                    "Do": [ { "Status": {
+                                "Type": "Connecting",
+                                "Percent": 95,
+                                "Message": { "Name": "AssetConnectFailedWithReasonAndAddress", 
+                                              "Parameters": [ "%AssetName%", "%Address%", "%Exception%" ] } } } ]
+                  }
+                }
+              },
+              {
+                "Throw": { "Value": "Tn3270 Connection Error" }
+              }
+            ]
+          }
+        },
+        { "Return": { "Value": true } }
+      ]
+    },
+    {
+      "Name": "LogoutRacf",
+      "Do": [{ 
+        "Try": {
+          "Do": [ { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "LOGOFF\n\f" } },
+                  { "Disconnect": { "ConnectionObjectName": "Tn3270Connection" } } ],
+          "Catch": [ { "Comment": { "Text": "Ignore exceptions logging out" } } ]
+          }
+        },
+        { "Return": { "Value": true } }
+      ]
+    },
+    { "Name": "LogoutRacfAndReturnFalse", 
+      "Do": [
+        { "Function": { "Name": "LogoutRacf" } },
+        { "Return": { "Value": false } }
+      ]
+    }
+  ]
+}
