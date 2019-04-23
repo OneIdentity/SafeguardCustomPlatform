@@ -154,7 +154,7 @@
           "If": "Regex.IsMatch(ReturnStatus, @\"SUDO password for\")",
           "Then": {
             "Do": [
-              { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%FuncPassword%" } },
+              { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%FuncPassword%", "ContainsSecret": true } },
               { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "ReturnStatus" } }
             ]
           }
@@ -218,7 +218,7 @@
                     "Then": {
                       "Do": [
                         {
-                          "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%FuncPassword%" } },
+                          "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%FuncPassword%", "ContainsSecret": true } },
                         { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "AccountEntry" } }
                       ]
                     }
@@ -304,7 +304,7 @@
                     "If": "Regex.IsMatch(PasswdAttempt, @\"SUDO password for\")",
                     "Then": {
                       "Do": [
-                        { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%FuncPassword%" } },
+                        { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%FuncPassword%", "ContainsSecret": true } },
                         { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } }
                       ]
                     }
@@ -314,7 +314,7 @@
                     "If": "Regex.IsMatch(PasswdAttempt, @\"[cC]urrent.*[Pp]assword\")",
                     "Then": {
                       "Do": [
-                        { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%AccountPassword%" } },
+                        { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%AccountPassword%", "ContainsSecret": true } },
                         { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } }
                       ]
                     }
@@ -324,7 +324,7 @@
                     "If": "Regex.IsMatch(PasswdAttempt, @\".*[Nn]ew.*[Pp]assword:\")",
                     "Then": {
                       "Do": [
-                        { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%NewPassword%" } },
+                        { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%NewPassword%", "ContainsSecret": true } },
                         { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } }
                       ]
                     }
@@ -334,7 +334,7 @@
                     "If": "Regex.IsMatch(PasswdAttempt, @\".*[Nn]ew.*[Pp]assword:\")",
                     "Then": {
                       "Do": [
-                        { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%NewPassword%" } },
+                        { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%NewPassword%", "ContainsSecret": true } },
                         { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } }
                       ]
                     }
