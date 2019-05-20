@@ -10,9 +10,7 @@
         { "FuncPassword": { "Type": "secret", "Required": false } },
         { "EnablePassword": { "Type": "secret", "Required": false } },
         { "Timeout": { "Type": "integer", "Required": false, "DefaultValue": 20 } },
-        { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 23 } },
-        { "CheckHostKey": { "Type": "boolean", "Required": false, "DefaultValue": true } },
-        { "HostKey": { "Type": "string", "Required": false } }
+        { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 23 } }
       ],
       "Do": [
         { "Function": { "Name": "ResolveAssetNameIfEmpty" } },
@@ -42,9 +40,7 @@
                       { "AccountUserName": { "Type": "string" } },
                       { "AccountPassword": { "Type": "secret" } },
                       { "Timeout": { "Type": "integer", "Required": false, "DefaultValue": 20 } },
-                      { "Port": { "Type": "integer", "Required": false, "DefaultValue": 22 } },
-                      { "CheckHostKey": { "Type": "boolean", "Required": false, "DefaultValue": true } },
-                      { "HostKey": { "Type": "string", "Required": false } } ],
+                      { "Port": { "Type": "integer", "Required": false, "DefaultValue": 23 } }],
       "Do": [
         { "Function": { "Name": "ConnectTelnet", "ResultVariable": "LoginResult", "Parameters": [ "%FuncUserName%", "%FuncPassword%" ] } },
         { "Function": { "Name": "LookupAccount", "ResultVariable": "LookupResult" } },
@@ -64,21 +60,19 @@
                       { "AccountUserName": { "Type": "string" } },
                       { "NewPassword": { "Type": "secret" } },
                       { "Timeout": { "Type": "integer", "Required": false, "DefaultValue": 20 } },
-                      { "Port": { "Type": "integer", "Required": false, "DefaultValue": 22 } },
-                      { "CheckHostKey": { "Type": "boolean", "Required": false, "DefaultValue": true } },
-                      { "HostKey": { "Type": "string", "Required": false } }
+                      { "Port": { "Type": "integer", "Required": false, "DefaultValue": 23 } }
       ],
       "Do": [
-        { "SetItem": { "Name": "Global:EnableType", "Value": "password" } },
-        { "SetItem": { "Name": "Global:PasswordType", "Value": "password" } },
-        { "SetItem": { "Name": "Global:RequestTerminal", "Value": true } },
+        { "SetItem": { "Name": "EnableType", "Value": "password" } },
+        { "SetItem": { "Name": "PasswordType", "Value": "password" } },
+        { "SetItem": { "Name": "RequestTerminal", "Value": true } },
         { "Function": { "Name": "ResolveAssetNameIfEmpty" } },
         { "Function": { "Name": "ConnectTelnet",  "ResultVariable": "LoginResult", "Parameters": ["%FuncUserName%", "%FuncPassword%"] } },
         { "Condition": { "If": "!LoginResult", 
                          "Then": { "Do": [ { "Comment": { "Text": "Able to connect, unable to log in" } },
                                            { "Return": { "Value": false } } ] } } },
         { "Function": { "Name": "SetupEnvironment" } },
-        { "Function": { "Name": "ChangeUserPassword", "ResultVariable": "OperationResult" } },
+        { "Function": { "Name": "ChangeUserPassword", "ResultVariable": "OperationResult", "Parameters": ["EnableType", "PasswordType", "RequestTerminal"] } },
         { "Function": { "Name": "Logout" } },
         { "Return": { "Value": "%OperationResult%" } }
       ]
@@ -149,8 +143,11 @@
                                                     { "Throw": { "Value": "Account %AccountUserName% not found" } } ] } } } ]
       },
       { "Name": "ChangeUserPassword",
+        "Parameters": [ {"EnableType": {"Type": "String"}},
+                        {"PasswordType": {"Type": "String"}},
+                        {"RequestTerminal": {"Type": "String"}}],
         "Do": [ { "Status": { "Type": "Changing", "Percent": 50, "Message": { "Name": "ChangingPassword", 
-                                                                              "Parameters": [ "%AccountUserName%" ]  } }  },
+                                                                              "Parameters": [ "%AccountUserName%"]  } }  },
                 { "Send": { "ConnectionObjectName": "TelnetConnection", "Buffer": "show config | include (^username %AccountUserName%($| ).*)" } },
                 { "Receive": { "ConnectionObjectName": "TelnetConnection", 
                                "BufferName": "ReturnStatus", 
@@ -160,9 +157,10 @@
                 { "Switch": { "MatchValue": "%ReturnStatus%",
                               "Cases": [ { "CaseValue": "(?m)^enable .*", 
                                             "Do": [ { "Function": { "Name": "ChangeEnableTypePassword",
-                                                         "Parameters": [ "%ReturnStatus%" ] } } ] },
+                                                         "Parameters": [ "%ReturnStatus%","%EnableType%" ] } } ] },
                                          { "CaseValue": "(?m)^username %AccountUserName%($| ).*", 
-                                           "Do": [ { "Function": { "Name": "ChangeUserTypePassword", "Parameters": [ "%ReturnStatus%" ] } } ] },
+                                           "Do": [ { "Function": { "Name": "ChangeUserTypePassword", "Parameters": [ "%ReturnStatus%","%PasswordType%" ] } },
+                                                   { "SetItem": "PasswordType" } ] },
                                          { "CaseValue": ".*#",
                                            "Do": [ { "Status": { "Type": "Changing", "Percent": 80, 
                                                     "Message": { "Name": "AccountNotFound", "Parameters": [ "%AccountUserName%" ] } } },
@@ -170,7 +168,8 @@
                                          "DefaultCase": { "Do": [ { "Return": { "Value": false } } ] } } } ]
       },
       { "Name": "ChangeEnableTypePassword",
-        "Parameters": [ { "ReturnStatus": { "Type": "String" } } ],
+        "Parameters": [ { "ReturnStatus": { "Type": "String" } },
+                        { "EnableType": { "Type": "String"} } ],
         "Do": [
           { "Function": { "Name": "SetEnableType", "Parameters": [ "%ReturnStatus%" ] } },
           { "Send": { "ConnectionObjectName": "TelnetConnection", "Buffer": "configure terminal" } },
@@ -239,11 +238,14 @@
                     "DefaultCase": { "Do": [ { "SetItem": {  "Name": "EnableType", "Value": "password" } } ] } } } ]
       },
       { "Name": "ChangeUserTypePassword",
-        "Parameters": [ { "ReturnStatus": { "Type": "String"  } } ],
-        "Do": [ { "Function": { "Name": "SetUserPrivilegeLevel", "Parameters": [ "%ReturnStatus%" ] } },
-                { "Function": { "Name": "SetPasswordType", "ResultVariable": "PasswordType", "Parameters": [ "%ReturnStatus%" ] } },
+        "Parameters": [ { "ReturnStatus": { "Type": "String"  } },
+                        { "PasswordType": { "Type": "String"  } } ],
+        "Do": [ { "SetItem": { "Name": "UserPrivilege", "Value": "privilege 1"} },
+                { "Function": { "Name": "SetUserPrivilegeLevel", "Parameters": [ "%ReturnStatus%","%UserPrivilege%" ] } },
+                { "Function": { "Name": "SetPasswordType", "ResultVariable": "PasswordType", "Parameters": [ "%ReturnStatus%","%PasswordType%" ] } },
+                { "SetItem": { "Name": "UserSecretLevel", "Value": "secret"} },
                 { "Condition": { "If": "PasswordType == \"secret\"", 
-                                "Then": { "Do": [ { "Function": { "Name": "SetUserSecretLevel", "Parameters": [ "%ReturnStatus%" ] } } ] } } },
+                                "Then": { "Do": [ { "Function": { "Name": "SetUserSecretLevel", "Parameters": [ "%UserSecretLevel%" ] } } ] } } },
                 { "Send": { "ConnectionObjectName": "TelnetConnection", "Buffer": "configure terminal" } },
                 { "Receive": { "ConnectionObjectName": "TelnetConnection", 
                                "BufferName": "ReturnStatus",
@@ -316,7 +318,8 @@
       },
       {
         "Name": "SetPasswordType",
-        "Parameters": [ { "ReturnStatus": { "Type": "String" } } ],
+        "Parameters": [ { "ReturnStatus": { "Type": "String" } },
+                        { "PasswordType": { "Type": "String" } } ],
         "Do": [
           { "Switch": { "MatchValue": "%ReturnStatus%",
               "Cases": [
@@ -333,17 +336,16 @@
       },
       {
         "Name": "SetUserSecretLevel",
-        "Parameters": [ { "ReturnStatus": { "Type": "String" } }
+        "Parameters": [ { "UserSecretLevel": { "Type": "String" } }
         ],
         "Do": [
-          { "SetItem": { "Name": "SecretMatch", "Value": "%{ Regex.Match(ReturnStatus, @\"(secret\\s+(\\d+))\") }%" } },
+          { "SetItem": { "Name": "SecretMatch", "Value": "%{ Regex.Match(UserSecretLevel, @\"(secret\\s+(\\d+))\") }%" } },
           { "Comment": {
               "Text": "If secret level is 5, don't include the level number in command to change the password as it is the default level"
             } },
           { "Condition": {
              "If": "SecretMatch.Success && SecretMatch.Groups[2].Value != \"5\"",
-              "Then": { "Do": [ { "SetItem": { "Name": "Global:UserSecretLevel", "Value": "%{ SecretMatch.Groups[1].Value }%" } } ] },
-              "Else": { "Do": [ { "SetItem": { "Name": "Global:UserSecretLevel", "Value": "secret" } } ] }
+              "Then": { "Do": [ { "SetItem": { "Name": "UserSecretLevel", "Value": "%{ SecretMatch.Groups[1].Value }%" } } ] }
             }
           },
           { "Return": { "Value": "%UserSecretLevel%" } }
@@ -351,12 +353,12 @@
       },
       {
         "Name": "SetUserPrivilegeLevel",
-        "Parameters": [ { "ReturnStatus": { "Type": "String" } } ],
+        "Parameters": [ { "ReturnStatus": { "Type": "String" } },
+                        { "UserPrivilege": {"Type": "String" } } ],
         "Do": [ { "SetItem": {  "Name": "PrivilegeMatch", "Value": "%{ Regex.Match(ReturnStatus, @\"(privilege\\s+\\d+)\") }%" } },
                 { "Condition": {
                     "If": "PrivilegeMatch.Success",
-                    "Then": { "Do": [ { "SetItem": { "Name": "Global:UserPrivilege", "Value": "%{ PrivilegeMatch.Groups[1].Value }%" } } ] },
-                    "Else": { "Do": [ { "SetItem": { "Name": "Global:UserPrivilege", "Value": "privilege 1" } } ] } } },
+                    "Then": { "Do": [ { "SetItem": { "Name": "UserPrivilege", "Value": "%{ PrivilegeMatch.Groups[1].Value }%" } } ] } } },
                 { "Return": { "Value": "%UserPrivilege%" } } ]
       },
       {
@@ -398,8 +400,8 @@
                              { "Send": { "ConnectionObjectName": "TelnetConnection", "Buffer": "%ConnectPassword%", "ContainsSecret": true } },
                              { "Receive": { "ConnectionObjectName": "TelnetConnection", "BufferName": "LoginStatus", "ExpectTimeout": 100000 } },
                              { "If": "Regex.IsMatch(LoginStatus , @\".*#\")",
-                               "Then": { "Do": [  { "SetItem": { "Name": "Global:RunSetup", "Value": false } } ] },
-                               "Else": { "Do": [  { "SetItem": { "Name": "Global:RunSetup", "Value": true } },
+                               "Then": { "Do": [  { "SetItem": { "Name": "RunSetup", "Value": false } } ] },
+                               "Else": { "Do": [  { "SetItem": { "Name": "RunSetup", "Value": true } },
                                                   { "If": "!Regex.IsMatch(LoginStatus, @\".*>\")",
                                                     "Then": { "Do": [ { "Return": { "Value": false } } ] } } ] } },
                               { "Return": { "Value": true } }
@@ -428,7 +430,7 @@
           { "ConnectUsername": { "Type": "String" } },
           { "ConnectPassword": { "Type": "String" } }
         ],
-        "Do": [ { "Connect": { "ConnectionObjectName": "Global:TelnetConnection2",
+        "Do": [ { "Connect": { "ConnectionObjectName": "TelnetConnection2",
                          "Type": "Telnet",
                          "Port": "%Port%",
                          "NetworkAddress": "%Address%",
