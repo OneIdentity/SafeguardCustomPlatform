@@ -440,7 +440,7 @@
           { "Send": { "ConnectionObjectName": "TelnetConnection2", "Buffer": "%ConnectPassword%", "ContainsSecret": true } },
           { "Receive": { "ConnectionObjectName": "TelnetConnection2", "BufferName": "ConnectionStatus", "ExpectTimeout": 100000 } },
           { "Disconnect": { "ConnectionObjectName": "TelnetConnection2"  } },
-          { "Condition": { "If": "!Regex.IsMatch(ConnectionStatus, @\".*>\")",
+          { "Condition": { "If": "!Regex.IsMatch(ConnectionStatus, @\".*>\") && !Regex.IsMatch(ConnectionStatus, @\".*#\")",
                            "Then": { "Do": [ { "Return": { "Value": false } } ] },
                            "Else": { "Do": [ { "Return": { "Value": true } } ] } } }
         ]
