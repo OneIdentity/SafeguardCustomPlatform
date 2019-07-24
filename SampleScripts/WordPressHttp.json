@@ -45,7 +45,7 @@
           }
         }
       },
-      { "Function": { "Name": "CheckForChecking",
+      { "Function": { "Name": "HandleResponse",
                       "Parameters": [ "%{SystemResponse.StatusCode.ToString()}%", "%{SystemResponse.Content.ToString()}%", "%{FuncUsername}%" ],
                       "ResultVariable": "ConnectToSiteResult" } },
       { "Return": "%{ConnectToSiteResult}%" }
@@ -90,7 +90,7 @@
         }
       },
       {
-        "Function": { "Name": "CheckForChecking",
+        "Function": { "Name": "HandleResponse",
           "Parameters": [ "%{SystemResponse.StatusCode.ToString()}%", "%{SystemResponse.Content.ToString()}%", "%{AccountUserName}%" ],
           "ResultVariable": "ConnectToSiteResult"
         }
@@ -214,49 +214,52 @@
       }
     ]
   },
-  "CheckForChecking": {
-    "Parameters": [
-      { "StatusCode": { "Type": "String", "Required": true } },
-      { "Content": { "Type": "String", "Required": true } },
-      { "AccountUserName": { "Type": "String", "Required": true } }
-    ],
-    "Do": [
-      { "Switch": {
-          "MatchValue": "%{StatusCode}%",
-          "Cases": [
-            { "CaseValue": "(OK)|(NoContent)",
+  "Functions": [
+    {
+      "Name": "HandleResponse",
+      "Parameters": [
+        { "StatusCode": { "Type": "String", "Required": true } },
+        { "Content": { "Type": "String", "Required": true } },
+        { "AccountUserName": { "Type": "String", "Required": true } }
+      ],
+      "Do": [
+        { "Switch": {
+            "MatchValue": "%{StatusCode}%",
+            "Cases": [
+              { "CaseValue": "(OK)|(NoContent)",
+                "Do": [
+                  { "Return": { "Value": true } }
+                ]
+              },
+              { "CaseValue": "Forbidden",
+                "Do": [
+                  { "Status": { "Type": "Changing", "Percent": 80, "Message": { "Name": "InsufficientPrivilegesAccessPassword"} } },
+                  { "Return": { "Value": false } }
+                ]
+              }
+            ],
+            "DefaultCase": {
               "Do": [
-                { "Return": { "Value": true } }
-              ]
-            },
-            { "CaseValue": "Forbidden",
-              "Do": [
-                { "Status": { "Type": "Changing", "Percent": 80, "Message": { "Name": "InsufficientPrivilegesAccessPassword"} } },
-                { "Return": { "Value": false } }
-              ]
-            }
-          ],
-          "DefaultCase": {
-            "Do": [
-              { "Condition": {
-                  "If": "Content.Contains(\"invalid_username\")",
-                  "Then": {
-                    "Do": [
-                      { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "AccountNotFound", "Parameters": [ "%AccountUserName%" ] } } },
-                      { "Throw": { "Value": "Account %AccountUserName% not found" } }
-                    ]
-                  },
-                  "Else":{
-                    "Do": [
-                      { "Return":  { "Value": false } }
-                    ]
+                { "Condition": {
+                    "If": "Content.Contains(\"invalid_username\")",
+                    "Then": {
+                      "Do": [
+                        { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "AccountNotFound", "Parameters": [ "%AccountUserName%" ] } } },
+                        { "Throw": { "Value": "Account %AccountUserName% not found" } }
+                      ]
+                    },
+                    "Else":{
+                      "Do": [
+                        { "Return":  { "Value": false } }
+                      ]
+                    }
                   }
                 }
-              }
-            ]
+              ]
+            }
           }
         }
-      }
-    ]
-  }
+      ]
+    }
+  ]
 }
