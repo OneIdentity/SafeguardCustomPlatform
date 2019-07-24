@@ -2,340 +2,339 @@
   "Id": "WordPressBasicAuth",
   "BackEnd": "Scriptable",
   "Meta": {
-		"Prerequisite":"The plugin JSON Basic Authentication (found here https://github.com/WP-API/Basic-Auth) was used to expose the API to Basic-Auth",
-		"Warning":"Basic Authentication requires sending your username and password with every request, and should only be used over SSL-secured connections or for local development and testing.",
-		"Example":"APIURL is the part of the URL after the Network Address. For the WordPress REST API at https://wordpress.org/wp-json/wp/v2 the APIURL would be wp-json/wp/v2, and the Address would be wordpress.org",
-		"UserLimit": "Change password works up to 100 users if more are needed the Request url needs to be updated from per_page=100 to the number needed"
-	},
-  
+    "Prerequisite":"The plugin JSON Basic Authentication (found here https://github.com/WP-API/Basic-Auth) was used to expose the API to Basic-Auth",
+    "Warning":"Basic Authentication requires sending your username and password with every request, and should only be used over SSL-secured connections or for local development and testing.",
+    "Example":"APIURL is the part of the URL after the Network Address. For the WordPress REST API at https://wordpress.org/wp-json/wp/v2 the APIURL would be wp-json/wp/v2, and the Address would be wordpress.org",
+    "UserLimit": "Change password works up to 100 users if more are needed the Request url needs to be updated from per_page=100 to the number needed"
+  },
   "CheckSystem":{
-		"Parameters": [
-			{
-				"FuncUsername": {
-					"Type": "String",
-					"Required": true
-				}
-			},
-			{
-				"FuncPassword": {
-					"Type": "Secret",
-					"Required": true
-				}
-			},
-			{
-				"UseSsl": {
-					"Type": "boolean",
-					"Required": false,
-					"DefaultValue": true
-				}
-			},
-			{
-				"SkipServerCertValidation": {
-					"Type": "boolean",
-					"Required": false,
-					"DefaultValue": true
-				}
-			},
-			{
-				"Address":{
-					"Type": "String",
-					"Required": true
-				}
-			},
-			{
-				"APIURL":{
-					"Type": "String",
-					"Required": true
-				}
-			}
-		],
-		"Do": [
-			{
-				"Condition": {
-					"If": "UseSsl",
-					"Then": {
-						"Do": [
-							{
-							  "BaseAddress": {"Address": "https://%Address%/%{APIURL}%/"}
-							}
-						]
-					},
-					"Else":{
-						"Do": [
-							{
-							  "BaseAddress": {"Address": "http://%Address%/%{APIURL}%/"}
-							}
-						]
-					}
-				}
-			},
-			{
-			  "NewHttpRequest": {
-				"ObjectName": "SystemRequest"
-			  }
-			},
-			{
-			  "HttpAuth": {
-				"RequestObjectName": "SystemRequest",
-				"Type": "Basic",
-				"Credentials": {
-					"Login": "%FuncUsername%",
-					"Password": "%FuncPassword%"
-				}
-			  }
-			},
-			{
-				"Request": {
-				  "RequestObjectName": "SystemRequest",
-				  "ResponseObjectName": "SystemResponse",
-				  "Verb": "GET",
-				  "Url": "settings",
-				  "SubstitutionInUrl": true,
-				  "IgnoreServerCertAuthentication": "%{SkipServerCertValidation}%",
-				  "Content": {
-					"ContentType": "application/json"
-				  }
-				}
-			},
-			{
-				"Function": {
-					"Name": "CheckForChecking",
-					"Parameters": [ "%{SystemResponse.StatusCode.ToString()}%", "%{SystemResponse.Content.ToString()}%", "%{FuncUsername}%" ],
-					"ResultVariable": "ConnectToSiteResult"
-				}
-			},
-			{
-				"Return": "%{ConnectToSiteResult}%"
-			}
-		]
-	},
-	
-	"CheckPassword":{
-		"Parameters": [
-			{
+    "Parameters": [
+     {
+        "FuncUsername": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "SkipServerCertValidation": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Address":{
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "APIURL":{
+          "Type": "String",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+       "Condition": {
+          "If": "UseSsl",
+          "Then": {
+            "Do": [
+              {
+                "BaseAddress": {"Address": "https://%Address%/%{APIURL}%/"}
+              }
+            ]
+          },
+          "Else":{
+            "Do": [
+              {
+                "BaseAddress": {"Address": "http://%Address%/%{APIURL}%/"}
+              }
+            ]
+          }
+        }
+      },
+      {
+        "NewHttpRequest": {
+        "ObjectName": "SystemRequest"
+        }
+      },
+      {
+        "HttpAuth": {
+        "RequestObjectName": "SystemRequest",
+        "Type": "Basic",
+        "Credentials": {
+          "Login": "%FuncUsername%",
+          "Password": "%FuncPassword%"
+          }
+        }
+      },
+      {
+        "Request": {
+          "RequestObjectName": "SystemRequest",
+          "ResponseObjectName": "SystemResponse",
+          "Verb": "GET",
+          "Url": "settings",
+          "SubstitutionInUrl": true,
+          "IgnoreServerCertAuthentication": "%{SkipServerCertValidation}%",
+          "Content": {
+          "ContentType": "application/json"
+          }
+        }
+      },
+      {
+        "Function": {
+          "Name": "CheckForChecking",
+          "Parameters": [ "%{SystemResponse.StatusCode.ToString()}%", "%{SystemResponse.Content.ToString()}%", "%{FuncUsername}%" ],
+          "ResultVariable": "ConnectToSiteResult"
+        }
+      },
+      {
+        "Return": "%{ConnectToSiteResult}%"
+      }
+    ]
+  },
+  
+  "CheckPassword":{
+    "Parameters": [
+      {
                 "AccountUserName": {
                   "Type": "String",
                   "Required": true
                 }
             },
-			 {
-				"AccountPassword": {
-				  "Type": "Secret",
-				  "Required": true
-				}
-			},
-			{
-				"UseSsl": {
-					"Type": "boolean",
-					"Required": false,
-					"DefaultValue": true
-				}
-			},		
-			{
-				"SkipServerCertValidation": {
-					"Type": "boolean",
-					"Required": false,
-					"DefaultValue": true
-				}
-			},
-			{
-				"Address":{
-					"Type": "String",
-					"Required": true
-				}
-			},
-			{
-				"APIURL":{
-					"Type": "String",
-					"Required": true
-				}
-			}
-		],
-		"Do": [
-			{
-				"Condition": {
-					"If": "UseSsl",
-					"Then": {
-						"Do": [
-							{
-							  "BaseAddress": {"Address": "https://%Address%"}
-							}
-						]
-					},
-					"Else":{
-						"Do": [
-							{
-							  "BaseAddress": {"Address": "http://%Address%"}
-							}
-						]
-					}
-				}
-			},
-			{
-			  "NewHttpRequest": {
-				"ObjectName": "SystemRequest"
-			  }
-			},
-			{
-			  "HttpAuth": {
-				"RequestObjectName": "SystemRequest",
-				"Type": "Basic",
-				"Credentials": {
-					"Login": "%AccountUserName%",
-					"Password": "%AccountPassword%"
-				}
-			  }
-			},
-			{
-				"Request": {
-				  "RequestObjectName": "SystemRequest",
-				  "ResponseObjectName": "SystemResponse",
-				  "Verb": "GET",
-				  "Url": "%{APIURL}%/users/me/",
-				  "SubstitutionInUrl": true,
-				  "IgnoreServerCertAuthentication": "%{SkipServerCertValidation}%",
-				  "Content": {
-					"ContentType": "application/json"
-				  }
-				}
-			},
+       {
+        "AccountPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },    
+      {
+        "SkipServerCertValidation": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Address":{
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "APIURL":{
+          "Type": "String",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Condition": {
+          "If": "UseSsl",
+          "Then": {
+            "Do": [
+              {
+                "BaseAddress": {"Address": "https://%Address%"}
+              }
+            ]
+          },
+          "Else":{
+            "Do": [
+              {
+                "BaseAddress": {"Address": "http://%Address%"}
+              }
+            ]
+          }
+        }
+      },
+      {
+        "NewHttpRequest": {
+        "ObjectName": "SystemRequest"
+        }
+      },
+      {
+        "HttpAuth": {
+        "RequestObjectName": "SystemRequest",
+        "Type": "Basic",
+        "Credentials": {
+          "Login": "%AccountUserName%",
+          "Password": "%AccountPassword%"
+        }
+        }
+      },
+      {
+        "Request": {
+          "RequestObjectName": "SystemRequest",
+          "ResponseObjectName": "SystemResponse",
+          "Verb": "GET",
+          "Url": "%{APIURL}%/users/me/",
+          "SubstitutionInUrl": true,
+          "IgnoreServerCertAuthentication": "%{SkipServerCertValidation}%",
+          "Content": {
+          "ContentType": "application/json"
+          }
+        }
+      },
             {
-				"Function": {
-					"Name": "CheckForChecking",
-					"Parameters": [ "%{SystemResponse.StatusCode.ToString()}%", "%{SystemResponse.Content.ToString()}%", "%{AccountUserName}%" ],
-					"ResultVariable": "ConnectToSiteResult"
-				}
-			},
-			{
-				"Return": "%{ConnectToSiteResult}%"
-			}
-		]
-	},
-	"ChangePassword":{
-		"Parameters": [
-			{
+        "Function": {
+          "Name": "CheckForChecking",
+          "Parameters": [ "%{SystemResponse.StatusCode.ToString()}%", "%{SystemResponse.Content.ToString()}%", "%{AccountUserName}%" ],
+          "ResultVariable": "ConnectToSiteResult"
+        }
+      },
+      {
+        "Return": "%{ConnectToSiteResult}%"
+      }
+    ]
+  },
+  "ChangePassword":{
+    "Parameters": [
+      {
                 "AccountUserName": {
                   "Type": "String",
                   "Required": true
                 }
             },
-			 {
-				"AccountPassword": {
-				  "Type": "Secret",
-				  "Required": true
-				}
-			},
-			{
-				"FuncUsername": {
-					"Type": "String",
-					"Required": true
-				}
-			},
-			{
-				"FuncPassword": {
-					"Type": "Secret",
-					"Required": true
-				}
-			},			
-			{
-				"NewPassword": {
-				  "Type": "Secret",
-				  "Required": true
-				}
-			},	
-			{
-				"UseSsl": {
-					"Type": "boolean",
-					"Required": false,
-					"DefaultValue": true
-				}
-			},
-			{
-				"SkipServerCertValidation": {
-					"Type": "boolean",
-					"Required": false,
-					"DefaultValue": true
-				}
-			},
-			{
-				"Address":{
-					"Type": "String",
-					"Required": true
-				}
-			},
-			{
-				"APIURL":{
-					"Type": "String",
-					"Required": true
-				}
-			}
-			
-		],
-		"Do": [
-			{
-				"Condition": {
-					"If": "UseSsl",
-					"Then": {
-						"Do": [
-							{
-							  "BaseAddress": {"Address": "https://%Address%"}
-							}
-						]
-					},
-					"Else":{
-						"Do": [
-							{
-							  "BaseAddress": {"Address": "http://%Address%"}
-							}
-						]
-					}
-				}
-			},
-			{
-			  "NewHttpRequest": {
-				"ObjectName": "SystemRequest"
-			  }
-			},
-			{
-			  "SetItem": {
-				"Name": "ChangePassJson",
-				"Value": {
-					"password": "%NewPassword%"
-				}
-			  }
-			},
-			{
-			  "HttpAuth": {
-				"RequestObjectName": "SystemRequest",
-				"Type": "Basic",
-				"Credentials": {
-					"Login": "%FuncUsername%",
-					"Password": "%FuncPassword%"
-				}
-			  }
-			},
-			{
-				"Request": {
-				  "RequestObjectName": "SystemRequest",
-				  "ResponseObjectName": "SystemUsers",
-				  "Verb": "GET",
-				  "Url": "%{APIURL}%/users?per_page=100",
-				  "SubstitutionInUrl": true,
-				  "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
-				  "Content": {
-					"ContentType": "application/json"
-				  }
-				}
-			},		
+       {
+        "AccountPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "FuncUsername": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },      
+      {
+        "NewPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },  
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "SkipServerCertValidation": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Address":{
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "APIURL":{
+          "Type": "String",
+          "Required": true
+        }
+      }
+      
+    ],
+    "Do": [
+      {
+        "Condition": {
+          "If": "UseSsl",
+          "Then": {
+            "Do": [
+              {
+                "BaseAddress": {"Address": "https://%Address%"}
+              }
+            ]
+          },
+          "Else":{
+            "Do": [
+              {
+                "BaseAddress": {"Address": "http://%Address%"}
+              }
+            ]
+          }
+        }
+      },
+      {
+        "NewHttpRequest": {
+        "ObjectName": "SystemRequest"
+        }
+      },
+      {
+        "SetItem": {
+        "Name": "ChangePassJson",
+        "Value": {
+          "password": "%NewPassword%"
+        }
+        }
+      },
+      {
+        "HttpAuth": {
+        "RequestObjectName": "SystemRequest",
+        "Type": "Basic",
+        "Credentials": {
+          "Login": "%FuncUsername%",
+          "Password": "%FuncPassword%"
+        }
+        }
+      },
+      {
+        "Request": {
+          "RequestObjectName": "SystemRequest",
+          "ResponseObjectName": "SystemUsers",
+          "Verb": "GET",
+          "Url": "%{APIURL}%/users?per_page=100",
+          "SubstitutionInUrl": true,
+          "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+          "Content": {
+          "ContentType": "application/json"
+          }
+        }
+      },    
             {
               "SetItem": {
                 "Name": "ParsedUsers",
                 "Value": ""
               }
             },
-			{
+      {
                 "ExtractJsonObject": {
-					"JsonObjectName": "SystemUsers",
+          "JsonObjectName": "SystemUsers",
                     "Name": "ParsedUsers"
                 }
             },
@@ -345,131 +344,131 @@
                 "Value": "null"
               }
             },
-			{
-				"ForEach": {
-					"CollectionName": "ParsedUsers",
-					"ElementName": "User",
-					"Body": {
-						"Do": [
-							{
-								"Condition": {
-									"If": "User.name.Value == AccountUserName",
-									"Then": {
-										"Do": [
-											{
-												"Request": {
-												  "RequestObjectName": "SystemRequest",
-												  "ResponseObjectName": "SystemResponse",
-												  "Verb": "POST",
-												  "Url": "%APIURL%/users/%{User.id.Value}%",
-												  "SubstitutionInUrl": true,
-												  "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
-												  "Content": {
-													"ContentObjectName": "ChangePassJson",
-													"ContentType": "application/json"
-												  }
-												}
-											},
-											{
-												"Switch": {
-													"MatchValue": "%{SystemResponse.StatusCode.ToString()}%",
-													"Cases": [
-															{
-															"CaseValue": "(OK)|(NoContent)",
-															"Do": [
-																{
-																	"Return": { "Value": true }
-																}
-															]
-														},
-														{
-															"CaseValue": "Forbidden",
-															"Do": [
-																{
-																	"Status": {
-																		"Type": "Changing",
-																		"Percent": 80,
-																		"Message": { "Name": "InsufficientPrivilegesAccessPassword"}
-																	}
-																},
-																{
-																	"Return": { "Value": false }
-																}
-															]
-														}
-													],
-													"DefaultCase": {
-														"Do": [
-															{
-																"Return":  { "Value": false }
-															}
-														]
-													}
-												}
-											}
-										]
-									}
-								}
-							}
-						]
-					}
-				}
-			},
-			{
-				"Condition": {
-					"If": "UserId.Equals(\"null\")",
-					"Then": {
-						"Do": [
-							{
-							  "Status": {
-								"Type": "Changing",
-								"Percent": 80,
-								"Message": {
-								  "Name": "AccountNotFound",
-								  "Parameters": [ "%AccountUserName%" ]
-								}
-							  }
-							},
-							{
-							  "Throw": { "Value": "Account %AccountUserName% not found" }
-							}
-						]
-					},
-					"Else":{
-						"Do": [
-							{
-								"Return":  { "Value": true }
-							}
-						]
-					}
-				}
-			}
-		]
-	},
-	
-	"CheckForChecking":{
-		"Parameters": [
-			{
-				"StatusCode": {
-					"Type": "String",
-					"Required": true
-				}
-			},
-			{
-				"Content": {
-					"Type": "String",
-					"Required": true
-				}
-			},
-			{
-				"AccountUserName": {
-					"Type": "String",
-					"Required": true
-				}
-			}
-		],
-		"Do":[
-			{
+      {
+        "ForEach": {
+          "CollectionName": "ParsedUsers",
+          "ElementName": "User",
+          "Body": {
+            "Do": [
+              {
+                "Condition": {
+                  "If": "User.name.Value == AccountUserName",
+                  "Then": {
+                    "Do": [
+                      {
+                        "Request": {
+                          "RequestObjectName": "SystemRequest",
+                          "ResponseObjectName": "SystemResponse",
+                          "Verb": "POST",
+                          "Url": "%APIURL%/users/%{User.id.Value}%",
+                          "SubstitutionInUrl": true,
+                          "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                          "Content": {
+                          "ContentObjectName": "ChangePassJson",
+                          "ContentType": "application/json"
+                          }
+                        }
+                      },
+                      {
+                        "Switch": {
+                          "MatchValue": "%{SystemResponse.StatusCode.ToString()}%",
+                          "Cases": [
+                              {
+                              "CaseValue": "(OK)|(NoContent)",
+                              "Do": [
+                                {
+                                  "Return": { "Value": true }
+                                }
+                              ]
+                            },
+                            {
+                              "CaseValue": "Forbidden",
+                              "Do": [
+                                {
+                                  "Status": {
+                                    "Type": "Changing",
+                                    "Percent": 80,
+                                    "Message": { "Name": "InsufficientPrivilegesAccessPassword"}
+                                  }
+                                },
+                                {
+                                  "Return": { "Value": false }
+                                }
+                              ]
+                            }
+                          ],
+                          "DefaultCase": {
+                            "Do": [
+                              {
+                                "Return":  { "Value": false }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "Condition": {
+          "If": "UserId.Equals(\"null\")",
+          "Then": {
+            "Do": [
+              {
+                "Status": {
+                "Type": "Changing",
+                "Percent": 80,
+                "Message": {
+                  "Name": "AccountNotFound",
+                  "Parameters": [ "%AccountUserName%" ]
+                }
+                }
+              },
+              {
+                "Throw": { "Value": "Account %AccountUserName% not found" }
+              }
+            ]
+          },
+          "Else":{
+            "Do": [
+              {
+                "Return":  { "Value": true }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  
+  "CheckForChecking":{
+    "Parameters": [
+      {
+        "StatusCode": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "Content": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "AccountUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      }
+    ],
+    "Do":[
+      {
                 "Switch": {
                     "MatchValue": "%{StatusCode}%",
                     "Cases": [
@@ -484,16 +483,16 @@
                         {
                             "CaseValue": "Forbidden",
                             "Do": [
-								{
-									"Status": {
-										"Type": "Changing",
-										"Percent": 80,
-										"Message": { "Name": "InsufficientPrivilegesAccessPassword"}
-									}
-								},
-								{
-									"Return": { "Value": false }
-								}
+                {
+                  "Status": {
+                    "Type": "Changing",
+                    "Percent": 80,
+                    "Message": { "Name": "InsufficientPrivilegesAccessPassword"}
+                  }
+                },
+                {
+                  "Return": { "Value": false }
+                }
                             ]
                         }
                     ],
@@ -504,34 +503,34 @@
                                     "If": "Content.Contains(\"invalid_username\")",
                                     "Then": {
                                         "Do": [
-											{
-											  "Status": {
-												"Type": "Checking",
-												"Percent": 80,
-												"Message": {
-												  "Name": "AccountNotFound",
-												  "Parameters": [ "%AccountUserName%" ]
-												}
-											  }
-											},
-											{
-											  "Throw": { "Value": "Account %AccountUserName% not found" }
-											}
-										]
-									},
-									"Else":{
-										"Do": [
-											{
-												"Return":  { "Value": false }
-											}
-										]
-									}
-                                }
-                            }
-                        ]
-                    }
+                      {
+                        "Status": {
+                        "Type": "Checking",
+                        "Percent": 80,
+                        "Message": {
+                          "Name": "AccountNotFound",
+                          "Parameters": [ "%AccountUserName%" ]
+                        }
+                        }
+                      },
+                      {
+                        "Throw": { "Value": "Account %AccountUserName% not found" }
+                      }
+                    ]
+                  },
+                  "Else":{
+                    "Do": [
+                      {
+                        "Return":  { "Value": false }
+                      }
+                    ]
+                  }
                 }
-            }
-		]
-	}
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
 }
