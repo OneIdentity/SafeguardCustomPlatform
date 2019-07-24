@@ -506,7 +506,7 @@
           "LoginUserName": {
             "Type": "string"
           }
-        },
+        }
       ],
       "Do": [
         {
