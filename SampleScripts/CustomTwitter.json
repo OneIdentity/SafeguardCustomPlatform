@@ -3,335 +3,109 @@
   "BackEnd": "Scriptable",
   "CheckPassword": {
     "Parameters": [
-      {
-        "Timeout": {
-          "Type": "Integer",
-          "Required": false,
-          "DefaultValue": 30
-        }
-      },
-      {
-        "AccountUserName": {
-          "Type": "String",
-          "Required": true
-        }
-      },
-      {
-        "AccountPassword": {
-          "Type": "Secret",
-          "Required": true
-        }
-      },
-      {
-        "AssetName": {
-          "Type": "String",
-          "Required": false,
-          "DefaultValue": "Twitter"
-        }
-      }
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 30 } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "Twitter" } }
     ],
     "Do": [
-      {
-        "Function": {
-          "Name": "Init"
-        }
-      },
-      {
-        "Status": {
-          "Type": "Checking",
-          "Percent": 10,
-          "Message": {
-            "Name": "VerifyingPassword"
-          }
-        }
-      },
-
-      {
-        "Function": {
-          "Name": "CheckAccountLogin",
-          "Parameters": [ "%AccountUserName%", "%AccountPassword%" ],
-          "ResultVariable": "CheckResult"
-        }
-      },
-      {
-        "Return": { "Value": "%CheckResult%" }
-      }
+      { "Function": { "Name": "Init" } },
+      { "Status": { "Type": "Checking", "Percent": 10, "Message": { "Name": "VerifyingPassword" } } },
+      { "Function": { "Name": "CheckAccountLogin", "Parameters": [ "%AccountUserName%", "%AccountPassword%" ], "ResultVariable": "CheckResult" } },
+      { "Return": { "Value": "%CheckResult%" } }
     ]
   },
   "ChangePassword": {
     "Parameters": [
-      {
-        "Timeout": {
-          "Type": "Integer",
-          "Required": false,
-          "DefaultValue": 30
-        }
-      },
-      {
-        "AccountUserName": {
-          "Type": "String",
-          "Required": true
-        }
-      },
-      {
-        "AccountPassword": {
-          "Type": "Secret",
-          "Required": true
-        }
-      },
-      {
-        "NewPassword": {
-          "Type": "Secret",
-          "Required": true
-        }
-      },
-      {
-        "AssetName": {
-          "Type": "String",
-          "Required": false,
-          "DefaultValue": "Twitter"
-        }
-      }
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 30 } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "NewPassword": { "Type": "Secret", "Required": true } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "Twitter" } }
     ],
     "Do": [
-      {
-        "Function": {
-          "Name": "Init"
-        }
-      },
-      {
-        "Status": {
-          "Type": "Changing",
-          "Percent": 10,
-          "Message": {
-            "Name": "ChangingPassword",
-            "Parameters": [ "%AccountUserName%" ]
-          }
-        }
-      },
-
-      {
-        "Status": {
-          "Type": "Checking",
-          "Percent": 20,
-          "Message": {
-            "Name": "LoggingInToService",
-            "Parameters": [ "%AssetName%", "%AccountUserName%" ]
-          }
-        }
-      },
-      {
-        "Function": {
-          "Name": "Login",
-          "Parameters": [ "%AccountUserName%", "%AccountPassword%" ],
-          "ResultVariable": "LoginResult"
-        }
-      },
-      {
-        "Condition": {
+      { "Function": { "Name": "Init" } },
+      { "Status": { "Type": "Changing", "Percent": 10, "Message": { "Name": "ChangingPassword", "Parameters": [ "%AccountUserName%" ] } } },
+      { "Status": { "Type": "Checking", "Percent": 20, "Message": { "Name": "LoggingInToService", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
+      { "Function": { "Name": "Login", "Parameters": [ "%AccountUserName%", "%AccountPassword%" ], "ResultVariable": "LoginResult" } },
+      { "Condition": {
           "If": "!LoginResult",
           "Then": {
             "Do": [
-              {
-                "Status": {
-                  "Type": "Checking",
-                  "Percent": 70,
-                  "Message": {
-                    "Name": "LoggingInWithAccountFailed",
-                    "Parameters": [ "%AssetName%", "%AccountUserName%" ]
-                  }
-                }
-              },
-              {
-                "Return": {
-                  "Value": false
-                }
-              }
+              { "Status": { "Type": "Checking", "Percent": 70, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
+              { "Return": { "Value": false } }
             ]
           }
         }
       },
-      {
-        "Condition": {
+      { "Condition": {
           "If": "LoginChallenge",
           "Then": {
             "Do": [
-              {
-                "Log": {
-                  "Text": "Authentication was successful, but extra account validation was requested"
-                }
-              },
-              {
-                "Status": {
-                  "Type": "Checking",
-                  "Percent": 80,
-                  "Message": {
-                    "Name": "AccountVerificationRequested",
-                    "Parameters": [
-                      "%AccountUserName%",
-                      "'%ChallengeType::$login%'"
-                    ]
-                  }
-                }
-              },
-              {
-                "Return": { "Value": false }
-              }
+              { "Log": { "Text": "Authentication was successful, but extra account validation was requested" } },
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "AccountVerificationRequested", "Parameters": [ "%AccountUserName%", "'%ChallengeType::$login%'" ] } } },
+              { "Return": { "Value": false } }
             ]
           }
         }
       },
-      {
-        "Condition": {
+      { "Condition": {
           "If": "AccountLocked",
           "Then": {
             "Do": [
-              {
-                "Log": {
-                  "Text": "Authentication was successful, but the account is locked (maybe temporarily)"
-                }
-              },
-              {
-                "Status": {
-                  "Type": "Checking",
-                  "Percent": 80,
-                  "Message": {
-                    "Name": "AccountLocked",
-                    "Parameters": [
-                      "%AccountUserName%"
-                    ]
-                  }
-                }
-              },
-              {
-                "Return": { "Value": false }
-              }
+              { "Log": { "Text": "Authentication was successful, but the account is locked (maybe temporarily)" } },
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "AccountLocked", "Parameters": [ "%AccountUserName%" ] } } },
+              { "Return": { "Value": false } }
             ]
           }
         }
       },
-
-      {
-        "Function": {
-          "Name": "ChangePasswordInternal",
-          "Parameters": ["%AccountUserName%"],
-          "ResultVariable": "ChangeResult"
-        }
-      },
-      {
-        "Return": { "Value": "%ChangeResult%" }
-      }
+      { "Function": { "Name": "ChangePasswordInternal", "Parameters": ["%AccountUserName%"], "ResultVariable": "ChangeResult" } },
+      { "Return": { "Value": "%ChangeResult%" } }
     ]
   },
   "Functions": [
     {
       "Name": "Init",
       "Do": [
-        {
-          "SetItem": {
-            "Name": "GLOBAL:LoginChallenge",
-            "Value": false
-          }
-        },
-        {
-          "SetItem": {
-            "Name": "GLOBAL:AccountLocked",
-            "Value": false
-          }
-        },
-        {
-          "SetItem": {
-            "Name": "GLOBAL:ChallengeType",
-            "Value": ""
-          }
-        }
+        { "SetItem": { "Name": "GLOBAL:LoginChallenge", "Value": false } },
+        { "SetItem": { "Name": "GLOBAL:AccountLocked", "Value": false } },
+        { "SetItem": { "Name": "GLOBAL:ChallengeType", "Value": "" } }
       ]
     },
     {
       "Name": "CheckAccountLogin",
       "Parameters": [
-        {
-          "LoginUserName": {
-            "Type": "string"
-          }
-        },
-        {
-          "LoginPassword": {
-            "Type": "secret"
-          }
-        }
+        { "LoginUserName": { "Type": "string" } },
+        { "LoginPassword": { "Type": "secret" } }
       ],
       "Do": [
-        {
-          "Status": {
-            "Type": "Checking",
-            "Percent": 20,
-            "Message": {
-              "Name": "LoggingInToService",
-              "Parameters": [ "%AssetName%", "%LoginUserName%" ]
-            }
-          }
-        },
-        {
-          "Function": {
-            "Name": "Login",
-            "Parameters": [ "%LoginUserName%", "%LoginPassword%" ],
-            "ResultVariable": "LoginResult"
-          }
-        },
-        {
-          "Condition": {
+        { "Status": { "Type": "Checking", "Percent": 20, "Message": { "Name": "LoggingInToService", "Parameters": [ "%AssetName%", "%LoginUserName%" ] } } },
+        { "Function": { "Name": "Login", "Parameters": [ "%LoginUserName%", "%LoginPassword%" ], "ResultVariable": "LoginResult" } },
+        { "Condition": {
             "If": "!LoginResult",
             "Then": {
               "Do": [
-                {
-                  "Status": {
-                    "Type": "Checking",
-                    "Percent": 70,
-                    "Message": {
-                      "Name": "LoggingInWithAccountFailed",
-                      "Parameters": [ "%AssetName%", "%LoginUserName%" ]
-                    }
-                  }
-                }
-
+                { "Status": { "Type": "Checking", "Percent": 70, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AssetName%", "%LoginUserName%" ] } } }
               ]
             }
           }
         },
-        {
-          "Return": { "Value": "%LoginResult%" }
-        }
+        { "Return": { "Value": "%LoginResult%" } }
       ]
     },
     {
       "Name": "Login",
       "Parameters": [
-        {
-          "LoginUserName": {
-            "Type": "string"
-          }
-        },
-        {
-          "LoginPassword": {
-            "Type": "secret"
-          }
-        }
+        { "LoginUserName": { "Type": "string" } },
+        { "LoginPassword": { "Type": "secret" } }
       ],
       "Do": [
-        {
-          "NewHttpRequest": { "ObjectName": "LoginRequest" }
-        },
-        {
-          "BaseAddress": {
-            "Address": "https://twitter.com"
-          }
-        },
-        {
-          "Try": {
+        { "NewHttpRequest": { "ObjectName": "LoginRequest" } },
+        { "BaseAddress": { "Address": "https://twitter.com" } },
+        { "Try": {
             "Do": [
-              {
-                "Request": {
+              { "Request": {
                   "Verb": "Get",
                   "Url": "login",
                   "RequestObjectName": "LoginRequest",
@@ -341,30 +115,13 @@
               }
             ],
             "Catch": [
-              {
-                "Status": {
-                  "Type": "Checking",
-                  "Percent": 80,
-                  "Message": {
-                    "Name": "ConnectionFailed",
-                    "Parameters": [ "%AssetName%", "%Exception%" ]
-                  }
-                }
-              },
-              {
-                "Throw": { "Value": "Error logging in" }
-              }
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Error logging in" } }
             ] 
           } 
         },
-        {
-          "ExtractFormData": {
-            "ResponseObjectName": "LoginResponse",
-            "FormObjectName": "LoginForm"
-          }
-        },
-        {
-          "Condition": {
+        { "ExtractFormData": { "ResponseObjectName": "LoginResponse", "FormObjectName": "LoginForm" } },
+        { "Condition": {
             "If": "LoginForm == null",
             "Then": {
               "Do": [
@@ -373,39 +130,13 @@
             }
           }
         },
-        {
-          "SetFormValue": {
-            "FormObjectName": "LoginForm",
-            "CreateForm": "DoNotCreate",
-            "InputName": "session[username_or_email]",
-            "Value": "%LoginUserName%"
-          }
-        },
-        {
-          "SetFormValue": {
-            "FormObjectName": "LoginForm",
-            "CreateForm": "DoNotCreate",
-            "InputName": "session[password]",
-            "Value": "%LoginPassword%",
-            "IsSecret": true
-          }
-        },
-        {
-          "NewHttpRequest": {
-            "ObjectName": "LoginPostRequest"
-          }
-        },
-        {
-          "Headers": {
-            "RequestObjectName": "LoginPostRequest",
-            "AddHeaders": { "Referer": "https://twitter.com/login" }
-          }
-        },
-        {
-          "Try": {
+        { "SetFormValue": { "FormObjectName": "LoginForm", "CreateForm": "DoNotCreate", "InputName": "session[username_or_email]", "Value": "%LoginUserName%" } },
+        { "SetFormValue": { "FormObjectName": "LoginForm", "CreateForm": "DoNotCreate", "InputName": "session[password]", "Value": "%LoginPassword%", "IsSecret": true } },
+        { "NewHttpRequest": { "ObjectName": "LoginPostRequest" } },
+        { "Headers": { "RequestObjectName": "LoginPostRequest", "AddHeaders": { "Referer": "https://twitter.com/login" } } },
+        { "Try": {
             "Do": [
-              {
-                "Request": {
+              { "Request": {
                   "Verb": "Post",
                   "Url": "sessions",
                   "RequestObjectName": "LoginPostRequest",
@@ -419,104 +150,54 @@
               }
             ],
             "Catch": [
-              {
-                "Status": {
-                  "Type": "Checking",
-                  "Percent": 80,
-                  "Message": {
-                    "Name": "ConnectionFailed",
-                    "Parameters": [ "%AssetName%", "%Exception%" ]
-                  }
-                }
-              },
-              {
-                "Throw": { "Value": "Error logging in" }
-              }
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Error logging in" } }
             ] 
           } 
         },
-        {
-          "Condition": {
+        { "Condition": {
             "If": "LoginPostResponse.StatusCode.ToString().Equals(\"Redirect\") && LoginPostResponse.Headers[\"Location\"][0].StartsWith(\"https://twitter.com/login/error\")",
             "Then": {
               "Do": [
-                {
-                  "Return": { "Value": false }
-                }
+                { "Return": { "Value": false } }
               ]
             }
           }
         },
-        {
-          "Comment": {
-            "Text": "Check for extra validation prompts"
-          }
-        },
-        {
-          "Condition": {
+        { "Comment": { "Text": "Check for extra validation prompts" } },
+        { "Condition": {
             "If": "%{ LoginPostResponse.StatusCode.ToString().Equals(\"Redirect\") && LoginPostResponse.Headers[\"Location\"][0].StartsWith(\"https://twitter.com/account/login_challenge\") || LoginPostResponse.Headers[\"Location\"][0].StartsWith(\"https://twitter.com/account/login_verification\")}%",
             "Then": {
               "Do": [
-                {
-                  "SetItem": {
-                    "Name": "LoginChallenge",
-                    "Value": true
-                  }
-                },
-                {
-                  "SetItem": {
-                    "Name": "TempVar",
-                    "Value": "%{ Regex.Replace(LoginPostResponse.Headers[\"Location\"][0], \"(.*challenge_type=)\", \"\") }%"
-                  }
-                },
-                {
-                  "SetItem": {
-                    "Name": "ChallengeType",
-                    "Value": "%{ Regex.Replace(TempVar, \"&.*\", \"\") }%"
-                  }
-                }
+                { "SetItem": { "Name": "LoginChallenge", "Value": true } },
+                { "SetItem": { "Name": "TempVar", "Value": "%{ Regex.Replace(LoginPostResponse.Headers[\"Location\"][0], \"(.*challenge_type=)\", \"\") }%" } },
+                { "SetItem": { "Name": "ChallengeType", "Value": "%{ Regex.Replace(TempVar, \"&.*\", \"\") }%" } }
               ]
             }
           }
         },
-        {
-          "Condition": {
+        { "Condition": {
             "If": "%{ LoginPostResponse.StatusCode.ToString().Equals(\"Redirect\") && LoginPostResponse.Headers[\"Location\"][0].StartsWith(\"https://twitter.com/account/locked\") }%",
             "Then": {
               "Do": [
-                {
-                  "SetItem": {
-                    "Name": "AccountLocked",
-                    "Value": true
-                  }
-                }
+                { "SetItem": { "Name": "AccountLocked", "Value": true } }
               ]
             }
           }
         },
-        {
-          "Return": { "Value": true }
-        }
+        { "Return": { "Value": true } }
       ]
     },
     {
       "Name": "ChangePasswordInternal",
       "Parameters": [
-        {
-          "LoginUserName": {
-            "Type": "string"
-          }
-        }
+        { "LoginUserName": { "Type": "string" } }
       ],
       "Do": [
-        {
-          "NewHttpRequest": { "ObjectName": "ChangeRequest" }
-        },
-        {
-          "Try": {
+        { "NewHttpRequest": { "ObjectName": "ChangeRequest" } },
+        { "Try": {
             "Do": [
-              {
-                "Request": {
+              { "Request": {
                   "Verb": "Get",
                   "Url": "settings/password",
                   "RequestObjectName": "ChangeRequest",
@@ -526,30 +207,13 @@
               }
             ],
             "Catch": [
-              {
-                "Status": {
-                  "Type": "Checking",
-                  "Percent": 80,
-                  "Message": {
-                    "Name": "ConnectionFailed",
-                    "Parameters": [ "%AssetName%", "%Exception%" ]
-                  }
-                }
-              },
-              {
-                "Throw": { "Value": "Error getting settings page" }
-              }
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Error getting settings page" } }
             ] 
           } 
         },
-        {
-          "ExtractFormData": {
-            "ResponseObjectName": "ChangeResponse",
-            "FormObjectName": "ChangeForm"
-          }
-        },
-        {
-          "Condition": {
+        { "ExtractFormData": { "ResponseObjectName": "ChangeResponse", "FormObjectName": "ChangeForm" } },
+        { "Condition": {
             "If": "ChangeForm == null",
             "Then": {
               "Do": [
@@ -558,49 +222,14 @@
             }
           }
         },
-        {
-          "SetFormValue": {
-            "FormObjectName": "ChangeForm",
-            "CreateForm": "DoNotCreate",
-            "InputName": "current_password",
-            "Value": "%AccountPassword%",
-            "IsSecret": true
-          }
-        },
-        {
-          "SetFormValue": {
-            "FormObjectName": "ChangeForm",
-            "CreateForm": "DoNotCreate",
-            "InputName": "user_password",
-            "Value": "%NewPassword%",
-            "IsSecret": true
-          }
-        },
-        {
-          "SetFormValue": {
-            "FormObjectName": "ChangeForm",
-            "CreateForm": "DoNotCreate",
-            "InputName": "user_password_confirmation",
-            "Value": "%NewPassword%",
-            "IsSecret": true
-          }
-        },
-        {
-          "NewHttpRequest": {
-            "ObjectName": "ChangePostRequest"
-          }
-        },
-        {
-          "Headers": {
-            "RequestObjectName": "ChangePostRequest",
-            "AddHeaders": { "Referer": "https://twitter.com/settings/password" }
-          }
-        },
-        {
-          "Try": {
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "current_password", "Value": "%AccountPassword%", "IsSecret": true } },
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "user_password", "Value": "%NewPassword%", "IsSecret": true } },
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "user_password_confirmation", "Value": "%NewPassword%", "IsSecret": true } },
+        { "NewHttpRequest": { "ObjectName": "ChangePostRequest" } },
+        { "Headers": { "RequestObjectName": "ChangePostRequest", "AddHeaders": { "Referer": "https://twitter.com/settings/password" } } },
+        { "Try": {
             "Do": [
-              {
-                "Request": {
+              { "Request": {
                   "Verb": "Post",
                   "Url": "settings/passwords/update",
                   "RequestObjectName": "ChangePostRequest",
@@ -614,24 +243,12 @@
               }
             ],
             "Catch": [
-              {
-                "Status": {
-                  "Type": "Checking",
-                  "Percent": 80,
-                  "Message": {
-                    "Name": "ConnectionFailed",
-                    "Parameters": [ "%AssetName%", "%Exception%" ]
-                  }
-                }
-              },
-              {
-                "Throw": { "Value": "Error requesting password change" }
-              }
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Error requesting password change" } }
             ] 
           }
         },
-        {
-          "Condition": {
+        { "Condition": {
             "If": "ChangePostResponse.StatusCode.ToString().Equals(\"Redirect\") && ChangePostResponse.Headers[\"Location\"][0].EndsWith(\"password_reset_confirmation\")",
             "Then": {
               "Do": [
@@ -640,33 +257,17 @@
             }
           }
         },
-        {
-          "Condition": {
+        { "Condition": {
             "If": "ChangePostResponse.StatusCode.ToString().Equals(\"Redirect\") && ChangePostResponse.Headers[\"Location\"][0].StartsWith(\"https://twitter.com/account/access\")",
             "Then": {
               "Do": [
-                {
-                  "Log": {
-                    "Text": "Account access is restricted - maybe temporarily"
-                  }
-                },
-                {
-                  "Status": {
-                    "Type": "Checking",
-                    "Percent": 80,
-                    "Message": {
-                      "Name": "AccessRestricted",
-                      "Parameters": [ "%LoginUserName%" ]
-                    }
-                  }
-                }
+                { "Log": { "Text": "Account access is restricted - maybe temporarily" } },
+                { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "AccessRestricted", "Parameters": [ "%LoginUserName%" ] } } }
               ]
             }
           }
         },
-        {
-          "Return": { "Value": false }
-        }
+        { "Return": { "Value": false } }
       ]
     }
   ]
