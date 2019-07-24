@@ -417,7 +417,7 @@
 			},
 			{
 				"Condition": {
-					"If": "UserId.Equals(\'null\')",
+					"If": "UserId.Equals(\"null\")",
 					"Then": {
 						"Do": [
 							{
