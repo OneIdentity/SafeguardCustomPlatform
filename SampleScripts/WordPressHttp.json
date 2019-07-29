@@ -21,12 +21,12 @@
           "If": "UseSsl",
           "Then": {
             "Do": [
-              { "BaseAddress": { "Address": "https://%Address%/%{APIURL}%/" } }
+              { "BaseAddress": { "Address": "https://%Address%" } }
             ]
           },
           "Else": {
             "Do": [
-              { "BaseAddress": { "Address": "http://%Address%/%{APIURL}%/" } }
+              { "BaseAddress": { "Address": "http://%Address%" } }
             ]
           }
         }
@@ -37,7 +37,7 @@
           "RequestObjectName": "SystemRequest",
           "ResponseObjectName": "SystemResponse",
           "Verb": "GET",
-          "Url": "settings",
+          "Url": "%{APIURL}%/settings",
           "SubstitutionInUrl": true,
           "IgnoreServerCertAuthentication": "%{SkipServerCertValidation}%",
           "Content": {
