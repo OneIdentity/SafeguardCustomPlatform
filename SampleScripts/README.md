@@ -1,5 +1,5 @@
 If you need help understanding the content of these sample scripts, it is highly
-recommended that you read the <a href="../wiki">wiki documentation</a>.
+recommended that you read the <a href="../../../wiki">wiki documentation</a>.
 
 These sample custom platform scripts are organized by the protocol used for managing
 the asset.  Currently, Safeguard custom platforms support: 

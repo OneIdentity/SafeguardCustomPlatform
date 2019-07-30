@@ -5,7 +5,7 @@ Support and documentation for custom platform management
 -----------
 
 <p align="center">
-<i>Check out our <a href="wiki">wiki documentation</a> to get started with your own custom integration to Safeguard!</i>
+<i>Check out our <a href="../../wiki">wiki documentation</a> to get started with your own custom integration to Safeguard!</i>
 </p>
 
 -----------
@@ -26,7 +26,7 @@ assets.  We call these platform definitions **custom platform scripts**.
 
 ## Getting Started
 
-The best place to start is to read the <a href="wiki">wiki documentation</a>
+The best place to start is to read the <a href="../../wiki">wiki documentation</a>
 included in this repository.  The custom platform scripts themselves may be
 thought of as an object model representing an intermediate language that is
 executed by Safeguard to manage the asset.  The custom platform intermediate
@@ -35,7 +35,7 @@ this intermediate language object model to avoid complications and security
 vulnerabilities related to parsing and interpreting a domain-specific language
 or a common scripting language.
 
-After reading the <a href="wiki">wiki documentation</a>, rather than writing a
+After reading the <a href="../../wiki">wiki documentation</a>, rather than writing a
 custom platform script from scratch, the best approach may be to start with
 a sample and modify it.  We include <a href="SampleScripts">sample custom
 platform</a> scripts that are organized by the protocol used for managing the
