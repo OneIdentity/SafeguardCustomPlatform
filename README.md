@@ -43,3 +43,24 @@ asset.  Currently, Safeguard custom platforms support:
 <a href="SampleScripts/SSH">SSH</a>,
 <a href="SampleScripts/Telnet">Telnet (TN3270)</a>, and
 <a href="SampleScripts/HTTP">HTTP</a>.
+
+## Telnet Sessions
+
+Telnet includes extensions to the protocol for use with particular terminal
+clients, e.g. TN3270 and TN5250.  The forms-based terminal applications that
+run on platforms that communicate using these protocol extensions often
+include custom forms that are used for user login.  In order to manage these
+platforms or play passwords into these assets for privileged session connections
+without exposing the password, Safeguard needs to have information about how
+to parse the forms to find the required fields.
+
+A custom platform script can be created for Safeguard for Privileged Passwords
+in order to manage password check and change operations via Telnet or TN3270.
+
+Safeguard for Privileged Sessions allows you to upload a pattern file that
+can instruct Safeguard how to play in the password during privileged session
+connections.
+
+Sample <a href="PatternFiles">pattern files</a> are available for some common
+platforms with the default configuration.  Pattern files nearly always require
+some customization for your specific use case.
