@@ -7,11 +7,10 @@ Support and documentation for custom platform management
 <p align="center">
 <i>Check out our <a href="wiki">wiki documentation</a> to get started with your own custom integration to Safeguard!</i>
 </p>
-<p align="center">
-<i>Get started quickly with one of our <a href="SampleScripts">sample scripts</a>.</i>
-</p>
 
 -----------
+
+<i>Get started quickly with one of our <a href="SampleScripts">sample scripts</a>.</i>
 
 ## Introduction
 
