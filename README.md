@@ -38,7 +38,7 @@ or a common scripting language.
 After reading the <a href="../../wiki">wiki documentation</a>, rather than writing a
 custom platform script from scratch, the best approach may be to start with
 a sample and modify it.  We include <a href="SampleScripts">sample custom
-platform</a> scripts that are organized by the protocol used for managing the
+platform scripts</a> that are organized by the protocol used for managing the
 asset.  Currently, Safeguard custom platforms support: 
 <a href="SampleScripts/SSH">SSH</a>,
 <a href="SampleScripts/Telnet">Telnet (TN3270)</a>, and
