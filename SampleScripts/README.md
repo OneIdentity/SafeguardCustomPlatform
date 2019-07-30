@@ -1,4 +1,4 @@
-If you need help understanding the content of these sampe scripts, it is highly
+If you need help understanding the content of these sample scripts, it is highly
 recommended that you read the <a href="../wiki">wiki documentation</a>.
 
 These sample custom platform scripts are organized by the protocol used for managing
