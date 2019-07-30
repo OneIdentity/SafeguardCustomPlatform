@@ -10,8 +10,6 @@ Support and documentation for custom platform management
 
 -----------
 
-<i>Get started quickly with one of our <a href="SampleScripts">sample scripts</a>.</i>
-
 ## Introduction
 
 Safeguard provides support for common platforms from which an asset
@@ -23,6 +21,8 @@ order to support assets that represent these scenarios, Safeguard includes a
 custom platform feature which allows the asset administrator to write a
 platform definition that instructs Safeguard on how to communicate with these
 assets.  We call these platform definitions **custom platform scripts**.
+
+<i>Get started quickly with one of our <a href="SampleScripts">sample scripts</a>.</i>
 
 ## Getting Started
 
