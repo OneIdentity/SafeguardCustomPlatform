@@ -1,5 +1,4 @@
-If you need help understanding the content of these sample scripts, it is highly
-recommended that you read the <a href="../../../wiki">wiki documentation</a>.
+To better understand the content of these sample scripts, read the <a href="../../../wiki">wiki documentation</a>.
 
 These sample custom platform scripts are organized by the protocol used for managing
 the asset.  Currently, Safeguard custom platforms support: 
@@ -9,6 +8,12 @@ the asset.  Currently, Safeguard custom platforms support:
 
 It may be possible to support a particular platform using more than one protocol.
 
-Please refer to the Safeguard product documentation for instructions on uploading
-a custom platform script and creating an asset.
-
+Please refer to the Safeguard for Privileged Passwords (SPP) product documentation for instructions on uploading a custom platform script and creating an asset.
+[SPP Administration Guide](https://support.oneidentity.com/technical-documents/one-identity-safeguard/administration-guide):
+For information on custom platforms, search for these topics:
+ - Custom Platforms
+ - Adding a custom platform
+For information on assets, search for these topics:
+ - Assets
+ - Adding an asset
+ - Connection tab (add asset) (edited) 
