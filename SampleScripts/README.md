@@ -7,13 +7,13 @@ the asset.  Currently, Safeguard custom platforms support:
 <a href="HTTP">HTTP</a>.
 
 It may be possible to support a particular platform using more than one protocol.
+Please refer to the Safeguard for Privileged Passwords (SPP) [Administration Guide](https://support.oneidentity.com/technical-documents/one-identity-safeguard/administration-guide) for more information.
 
-Please refer to the Safeguard for Privileged Passwords (SPP) product documentation for instructions on uploading a custom platform script and creating an asset.
-[SPP Administration Guide](https://support.oneidentity.com/technical-documents/one-identity-safeguard/administration-guide):
-For information on custom platforms, search for these topics:
+For information on creating and adding a custom platforms, search for these topics in the SPP [Administration Guide](https://support.oneidentity.com/technical-documents/one-identity-safeguard/administration-guide):
  - Custom Platforms
- - Adding a custom platform
-For information on assets, search for these topics:
+ - Adding a custom platform </br>
+
+For information on assets, search for these topics in the SPP [Administration Guide](https://support.oneidentity.com/technical-documents/one-identity-safeguard/administration-guide):
  - Assets
  - Adding an asset
- - Connection tab (add asset) (edited) 
+ - Connection tab (add asset) 
