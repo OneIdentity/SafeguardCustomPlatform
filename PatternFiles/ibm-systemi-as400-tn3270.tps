@@ -1,6 +1,6 @@
 {
-    "name": "AS400",
-    "description": "AS400 (TN3270)",
+    "name": "IBM-Systemi-as400-tn3270",
+    "description": "AS400 (TN3270) Pattern File For IBMi Series",
     "states":
     {
         "_START_": {

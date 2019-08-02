@@ -1,6 +1,6 @@
 {
-    "name": "TSO/E",
-    "description": "TSO/E (TN3270)",
+    "name": "IBM TSO/E TN3270",
+    "description": "TSO/E (TN3270) Pattern File For IBMz Series",
     "states":
     {
         "_START_": {
