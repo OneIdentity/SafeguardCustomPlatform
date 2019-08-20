@@ -15,10 +15,15 @@
         "USERNAME_ANCHOR": {
             "patterns": ["`User`[` `,`.`]*"],
             "side": "server",
-            "next_states": ["PASSWORD_ANCHOR"]
+            "next_states": ["PASSWORD_ANCHOR", "PASSWORD_ANCHOR_2"]
         },
         "PASSWORD_ANCHOR": {
             "patterns": ["`Password`[` `,`.`,#00]*#29..(?P<modifyattr>.)"],
+            "side": "server",
+            "next_states": ["USERNAME"]
+        },
+        "PASSWORD_ANCHOR_2": {
+            "patterns": ["`Password`[` `,`.`,#00]*#1d(?P<modifyattr>.)#11(?P<sba>..)#1d"],
             "side": "server",
             "next_states": ["USERNAME"]
         },
