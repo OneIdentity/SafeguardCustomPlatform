@@ -1,0 +1,296 @@
+{
+  "Id": "CustomFacebook",
+  "BackEnd": "Scriptable",
+  "CheckPassword": {
+    "Parameters": [
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 30 } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "Facebook" } }
+    ],
+    "Do": [
+      { "Status": { "Type": "Checking", "Percent": 10, "Message": { "Name": "VerifyingPassword" } } },
+      { "Function": { "Name": "CheckAccountLogin", "Parameters": [ "%AccountUserName%", "%AccountPassword%" ], "ResultVariable": "CheckResult" } },
+      { "Return": { "Value": "%CheckResult%" } }
+    ]
+  },
+  "ChangePassword": {
+    "Parameters": [
+      { "Timeout": { "Type": "Integer", "Required": false,  "DefaultValue": 30 } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "NewPassword": { "Type": "Secret", "Required": true } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "Facebook" } }
+    ],
+    "Do": [
+      { "Status": { "Type": "Changing", "Percent": 20, "Message": { "Name": "ChangingPassword", "Parameters": [ "%AccountUserName%" ] } } },
+      { "Condition": {
+          "If": "AccountPassword.Equals(NewPassword)",
+          "Then": {
+            "Do": [
+              { "Status": { "Type": "Changing", "Percent": 80, "Message": { "Name": "CurrentAndNewPasswordsAreIdentical", "Parameters": [ "%AccountUserName%" ] } } },
+              { "Return": { "Value": false } }
+            ]
+          }
+        }
+      },
+      { "Status": { "Type": "Changing", "Percent": 20, "Message": { "Name": "LoggingInToService", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
+      { "Function": { "Name": "Login", "Parameters": [ "%AccountUserName%", "%AccountPassword%" ], "ResultVariable": "LoginResult" } },
+      { "Condition": {
+          "If": "!LoginResult",
+          "Then": {
+            "Do": [
+              { "Status": { "Type": "Changing", "Percent": 70, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
+              { "Return": { "Value": false } }
+            ]
+          }
+        }
+      },
+      { "Try": {
+          "Do": [
+            { "Function": { "Name": "ChangeUserPassword", "ResultVariable": "CheckResult" } },
+            { "Return": { "Value": "%CheckResult%" } }
+          ],
+          "Catch": [
+            { "Function": { "Name": "Logout" } },
+            { "Throw": { "Value": "Error changing password" } }
+          ]
+        }
+      }
+    ]
+  },
+  "Functions": [
+    {
+      "Name": "CheckAccountLogin",
+      "Parameters": [
+        { "UserName": { "Type": "String" } },
+        { "Password": { "Type": "Secret" } }
+      ],
+      "Do": [
+        { "Status": { "Type": "Checking", "Percent": 20, "Message": { "Name": "LoggingInToService", "Parameters": [ "%AssetName%", "%UserName%" ] } } },
+        { "Function": { "Name": "Login", "Parameters": [ "%UserName%", "%Password%" ], "ResultVariable": "LoginResult" } },
+        { "Condition": {
+            "If": "!LoginResult",
+            "Then": {
+              "Do": [
+                { "Status": { "Type": "Checking", "Percent": 70, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AssetName%", "%UserName%" ] } } }
+              ]
+            }
+          }
+        },
+        { "Function": { "Name": "Logout" } },
+        { "Return": { "Value": "%LoginResult%" } }
+      ]
+    },
+    {
+      "Name": "Login",
+      "Parameters": [
+        { "UserName": { "Type": "string" } },
+        { "Password": { "Type": "secret" } }
+      ],
+      "Do": [
+        { "BaseAddress": { "Address": "https://www.facebook.com" } },
+        { "NewHttpRequest": { "ObjectName": "LoginRequest" } },
+        { "Headers": { "RequestObjectName": "LoginRequest", "AddHeaders": { "User-Agent": "Safeguard" } } },
+        { "Try": {
+            "Do": [
+              { "Request": {
+                  "Verb": "Get",
+                  "Url": "login?_fb_noscript=1",
+                  "RequestObjectName": "LoginRequest",
+                  "ResponseObjectName": "Global:LoginResponse", 
+                  "AllowRedirect": true
+                }
+              }
+            ],
+            "Catch": [
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Error logging in" } }
+            ] 
+          } 
+        },
+        { "ExtractFormData": { "ResponseObjectName": "LoginResponse", "FormObjectName": "LoginForm" } },
+        { "Condition": {
+            "If": "LoginForm == null",
+            "Then": {
+              "Do": [
+                { "Log": { "Text": "Error, login form not found" } },
+                { "Throw": { "Value": "Login form not found" } }
+              ]
+            }
+          }
+        },
+        { "SetFormValue": { "FormObjectName": "LoginForm", "CreateForm": "DoNotCreate", "InputName": "email", "Value": "%UserName%" } },
+        { "SetFormValue": { "FormObjectName": "LoginForm", "CreateForm": "DoNotCreate", "InputName": "pass", "Value": "%Password%", "IsSecret": true } },
+        { "NewHttpRequest": { "ObjectName": "LoginPostRequest" } },
+        { "Headers": { "RequestObjectName": "LoginPostRequest", "AddHeaders": { "User-Agent": "Safeguard" } } },
+        { "Try": {
+            "Do": [
+              { "Request": {
+                  "Verb": "Post",
+                  "Url": "login.php?login_attempt=1&lwv=110&_fb_noscript=1",
+                  "RequestObjectName": "LoginPostRequest",
+                  "ResponseObjectName": "Global:LoginPostResponse",
+                  "AllowRedirect": false,
+                  "Content": {
+                    "ContentObjectName": "LoginForm",
+                    "ContentType": "application/x-www-form-urlencoded"
+                  }
+                }
+              }
+            ],
+            "Catch": [
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Error logging in" } }
+            ]
+          }
+        },
+        { "Condition": {
+            "If": "!LoginPostResponse.StatusCode.ToString().Equals(\"Redirect\") || !LoginPostResponse.Headers.ContainsKey(\"Location\")",
+            "Then": {
+              "Do": [
+                { "Log": { "Text": "Expected a redirect - did not get one" } },
+                { "Return": { "Value": false } }
+              ]
+            }
+          }
+        },
+        { "Condition": {
+            "If": "LoginPostResponse.Headers[\"Location\"][0].StartsWith(\"https://www.facebook.com/checkpoint/\")",
+            "Then": {
+              "Do": [
+                { "Log": { "Text": "Auth successful , but login approvals enabled" } },
+                { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "AccountHasLoginApprovalsEnabled", "Parameters": [ "%UserName%" ] } } },
+                { "Return": { "Value": false } }
+              ]
+            }
+          }
+        },
+        { "Condition": {
+            "If": "!Regex.IsMatch(LoginPostResponse.Headers[\"Location\"][0], \"https://www.facebook.com/[?.*]*\")",
+            "Then": {
+              "Do": [
+                { "Comment": { "Text": "Did not get the expected redirect" } },
+                { "Return": { "Value": false } }
+              ]
+            }
+          }
+        },
+        { "Return": { "Value": true } }
+      ]
+    },
+    {
+      "Name": "GetHomePage",
+      "Do": [
+        { "NewHttpRequest": { "ObjectName": "HomePageRequest" } },
+        {  "Headers": { "RequestObjectName": "HomePageRequest", "AddHeaders": { "User-Agent": "Safeguard" } } },
+        { "Request": {
+            "Verb": "Get",
+            "Url": "home.php",
+            "RequestObjectName": "HomePageRequest",
+            "ResponseObjectName": "HomePageResponse",
+            "AllowRedirect": true
+          }
+        },
+        { "ExtractFormData": { "ResponseObjectName": "HomePageResponse", "FormObjectName": "GLOBAL:logout_form" } },
+        { "Condition": {
+            "If": "logout_form==null",
+            "Then": {
+              "Do": [
+                { "Log": { "Text": "Error, home page form not found" } }
+              ]
+            }
+          }
+        },
+        { "Return": { "Value": true } }
+      ]
+    },
+    {
+      "Name": "Logout",
+      "Do": [
+        { "Function": { "Name": "GetHomePage" } },
+        { "NewHttpRequest": { "ObjectName": "LogoutPostRequest" } },
+        { "Headers": { "RequestObjectName": "LogoutPostRequest", "AddHeaders": { "User-Agent": "Safeguard" } } },
+        { "Request": {
+            "Verb": "Post",
+            "Url": "logout.php?button_name=logout&button_location=settings",
+            "RequestObjectName": "LogoutPostRequest",
+            "ResponseObjectName": "LogoutPostResponse",
+            "AllowRedirect": false,
+            "Content": {
+              "ContentObjectName": "logout_form",
+              "ContentType": "application/x-www-form-urlencoded"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "Name": "ChangeUserPassword",
+      "Do": [
+        { "NewHttpRequest": { "ObjectName": "ChangeRequest" } },
+        { "Headers": { "RequestObjectName": "ChangeRequest", "AddHeaders": { "User-Agent": "Safeguard" } } },
+        { "Try": {
+            "Do": [
+              { "Request": {
+                  "Verb": "Get",
+                  "Url": "settings?tab=security&section=password&view",
+                  "RequestObjectName": "ChangeRequest",
+                  "ResponseObjectName": "Global:ChangeResponse",
+                  "AllowRedirect": true
+                }
+              }
+            ],
+            "Catch": [
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Failed to change password" } }
+            ]
+          } 
+        },
+        { "ExtractFormData": { "ResponseObjectName": "ChangeResponse", "FormObjectName": "ChangeForm" } },
+        { "Condition": {
+            "If": "ChangeForm==null",
+            "Then": {
+              "Do": [
+                { "Log": { "Text": "Error, password form not found" } },
+                { "Throw": { "Value": "Error password form not found" } }
+              ]
+            }
+          }
+        },
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "password_old", "Value": "%AccountPassword%", "IsSecret": true } },
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "password_new", "Value": "%NewPassword%", "IsSecret": true } },
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "password_confirm", "Value": "%NewPassword%", "IsSecret": true } },
+        { "NewHttpRequest": { "ObjectName": "ChangePostRequest" } },
+        { "Headers": { "RequestObjectName": "ChangePostRequest", 
+                       "AddHeaders": { "Referer": "https://www.facebook.com/settings?tab=security&section=password&view", "User-Agent": "Safeguard" } } },
+        { "Try": {
+            "Do": [
+              { "Request": {
+                  "Verb": "Post",
+                  "Url": "/ajax/settings/security/password.php?dpr=1",
+                  "RequestObjectName": "ChangePostRequest",
+                  "ResponseObjectName": "Global:ChangePostResponse",
+                  "AllowRedirect": false,
+                  "Content": {
+                    "ContentObjectName": "ChangeForm",
+                    "ContentType": "application/x-www-form-urlencoded"
+                  }
+                }
+              }
+            ],
+            "Catch": [
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Failed to change password" } }
+            ] 
+          } 
+        },
+        { "Function": { "Name": "Logout" } },
+        { "Comment": { "Text": "Test the new password" } },
+        { "Function": { "Name": "Login", "Parameters": [ "%AccountUserName%", "%NewPassword%" ], "ResultVariable": "LoginResult" } },
+        { "Function": {  "Name": "Logout" } },
+        { "Return": { "Value": "%LoginResult%" } }
+      ]
+    }
+  ]
+}
