@@ -1,5 +1,5 @@
 {
-  "Id": "ExampleLinuxScript",
+  "Id": "ExampleLinuxScriptWithAD",
   "BackEnd": "Scriptable",
   "CheckSystem": {
     "Parameters": [
@@ -7,6 +7,7 @@
       { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20 } },
       { "Address": { "Type": "String", "Required": true } },
       { "FuncUserName": { "Type": "String", "Required": true } },
+      { "FuncUserDomain": { "Type": "String", "Required": false } },
       { "FuncPassword": { "Type": "Secret", "Required": false } },
       { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
       { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "sudo" } },
@@ -16,7 +17,7 @@
       { "UserKey": { "Type": "Secret", "Required": false } }
    ],
     "Do": [
-      { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": [ "%FuncUserName%", "%FuncPassword%", "%UserKey::$%" ] } },
+      { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": [ "%FuncUserName%", "%FuncUserDomain%", "%FuncPassword%", "%UserKey::$%" ] } },
       { "Function": { "Name": "SetUpEnvironment", "ResultVariable": "ValidateResult" } },
       { "Function": { "Name": "ValidateAccount", "ResultVariable": "ValidateResult" } },
       { "Function": { "Name": "LogoutSsh", "ResultVariable": "LogoutResult" } },
@@ -31,6 +32,7 @@
       { "FuncUserName": { "Type": "String", "Required": true } },
       { "FuncPassword": { "Type": "Secret", "Required": false } },
       { "AccountUserName": { "Type": "String", "Required": true } },
+      { "FuncUserDomain": { "Type": "String", "Required": false } },
       { "AccountPassword": { "Type": "Secret", "Required": true } },
       { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
       { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "sudo" } },
@@ -40,7 +42,7 @@
       { "UserKey": { "Type": "Secret", "Required": false } }
    ],
     "Do": [
-      { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": ["%FuncUserName%", "%FuncPassword%", "%UserKey::$%"] } },
+      { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": ["%FuncUserName%", "%FuncUserDomain%", "%FuncPassword%", "%UserKey::$%"] } },
       { "Function": { "Name": "SetUpEnvironment", "ResultVariable": "ValidateResult" } },
       { "Function": { "Name": "ValidatePassword", "ResultVariable": "ValidationResult" } },
       { "Function": { "Name": "LogoutSsh", "ResultVariable": "LogoutResult" } },
@@ -55,6 +57,7 @@
       { "FuncUserName": { "Type": "String", "Required": true } },
       { "FuncPassword": { "Type": "Secret", "Required": false } },
       { "AccountUserName": { "Type": "String", "Required": true } },
+      { "FuncUserDomain": { "Type": "String", "Required": false } },
       { "AccountPassword": { "Type": "Secret", "Required": true } },
       { "NewPassword": { "Type": "Secret", "Required": true } },
       { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
@@ -65,7 +68,7 @@
       { "UserKey": { "Type": "Secret", "Required": false } }
     ],
     "Do": [
-      { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": [ "%FuncUserName%", "%FuncPassword%", "%UserKey::$%" ] } },
+      { "Function": { "Name": "LoginSsh", "ResultVariable": "LoginResult", "Parameters": [ "%FuncUserName%", "%FuncUserDomain%", "%FuncPassword%", "%UserKey::$%" ] } },
       { "Function": { "Name": "ChangeUserPassword", "ResultVariable": "ChangeUserPasswordResult" } },
       { "Function": { "Name": "LogoutSsh", "ResultVariable": "LogoutResult" } },
       { "Return": { "Value": "%ChangeUserPasswordResult%" } }
@@ -86,10 +89,20 @@
   "LoginSsh": {
     "Parameters": [
       { "UserName": { "Type": "String", "Required": true } },
+      { "FuncUserDomain": { "Type": "String", "Required": false } },
       { "Password": { "Type": "Secret", "Required": false } },
       { "LoginKey": { "Type": "Secret", "Required": false } }
     ],
     "Do": [
+      { "Condition": {
+        "If": "!string.IsNullOrEmpty(FuncUserDomain)",
+           "Then": {
+           "Do": [
+               { "SetItem": { "Name": "UserName", "Value": "%UserName%@%FuncUserDomain%" } }
+               ] 
+            } 
+        }
+      },
       { "Status": { "Type": "Connecting", "Percent": 30,
           "Message": { "Name": "AssetConnectingWithAddress", "Parameters": [ "%AssetName%", "%Address%" ] } }
       },
@@ -148,7 +161,7 @@
       { "Status": { "Type": "Checking", "Percent": "60",
           "Message": { "Name": "AssetTestingConnectionWithAddress", "Parameters": [ "%AssetName%", "%Address%" ] } }
       },
-      { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%DelegationPrefix% egrep -q '^(%FuncUserName%):' /etc/shadow; echo \"CHECKSYS=$?\"" } },
+      { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%DelegationPrefix% egrep -q '^(%FuncUserName%|root):' /etc/shadow; echo \"CHECKSYS=$?\"" } },
       { "Receive": { "ConnectionObjectName": "ConnectSsh", "ContainsSecret": true, "BufferName": "ReturnStatus" } },
       { "Condition": {
           "If": "Regex.IsMatch(ReturnStatus, @\"SUDO password for\")",
