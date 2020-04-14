@@ -10,6 +10,10 @@ Support and documentation for custom platform management
 
 -----------
 
+## Support
+
+One Identity open source projects are supported through [One Identity GitHub issues](https://github.com/OneIdentity/SafeguardCustomPlatform/issues) and the [One Identity Community](https://www.oneidentity.com/community/). This includes all scripts, plugins, SDKs, modules, code snippets or other solutions. For assistance with any One Identity GitHub project, please raise a new Issue on the [One Identity GitHub project](https://github.com/OneIdentity/SafeguardCustomPlatform/issues) page. You may also visit the [One Identity Community](https://www.oneidentity.com/community/) to ask questions.  Requests for assistance made through official One Identity Support will be referred back to GitHub and the One Identity Community forums where those requests can benefit all users.
+
 ## Introduction
 
 Safeguard provides support for common platforms from which an asset
@@ -39,7 +43,7 @@ After reading the <a href="../../wiki">wiki documentation</a>, rather than writi
 custom platform script from scratch, the best approach may be to start with
 a sample and modify it.  We include <a href="SampleScripts">sample custom
 platform scripts</a> that are organized by the protocol used for managing the
-asset.  Currently, Safeguard custom platforms support: 
+asset.  Currently, Safeguard custom platforms support:
 <a href="SampleScripts/SSH">SSH</a>,
 <a href="SampleScripts/Telnet">Telnet (TN3270)</a>, and
 <a href="SampleScripts/HTTP">HTTP</a>.
