@@ -597,8 +597,7 @@
                             "Name": "%{match.Groups[\"uname\"].Value}%",
                             "UserId": "%{match.Groups[\"uid\"].Value}%",
                             "GroupId": "%{match.Groups[\"gid\"].Value}%",
-                            "Groups": "%{match.Groups[\"groupid\"].Captures.Cast<Capture>().Select((groupIdCapture,index) =>new DiscoveredGroup(GroupNames[index], groupIdCapture.Value))}%",
-                            "FilterQuery": "{'Rules': [{'Name':'Override Contains A|a','Type':'Constraints','Filters':{'UserName':'.*[aA].*','UserId':'','Group':'','GroupId':'','RelativeId':''}}]}"
+                            "Groups": "%{match.Groups[\"groupid\"].Captures.Cast<Capture>().Select((groupIdCapture,index) =>new DiscoveredGroup(GroupNames[index], groupIdCapture.Value))}%"
                           }
                         },
                         { "SetItem": { "Name": "match", "Value": "%{match.NextMatch()}%" } }
