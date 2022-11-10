@@ -1,0 +1,1973 @@
+{
+    "Id": "oktawithdiscoveryandgroupmembershiprestore",
+    "BackEnd": "Scriptable",
+    "Meta": {
+        "Author": "Viktor Varga (One Identity), based on Dan Johnson's okta.json",
+        "Description": "At Restore, the user is added to the configured groups. At Suspend, the user is removed from the configured groups. The script is tested with ACTIVE Okta users."
+    },
+    "CheckSystem": {
+        "Parameters": [{
+                "FuncUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "FuncPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            }, {
+                "UseSsl": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }
+        ],
+        "Do": [{
+                "Try": {
+                    "Do": [{
+                            "Function": {
+                                "Name": "GetUser",
+                                "Parameters": ["%Address%", "%FuncUsername%", "%FuncPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%"],
+                                "ResultVariable": "GetUserResult"
+                            }
+                        }, {
+                            "Return": {
+                                "Value": true
+                            }
+                        }
+                    ],
+                    "Catch": [{
+                            "Return": {
+                                "Value": false
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "CheckPassword": {
+        "Parameters": [{
+                "AccountUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "AccountPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            }, {
+                "UseSsl": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }
+        ],
+        "Do": [{
+                "Try": {
+                    "Do": [{
+                            "Function": {
+                                "Name": "ApiAuth",
+                                "Parameters": ["%Address%", "%AccountUsername%", "%AccountPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%"],
+                                "ResultVariable": "ApiAuthResult"
+                            }
+                        }, {
+                            "Return": {
+                                "Value": true
+                            }
+                        }
+                    ],
+                    "Catch": [{
+                            "Return": {
+                                "Value": false
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "ChangePassword": {
+        "Parameters": [{
+                "AccountUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "AccountPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            }, {
+                "FuncPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            }, {
+                "NewPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            }, {
+                "UseSsl": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }
+        ],
+        "Do": [{
+                "Try": {
+                    "Do": [{
+                            "Function": {
+                                "Name": "GetUser",
+                                "Parameters": ["%Address%", "%AccountUsername%", "%FuncPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%"],
+                                "ResultVariable": "GetUserResult"
+                            }
+                        }, {
+                            "Function": {
+                                "Name": "UpdatePassword",
+                                "Parameters": ["%Address%", "%GetUserResult%", "%FuncPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%", "%NewPassword%"],
+                                "ResultVariable": "UpdatePasswordResult"
+                            }
+                        }, {
+                            "Return": {
+                                "Value": "%UpdatePasswordResult%"
+                            }
+                        }
+                    ],
+                    "Catch": [{
+                            "Return": {
+                                "Value": false
+                            }
+                        }
+                    ]
+                }
+            }
+
+        ]
+    },
+    "EnableAccount": {
+        "Parameters": [{
+                "FuncPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            }, {
+                "AccountUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "UseSsl": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "Group1Name": {
+                    "Name": "Group Name 1",
+                    "Description": "The name of the group to assign users to",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group1Members": {
+                    "Name": "Group Members 1",
+                    "Description": "<all> means all Accounts on the Asset are added to this group. Otherwise list the complete username or or parts of it to the user to this group. Comma separated format, example: usr1,usr2",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group2Name": {
+                    "Name": "Group Name 2",
+                    "Description": "The name of the group to assign users to",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group2Members": {
+                    "Name": "Group Members 2",
+                    "Description": "<all> means all Accounts on the Asset are added to this group. Otherwise list the complete username or or parts of it to the user to this group. Comma separated format, example: usr1,usr2",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group3Name": {
+                    "Name": "Group Name 3",
+                    "Description": "The name of the group to assign users to",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group3Members": {
+                    "Name": "Group Members 3",
+                    "Description": "<all> means all Accounts on the Asset are added to this group. Otherwise list the complete username or or parts of it to the user to this group. Comma separated format, example: usr1,usr2",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group4Name": {
+                    "Name": "Group Name 4",
+                    "Description": "The name of the group to assign users to",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group4Members": {
+                    "Name": "Group Members 4",
+                    "Description": "<all> means all Accounts on the Asset are added to this group. Otherwise list the complete username or or parts of it to the user to this group. Comma separated format, example: usr1,usr2",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group5Name": {
+                    "Name": "Group Name 5",
+                    "Description": "The name of the group to assign users to",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group5Members": {
+                    "Name": "Group Members 5",
+                    "Description": "<all> means all Accounts on the Asset are added to this group. Otherwise list the complete username or or parts of it to the user to this group. Comma separated format, example: usr1,usr2",
+                    "Type": "string",
+                    "Required": false
+                }
+            }
+        ],
+        "Do": [{
+                "Try": {
+                    "Do": [{
+                            "Log": {
+                                "Text": "Reading groups for the user"
+                            }
+                        }, {
+                            "Function": {
+                                "Name": "SelectGroupsOfUser",
+                                "Parameters": ["%AccountUsername%", "%Group1Name%", "%Group1Members%", "%Group2Name%", "%Group2Members%", "%Group3Name%", "%Group3Members%", "%Group4Name%", "%Group4Members%", "%Group5Name%", "%Group5Members%"],
+                                "ResultVariable": "SelectGroupsOfUserResult"
+                            }
+                        }, {
+                            "ForEach": {
+                                "CollectionName": "SelectGroupsOfUserResult",
+                                "ElementName": "GroupName",
+                                "Body": {
+                                    "Do": [{
+                                            "Function": {
+                                                "Name": "GetGroupId",
+                                                "Parameters": ["%Address%", "%{GroupName}%", "%FuncPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%"],
+                                                "ResultVariable": "GetGroupIdResult"
+                                            }
+                                        }, {
+                                            "Condition": {
+                                                "If": "GetGroupIdResult.GetType() != System.Boolean",
+                                                "Then": {
+                                                    "Do": [{
+                                                            "Log": {
+                                                                "Text": "Adding User: %AccountUsername% to Group: %GroupName%"
+                                                            }
+                                                        }, {
+                                                            "Function": {
+                                                                "Name": "UserGroupMod",
+                                                                "Parameters": ["AddUser", "%Address%", "%AccountUsername%", "%GetGroupIdResult%", "%FuncPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%"],
+                                                                "ResultVariable": "UserGroupModResult"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }, {
+                            "Return": {
+                                "Value": true
+                            }
+                        }
+
+                    ],
+                    "Catch": [{
+                            "Return": {
+                                "Value": false
+                            }
+                        }
+                    ]
+                }
+            }
+
+        ]
+    },
+    "DisableAccount": {
+        "Parameters": [{
+                "FuncPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            }, {
+                "AccountUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "UseSsl": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "Group1Name": {
+                    "Name": "Group Name 1",
+                    "Description": "The name of the group to assign users to",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group1Members": {
+                    "Name": "Group Members 1",
+                    "Description": "<all> means all Accounts on the Asset are added to this group. Otherwise list the complete username or or parts of it to the user to this group. Comma separated format, example: usr1,usr2",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group2Name": {
+                    "Name": "Group Name 2",
+                    "Description": "The name of the group to assign users to",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group2Members": {
+                    "Name": "Group Members 2",
+                    "Description": "<all> means all Accounts on the Asset are added to this group. Otherwise list the complete username or or parts of it to the user to this group. Comma separated format, example: usr1,usr2",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group3Name": {
+                    "Name": "Group Name 3",
+                    "Description": "The name of the group to assign users to",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group3Members": {
+                    "Name": "Group Members 3",
+                    "Description": "<all> means all Accounts on the Asset are added to this group. Otherwise list the complete username or or parts of it to the user to this group. Comma separated format, example: usr1,usr2",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group4Name": {
+                    "Name": "Group Name 4",
+                    "Description": "The name of the group to assign users to",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group4Members": {
+                    "Name": "Group Members 4",
+                    "Description": "<all> means all Accounts on the Asset are added to this group. Otherwise list the complete username or or parts of it to the user to this group. Comma separated format, example: usr1,usr2",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group5Name": {
+                    "Name": "Group Name 5",
+                    "Description": "The name of the group to assign users to",
+                    "Type": "string",
+                    "Required": false
+                }
+            }, {
+                "Group5Members": {
+                    "Name": "Group Members 5",
+                    "Description": "<all> means all Accounts on the Asset are added to this group. Otherwise list the complete username or or parts of it to the user to this group. Comma separated format, example: usr1,usr2",
+                    "Type": "string",
+                    "Required": false
+                }
+            }
+        ],
+        "Do": [{
+                "Try": {
+                    "Do": [{
+                            "Log": {
+                                "Text": "Reading groups for the user"
+                            }
+                        }, {
+                            "Function": {
+                                "Name": "SelectGroupsOfUser",
+                                "Parameters": ["%AccountUsername%", "%Group1Name%", "%Group1Members%", "%Group2Name%", "%Group2Members%", "%Group3Name%", "%Group3Members%", "%Group4Name%", "%Group4Members%", "%Group5Name%", "%Group5Members%"],
+                                "ResultVariable": "SelectGroupsOfUserResult"
+                            }
+                        }, {
+                            "ForEach": {
+                                "CollectionName": "SelectGroupsOfUserResult",
+                                "ElementName": "GroupName",
+                                "Body": {
+                                    "Do": [{
+                                            "Function": {
+                                                "Name": "GetGroupId",
+                                                "Parameters": ["%Address%", "%{GroupName}%", "%FuncPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%"],
+                                                "ResultVariable": "GetGroupIdResult"
+                                            }
+                                        }, {
+                                            "Condition": {
+                                                "If": "GetGroupIdResult.GetType() != System.Boolean",
+                                                "Then": {
+                                                    "Do": [{
+                                                            "Log": {
+                                                                "Text": "Deleting User: %AccountUsername% from Group: %GroupName%"
+                                                            }
+                                                        }, {
+                                                            "Function": {
+                                                                "Name": "UserGroupMod",
+                                                                "Parameters": ["DeleteUser", "%Address%", "%AccountUsername%", "%GetGroupIdResult%", "%FuncPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%"],
+                                                                "ResultVariable": "UserGroupModResult"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }, {
+                            "Return": {
+                                "Value": true
+                            }
+                        }
+
+                    ],
+                    "Catch": [{
+                            "Return": {
+                                "Value": false
+                            }
+                        }
+                    ]
+                }
+            }
+
+        ]
+    },
+    "DiscoverAccounts": {
+        "Parameters": [{
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "FuncPassword": {
+                    "Type": "Secret",
+                    "Required": false
+                }
+            }, {
+                "UseSsl": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "DiscoveryQuery": {
+                    "Type": "Object",
+                    "Required": false
+                }
+            }, {
+                "SearchCriteria": {
+                    "Type": "string",
+                    "Description": "Do not use this for name or group filter, configure it in the Safeguard Account Discovery rules. Enter the API search criteria that goes to the search= parameter of the List User query. The query does not list Deactivated users by default.",
+                    "Required": false
+                }
+            }, {
+                "ResultsPageLimit": {
+                    "Type": "integer",
+                    "Description": "The number of users to fetch in a single List Users request. Default: 25",
+                    "Required": false,
+                    "DefaultValue": 25
+                }
+            }
+        ],
+        "Do": [{
+                "Try": {
+                    "Do": [{
+                            "Function": {
+                                "Name": "DiscoverAccountsOnAsset",
+                                "Parameters": ["%Address%", "%FuncPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%", "%{SearchCriteria}%", "%{DiscoveryQuery}%", "%{ResultsPageLimit}%"],
+                                "ResultVariable": "DiscoveryResult"
+                            }
+                        }, {
+                            "Return": {
+                                "Value": "%DiscoveryResult%"
+                            }
+                        }
+                    ],
+                    "Catch": [{
+                            "Return": {
+                                "Value": false
+                            }
+                        }
+                    ]
+                }
+            }
+
+        ]
+    },
+    "Functions": [{
+            "Name": "GetUser",
+            "Parameters": [{
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "AccountUsername": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "FuncPassword": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "UseSsl": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }
+
+            ],
+            "Do": [{
+                    "SetItem": {
+                        "Name": "ParsedUser",
+                        "Value": "%{AccountUsername.Replace(\"@\",\"%40\")}%"
+                    }
+                }, {
+                    "Log": {
+                        "Text": "%ParsedUser%"
+                    }
+                }, {
+                    "Condition": {
+                        "If": "UseSsl",
+                        "Then": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "https://%Address%"
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "http://%Address%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                }, {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Authorization": "SSWS %FuncPassword%"
+                        }
+                    }
+                }, {
+                    "Request": {
+                        "RequestObjectName": "SystemRequest",
+                        "ResponseObjectName": "SystemResponse",
+                        "Verb": "GET",
+                        "Url": "api/v1/users/%ParsedUser%",
+                        "SubstitutionInUrl": true,
+                        "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                        "Content": {}
+                    }
+                }, {
+                    "ExtractJsonObject": {
+                        "JsonObjectName": "SystemResponse",
+                        "Name": "GetUserResponseJson"
+                    }
+                }, {
+                    "Log": {
+                        "Text": "%{SystemResponse.StatusCode}%"
+                    }
+                }, {
+                    "Condition": {
+                        "If": "SystemResponse.StatusCode == 200",
+                        "Then": {
+                            "Do": [{
+                                    "Return": {
+                                        "Value": "%{GetUserResponseJson.id}%"
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "Throw": {
+                                        "Value": "Error: %{SystemResponse.StatusCode}%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+
+            ]
+        }, {
+            "Name": "ApiAuth",
+            "Parameters": [{
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "AccountUsername": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "AccountPassword": {
+                        "Type": "Secret",
+                        "Required": true
+
+                    }
+                }, {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "UseSsl": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }
+
+            ],
+            "Do": [{
+                    "SetItem": {
+                        "Name": "AuthJson",
+                        "Value": {
+                            "username": "%AccountUsername%",
+                            "password": "%AccountPassword%",
+                            "options": {
+                                "multiOptionalFactorEnroll": false,
+                                "warnBeforePasswordExpired": false
+                            }
+                        }
+                    }
+                }, {
+                    "Condition": {
+                        "If": "UseSsl",
+                        "Then": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "https://%Address%"
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "http://%Address%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                }, {
+                    "Request": {
+                        "RequestObjectName": "SystemRequest",
+                        "ResponseObjectName": "SystemResponse",
+                        "Verb": "POST",
+                        "Url": "api/v1/authn",
+                        "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                        "Content": {
+                            "ContentType": "application/json",
+                            "ContentObjectName": "AuthJson"
+                        }
+                    }
+                }, {
+                    "ExtractJsonObject": {
+                        "JsonObjectName": "SystemResponse",
+                        "Name": "AuthResponseJson"
+                    }
+                }, {
+                    "Condition": {
+                        "If": "SystemResponse.StatusCode == 200",
+                        "Then": {
+                            "Do": [{
+                                    "Return": {
+                                        "Value": true
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "Throw": {
+                                        "Value": "Error: %{SystemResponse.StatusCode}%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+
+            ]
+        }, {
+            "Name": "UpdatePassword",
+            "Parameters": [{
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "UserId": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "FuncPassword": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                }, {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "UseSsl": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "NewPassword": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                }
+            ],
+            "Do": [{
+                    "Condition": {
+                        "If": "UseSsl",
+                        "Then": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "https://%Address%"
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "http://%Address%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                }, {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Authorization": "SSWS %FuncPassword%"
+                        }
+                    }
+                }, {
+                    "SetItem": {
+                        "Name": "UpdateJson",
+                        "Value": {
+                            "credentials": {
+                                "password": "%NewPassword%"
+                            }
+                        }
+                    }
+                }, {
+                    "Request": {
+                        "RequestObjectName": "SystemRequest",
+                        "ResponseObjectName": "SystemResponse",
+                        "Verb": "POST",
+                        "Url": "api/v1/users/%UserId%",
+                        "SubstitutionInUrl": true,
+                        "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                        "Content": {
+                            "ContentType": "application/json",
+                            "ContentObjectName": "UpdateJson"
+                        }
+                    }
+                }, {
+                    "Condition": {
+                        "If": "SystemResponse.StatusCode == 200",
+                        "Then": {
+                            "Do": [{
+                                    "Return": {
+                                        "Value": true
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "Throw": {
+                                        "Value": "Error: %{SystemResponse.StatusCode}%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }, {
+            "Name": "DiscoverAccountsOnAsset",
+            "Parameters": [{
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "FuncPassword": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "UseSsl": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "SearchCriteria": {
+                        "Type": "string",
+                        "Required": false
+                    }
+                }, {
+                    "DiscoveryQuery": {
+                        "Type": "Object",
+                        "Required": false
+                    }
+                }, {
+                    "Limit": {
+                        "Type": "integer",
+                        "Required": true
+                    }
+                }
+
+            ],
+            "Do": [{
+                    "Condition": {
+                        "If": "Limit > 200",
+                        "Then": {
+                            "Do": [{
+                                    "Log": {
+                                        "Text": "Max results returned is 200 per Okta definition, setting Limit to 200"
+                                    }
+                                }, {
+                                    "SetItem": {
+                                        "Name": "Limit",
+                                        "Value": 200
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "SetItem": {
+                        "Name": "url",
+                        "Value": "%{\"api/v1/users?limit=\" + Limit}%"
+                    }
+                }, {
+                    "Condition": {
+                        "If": "SearchCriteria != ''",
+                        "Then": {
+                            "Do": [{
+                                    "SetItem": {
+                                        "Name": "url",
+                                        "Value": "%{url + \"&search=\"}%"
+                                    }
+                                }, {
+                                    "SetItem": {
+                                        "Name": "url",
+                                        "Value": "%{url + SearchCriteria}%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "Log": {
+                        "Text": "URL: %url%"
+                    }
+                }, {
+                    "SetItem": {
+                        "Name": "AuthHeader",
+                        "Type": "secret",
+                        "Value": "SSWS %FuncPassword%"
+
+                    }
+                }, {
+                    "SetItem": {
+                        "Name": "iteration",
+                        "Value": 1
+                    }
+                }, {
+				  
+					"Status": {
+						"Type": "Discovering",
+						"Percent": 10,
+						"Message": {
+							"Name": "DiscoveringAccounts",
+							"Parameters": [ "%Address%" ]
+						}
+					}
+				}, {
+                    "Function": {
+                        "Name": "IterateDiscovery",
+                        "Parameters": ["%Address%", "%FuncPassword%", "%url%", "%AuthHeader%", "%{SkipServerCertValidation}%", "%{UseSsl}%", "%{iteration}%"],
+                        "ResultVariable": "IterateDiscoveryResult"
+                    }
+                }, {
+                    "Comment": {
+                        "Text": "IterateDiscoveryResult is the Header of the previous HTTP request."
+                    }
+                }, {
+                    "For": {
+                        "Before": "iteration = 2",
+                        "Condition": "IterateDiscoveryResult[\"Link\"].Length == 2",
+                        "End": "iteration = iteration + 1",
+                        "Body": {
+                            "Do": [{
+                                    "SetItem": {
+                                        "Name": "subStart",
+                                        "Value": "%{IterateDiscoveryResult[\"Link\"][1].IndexOf(\"/api\")}%"
+                                    }
+                                }, {
+                                    "SetItem": {
+                                        "Name": "subClose",
+                                        "Value": "%{IterateDiscoveryResult[\"Link\"][1].IndexOf(\">\")}%"
+                                    }
+                                }, {
+                                    "Log": {
+                                        "Text": "Next ref link: %{IterateDiscoveryResult[\"Link\"][1]}%"
+                                    }
+                                }, {
+                                    "SetItem": {
+                                        "Name": "newUrl",
+                                        "Value": "%{IterateDiscoveryResult[\"Link\"][1].Remove(subClose).Remove(0,subStart+1)}%"
+                                    }
+                                }, {
+                                    "Log": {
+                                        "Text": "New URL %newUrl%"
+                                    }
+                                }, {
+                                    "Function": {
+                                        "Name": "IterateDiscovery",
+                                        "Parameters": ["%Address%", "%FuncPassword%", "%newUrl%", "%AuthHeader%", "%{SkipServerCertValidation}%", "%{UseSsl}%", "%{iteration}%"],
+                                        "ResultVariable": "IterateDiscoveryResult"
+                                    }
+                                }
+
+                            ]
+                        }
+                    }
+
+                }, {
+                    "Return": {
+                        "Value": true
+                    }
+                }
+
+            ]
+        }, {
+            "Name": "IterateDiscovery",
+            "Parameters": [{
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "FuncPassword": {
+                        "Type": "secret",
+                        "Required": true
+                    }
+                }, {
+                    "url": {
+                        "Type": "string",
+                        "Required": true
+                    }
+                }, {
+                    "AuthHeader": {
+                        "Type": "secret",
+                        "Required": true
+                    }
+                }, {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "UseSsl": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "Iteration": {
+                        "Type": "integer",
+                        "Required": true
+                    }
+                }
+            ],
+            "Do": [{
+                    "Function": {
+                        "Name": "MakeHttpRequest",
+                        "Parameters": ["GET", "%Address%", "%url%", "%AuthHeader%", "%{SkipServerCertValidation}%", "%{UseSsl}%"],
+                        "ResultVariable": "MakeHttpRequestResult"
+
+                    }
+                }, {
+                    "ExtractJsonObject": {
+                        "JsonObjectName": "MakeHttpRequestResult",
+                        "Name": "ListUsersResponseJson"
+                    }
+                }, {
+                    "Log": {
+                        "Text": "%{MakeHttpRequestResult.StatusCode}%"
+                    }
+                }, {
+                    "Log": {
+                        "Text": "Found %{ListUsersResponseJson.Count}% Users in iteration %Iteration% "
+                    }
+                }, {
+                    "Condition": {
+                        "If": "MakeHttpRequestResult.StatusCode == 200",
+                        "Then": {
+                            "Do": [{
+									"Status": {
+										"Type": "Discovering",
+										"Percent": 20,
+										"Message": {
+											"Name": "DiscoverAccountsFiltering",
+											"Parameters": [ "%Address%" ]
+										}
+									}
+								}, {
+                                    "Log": {
+                                        "Text": "Getting groups for users"
+                                    }
+                                }, {
+                                    "SetItem": {
+                                        "Name": "GroupList",
+                                        "Value": "%{new List<DiscoveredGroup>()}%"
+                                    }
+                                }, {
+                                    "ForEach": {
+                                        "CollectionName": "ListUsersResponseJson",
+                                        "ElementName": "user",
+                                        "Body": {
+                                            "Do": [{
+                                                    "Function": {
+                                                        "Name": "GetGroupsOfUser",
+                                                        "Parameters": ["%Address%", "%{user.id}%", "%FuncPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%"],
+                                                        "ResultVariable": "GetGroupsOfUserResult"
+                                                    },
+                                                }, {
+                                                    "ForEach": {
+                                                        "CollectionName": "GetGroupsOfUserResult",
+                                                        "ElementName": "group",
+                                                        "Body": {
+                                                            "Do": [{
+                                                                    "SetItem": {
+                                                                        "Name": "GroupName",
+                                                                        "Value": "%{group.profile.name.ToString()}%"
+                                                                    }
+                                                                }, {
+                                                                    "SetItem": {
+                                                                        "Name": "GroupId",
+                                                                        "Value": "%{group.id.ToString()}%"
+                                                                    }
+                                                                }, {
+                                                                    "Eval": {
+                                                                        "Expression": "%{GroupList.Add(new DiscoveredGroup(GroupName,GroupId))}%"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }, {
+                                                    "WriteDiscoveredAccount": {
+                                                        "Name": "%{user.profile.login.ToString()}%",
+                                                        "Groups": "%{GroupList}%"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "Throw": {
+                                        "Value": "Error: %{MakeHttpRequestResult.StatusCode}%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "Return": {
+                        "Value": "%{ MakeHttpRequestResult.Headers }%"
+                    }
+                }
+            ]
+        }, {
+            "Name": "SelectGroupsOfUser",
+            "Parameters": [{
+                    "AccountUsername": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "Group1Name": {
+                        "Type": "string",
+                        "Required": false
+                    }
+                }, {
+                    "Group1Members": {
+                        "Type": "string",
+                        "Required": false
+                    }
+                }, {
+                    "Group2Name": {
+                        "Type": "string",
+                        "Required": false
+                    }
+                }, {
+                    "Group2Members": {
+                        "Type": "string",
+                        "Required": false
+                    }
+                }, {
+                    "Group3Name": {
+                        "Type": "string",
+                        "Required": false
+                    }
+                }, {
+                    "Group3Members": {
+                        "Type": "string",
+                        "Required": false
+                    }
+                }, {
+                    "Group4Name": {
+                        "Type": "string",
+                        "Required": false
+                    }
+                }, {
+                    "Group4Members": {
+                        "Type": "string",
+                        "Required": false
+                    }
+                }, {
+                    "Group5Name": {
+                        "Type": "string",
+                        "Required": false
+                    }
+                }, {
+                    "Group5Members": {
+                        "Type": "string",
+                        "Required": false
+                    }
+                }
+
+            ],
+            "Do": [{
+                    "SetItem": {
+                        "Name": "GroupsOfUser",
+                        "Value": "%{new List<String>()}%"
+                    }
+                }, {
+                    "Condition": {
+                        "If": "Group1Members != null",
+                        "Then": {
+                            "Do": [{
+                                    "Function": {
+                                        "Name": "IsGroupNeededForUser",
+                                        "Parameters": ["%Group1Members%", "%Group1Name%", "%AccountUsername%", "%{GroupsOfUser}%"],
+                                        "ResultVariable": "GroupsOfUser"
+                                    }
+                                }
+
+                            ]
+                        }
+                    }
+                }, {
+                    "Condition": {
+                        "If": "Group2Members != null",
+                        "Then": {
+                            "Do": [{
+                                    "Function": {
+                                        "Name": "IsGroupNeededForUser",
+                                        "Parameters": ["%Group2Members%", "%Group2Name%", "%AccountUsername%", "%{GroupsOfUser}%"],
+                                        "ResultVariable": "GroupsOfUser"
+                                    }
+                                }
+
+                            ]
+                        }
+                    }
+                }, {
+                    "Condition": {
+                        "If": "Group3Members != null",
+                        "Then": {
+                            "Do": [{
+                                    "Function": {
+                                        "Name": "IsGroupNeededForUser",
+                                        "Parameters": ["%Group3Members%", "%Group3Name%", "%AccountUsername%", "%{GroupsOfUser}%"],
+                                        "ResultVariable": "GroupsOfUser"
+                                    }
+                                }
+
+                            ]
+                        }
+                    }
+                }, {
+                    "Condition": {
+                        "If": "Group4Members != null",
+                        "Then": {
+                            "Do": [{
+                                    "Function": {
+                                        "Name": "IsGroupNeededForUser",
+                                        "Parameters": ["%Group4Members%", "%Group4Name%", "%AccountUsername%", "%{GroupsOfUser}%"],
+                                        "ResultVariable": "GroupsOfUser"
+                                    }
+                                }
+
+                            ]
+                        }
+                    }
+                }, {
+                    "Condition": {
+                        "If": "Group5Members != null",
+                        "Then": {
+                            "Do": [{
+                                    "Function": {
+                                        "Name": "IsGroupNeededForUser",
+                                        "Parameters": ["%Group5Members%", "%Group5Name%", "%AccountUsername%", "%{GroupsOfUser}%"],
+                                        "ResultVariable": "GroupsOfUser"
+                                    }
+                                }
+
+                            ]
+                        }
+                    }
+                }, {
+                    "SetItem": {
+                        "Name": "groupsforlog",
+                        "Value": ":"
+                    }
+                }, {
+                    "ForEach": {
+                        "CollectionName": "GroupsOfUser",
+                        "ElementName": "group",
+                        "Body": {
+                            "Do": [{
+                                    "Eval": {
+                                        "Expression": "groupsforlog = groupsforlog + '  '"
+                                    }
+                                }, {
+                                    "Eval": {
+                                        "Expression": "groupsforlog = groupsforlog + group"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "Log": {
+                        "Text": "Groups to Restore for the User %AccountUsername%%groupsforlog%"
+                    }
+                }, {
+                    "Return": {
+                        "Value": "%{GroupsOfUser}%"
+                    }
+                }
+
+            ]
+        }, {
+            "Name": "IsGroupNeededForUser",
+            "Parameters": [{
+                    "GroupMembers": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "GroupName": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "AccountUsername": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "GroupsList": {
+                        "Type": "Array",
+                        "Required": true
+                    }
+                }
+            ],
+            "Do": [{
+                    "Log": {
+                        "Text": "GroupMembers: %GroupMembers%"
+                    }
+                }, {
+                    "Condition": {
+                        "If": "GroupMembers == \"<all>\"",
+                        "Then": {
+                            "Do": [{
+                                    "Eval": {
+                                        "Expression": "%{GroupsList.Add(GroupName)}%"
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "Split": {
+                                        "DelimiterChars": [","],
+                                        "Source": "%GroupMembers%",
+                                        "ResultVariableName": "GroupMembersArray"
+                                    }
+                                }, {
+                                    "ForEach": {
+                                        "CollectionName": "GroupMembersArray",
+                                        "ElementName": "userPart",
+                                        "Body": {
+                                            "Do": [{
+                                                    "Log": {
+                                                        "Text": "Does AccountUsername %AccountUsername% contain %userPart%?"
+                                                    }
+                                                }, {
+                                                    "Condition": {
+                                                        "If": "AccountUsername.Contains(userPart)",
+                                                        "Then": {
+                                                            "Do": [{
+                                                                    "Eval": {
+                                                                        "Expression": "%{GroupsList.Add(GroupName)}%"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "Return": {
+                        "Value": "%{GroupsList}%"
+                    }
+                }
+
+            ]
+        }, {
+            "Name": "GetGroupId",
+            "Parameters": [{
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "GroupName": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "FuncPassword": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "UseSsl": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }
+
+            ],
+            "Do": [{
+                    "Log": {
+                        "Text": "Getting id of Group: %GroupName%"
+                    }
+                }, {
+                    "Condition": {
+                        "If": "UseSsl",
+                        "Then": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "https://%Address%"
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "http://%Address%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                }, {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Authorization": "SSWS %FuncPassword%"
+                        }
+                    }
+                }, {
+                    "Request": {
+                        "RequestObjectName": "SystemRequest",
+                        "ResponseObjectName": "SystemResponse",
+                        "Verb": "GET",
+                        "Url": "api/v1/groups?q=%GroupName%",
+                        "SubstitutionInUrl": true,
+                        "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                        "Content": {}
+                    }
+                }, {
+                    "ExtractJsonObject": {
+                        "JsonObjectName": "SystemResponse",
+                        "Name": "GetGroupResponseJson"
+                    }
+                }, {
+                    "Log": {
+                        "Text": "%{SystemResponse.StatusCode}%"
+                    }
+                }, {
+                    "Condition": {
+                        "If": "SystemResponse.StatusCode == 200",
+                        "Then": {
+                            "Do": [{
+                                    "Condition": {
+                                        "If": "GetGroupResponseJson.Count == 0",
+                                        "Then": {
+                                            "Do": [{
+                                                    "Log": {
+                                                        "Text": "There is no group with name: %GroupName% on the server..."
+                                                    }
+                                                }, {
+                                                    "Return": {
+                                                        "Value": false
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "Else": {
+                                            "Do": [{
+                                                    "Return": {
+                                                        "Value": "%{GetGroupResponseJson.First().id}%"
+                                                    }
+                                                }
+                                            ]
+                                        }
+
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "Throw": {
+                                        "Value": "Error: %{SystemResponse.StatusCode}%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+
+            ]
+        }, {
+            "Name": "UserGroupMod",
+            "Parameters": [{
+                    "GroupMod": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "UserName": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "GroupId": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "FuncPassword": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                }, {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "UseSsl": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }
+            ],
+            "Do": [{
+                    "Function": {
+                        "Name": "GetUser",
+                        "Parameters": ["%Address%", "%AccountUsername%", "%FuncPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%"],
+                        "ResultVariable": "UserId"
+                    }
+                }, {
+                    "SetItem": {
+                        "Name": "url",
+                        "Value": "api/v1/groups/%GroupId%/users/%UserId%"
+                    }
+                }, {
+                    "Log": {
+                        "Text": "URL: %url%"
+                    }
+                }, {
+                    "SetItem": {
+                        "Name": "AuthHeader",
+                        "Value": "SSWS %FuncPassword%"
+                    }
+                }, {
+                    "Switch": {
+                        "MatchValue": "%GroupMod%",
+                        "Cases": [{
+                                "CaseValue": "AddUser",
+                                "Do": [{
+                                        "Function": {
+                                            "Name": "MakeHttpRequest",
+                                            "Parameters": ["PUT", "%Address%", "%url%", "%AuthHeader%", "%{SkipServerCertValidation}%", "%{UseSsl}%"],
+                                            "ResultVariable": "MakeHttpRequestResult"
+                                        }
+                                    }, {
+                                        "Condition": {
+                                            "If": "MakeHttpRequestResult.StatusCode == 204",
+                                            "Then": {
+                                                "Do": [{
+                                                        "Return": {
+                                                            "Value": true
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "Else": {
+                                                "Do": [{
+                                                        "Throw": {
+                                                            "Value": "Error: %{MakeHttpRequestResult.StatusCode}%"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }, {
+                                "CaseValue": "DeleteUser",
+                                "Do": [{
+                                        "Function": {
+                                            "Name": "MakeHttpRequest",
+                                            "Parameters": ["DELETE", "%Address%", "%url%", "%AuthHeader%", "%{SkipServerCertValidation}%", "%{UseSsl}%"],
+                                            "ResultVariable": "MakeHttpRequestResult"
+                                        }
+                                    }, {
+                                        "Condition": {
+                                            "If": "MakeHttpRequestResult.StatusCode == 204",
+                                            "Then": {
+                                                "Do": [{
+                                                        "Return": {
+                                                            "Value": true
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "Else": {
+                                                "Do": [{
+                                                        "Throw": {
+                                                            "Value": "Error: %{MakeHttpRequestResult.StatusCode}%"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }, {
+            "Name": "GetGroupsOfUser",
+            "Parameters": [{
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "UserId": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "FuncPassword": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "UseSsl": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }
+            ],
+            "Do": [{
+                    "Condition": {
+                        "If": "UseSsl",
+                        "Then": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "https://%Address%"
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "http://%Address%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                }, {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Authorization": "SSWS %FuncPassword%"
+                        }
+                    }
+                }, {
+                    "Request": {
+                        "RequestObjectName": "SystemRequest",
+                        "ResponseObjectName": "SystemResponse",
+                        "Verb": "GET",
+                        "Url": "api/v1/users/%UserId%/groups",
+                        "SubstitutionInUrl": true,
+                        "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                        "Content": {}
+                    }
+                }, {
+                    "ExtractJsonObject": {
+                        "JsonObjectName": "SystemResponse",
+                        "Name": "GetGroupsResponseJson"
+                    }
+                }, {
+                    "Log": {
+                        "Text": "%{SystemResponse.StatusCode}%"
+                    }
+                }, {
+                    "Condition": {
+                        "If": "SystemResponse.StatusCode == 200",
+                        "Then": {
+                            "Do": [{
+                                    "Return": {
+                                        "Value": "%{GetGroupsResponseJson}%"
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "Throw": {
+                                        "Value": "Error: %{SystemResponse.StatusCode}%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }, {
+            "Name": "MakeHttpRequest",
+            "Parameters": [{
+                    "Method": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "url": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "AuthHeader": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "UseSsl": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }
+            ],
+            "Do": [{
+                    "Condition": {
+                        "If": "UseSsl",
+                        "Then": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "https://%Address%"
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "http://%Address%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                }, {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Authorization": "%AuthHeader%"
+                        }
+                    }
+                }, {
+                    "Switch": {
+                        "MatchValue": "%Method%",
+                        "Cases": [{
+                                "CaseValue": "PUT",
+                                "Do": [{
+                                        "Request": {
+                                            "RequestObjectName": "SystemRequest",
+                                            "ResponseObjectName": "SystemResponse",
+                                            "Verb": "PUT",
+                                            "Url": "%url%",
+                                            "SubstitutionInUrl": true,
+                                            "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                                            "Content": {}
+                                        }
+                                    }, {
+                                        "Return": {
+                                            "Value": "%{SystemResponse}%"
+                                        }
+                                    }
+                                ]
+                            }, {
+                                "CaseValue": "GET",
+                                "Do": [{
+                                        "Request": {
+                                            "RequestObjectName": "SystemRequest",
+                                            "ResponseObjectName": "SystemResponse",
+                                            "Verb": "GET",
+                                            "Url": "%url%",
+                                            "SubstitutionInUrl": true,
+                                            "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                                            "Content": {}
+                                        }
+                                    }, {
+                                        "Return": {
+                                            "Value": "%{SystemResponse}%"
+                                        }
+                                    }
+                                ]
+                            }, {
+                                "CaseValue": "DELETE",
+                                "Do": [{
+                                        "Request": {
+                                            "RequestObjectName": "SystemRequest",
+                                            "ResponseObjectName": "SystemResponse",
+                                            "Verb": "DELETE",
+                                            "Url": "%url%",
+                                            "SubstitutionInUrl": true,
+                                            "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                                            "Content": {}
+                                        }
+                                    }, {
+                                        "Return": {
+                                            "Value": "%{SystemResponse}%"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
