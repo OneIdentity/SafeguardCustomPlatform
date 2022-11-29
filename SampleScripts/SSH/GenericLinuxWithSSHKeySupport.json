@@ -379,13 +379,13 @@
             { "CaseValue": "CHECKUSER=0",
               "Do": [
                 { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%DelegationPrefix% passwd %AccountUserName%; echo \"CHGPASS=$?\"" } },
-                { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } },
+                { "Receive": {"ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } },
                 { "Condition": {
                     "If": "Regex.IsMatch(PasswdAttempt, @\"SUDO password for\")",
                     "Then": {
                       "Do": [
                         { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%FuncPassword%", "ContainsSecret": true } },
-                        { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } }
+                        { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt", "ExpectRegex": "([cC]urrent.*[Pp]assword)|([Nn]ew.*[Pp]assword:)|" } }
                       ]
                     }
                   }
@@ -395,7 +395,7 @@
                     "Then": {
                       "Do": [
                         { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%AccountPassword%", "ContainsSecret": true } },
-                        { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } }
+                        { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt", "ExpectRegex": "([Nn]ew.*[Pp]assword:)" } }
                       ]
                     }
                   }
@@ -405,13 +405,13 @@
                     "Then": {
                       "Do": [
                         { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%NewPassword%", "ContainsSecret": true } },
-                        { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt" } }
+                        { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "PasswdAttempt", "ExpectRegex": "([Nn]ew.*[Pp]assword:)" } }
                       ]
                     }
                   }
                 },
                 { "Condition": {
-                    "If": "Regex.IsMatch(PasswdAttempt, @\".*[Nn]ew.*[Pp]assword:\")",
+                    "If": "Regex.IsMatch(PasswdAttempt, @\".*[Nn]ew.*[Pp]assword:\", RegexOptions.Multiline)",
                     "Then": {
                       "Do": [
                         { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%NewPassword%", "ContainsSecret": true } },
