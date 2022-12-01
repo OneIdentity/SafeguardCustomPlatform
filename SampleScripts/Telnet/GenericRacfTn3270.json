@@ -194,7 +194,7 @@
                       "Message": { "Name": "SystemLoginCheck", "Parameters": ["%Address%"] } } },
         { "Send": { "ConnectionObjectName": "Tn3270Connection", "Buffer": "LOGON %UserName%\n\f" } },
         { "Receive": { "ConnectionObjectName": "Tn3270Connection", "BufferName": "LoginCheckBuffer",
-                        "ExpectRegex": "(.*INVALID USERID.*%UserName%.*)|((.*USERID %UserName%.*NOT AUTHORIZED TO USE.*)|(.*TSO/E LOGON.*)|(.*USERID %UserName%.*NOT AUTHORIZED TO USE.*)" } },
+                        "ExpectRegex": "(.*INVALID USERID.*%UserName%.*)|((.*USERID %UserName%.*NOT AUTHORIZED TO USE.*)|(.*TSO/E LOGON.*)|(.*USERID %UserName%.*NOT AUTHORIZED TO USE.*))" } },
         { "Switch": { "MatchValue": "%LoginCheckBuffer%",
             "Cases": [
               { "CaseValue": "((?i).*INVALID USERID.*%UserName%.*)|((?i).*USERID %UserName%.*NOT AUTHORIZED TO USE.*)",
