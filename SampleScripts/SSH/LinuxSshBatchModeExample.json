@@ -1,0 +1,350 @@
+{
+  "Id": "ExecuteExample2",
+  "BackEnd": "Scriptable",
+  "Meta": {
+    "Filename":"LinuxSshBatchModeExample.json",
+     "Description":"This script demonstrates how to use remote SSH commands, instead of an interactive shell on a Linux platform. For this script, the service account requires sudo access to the commands: '/usr/bin/cat /etc/shadow' and /usr/bin/passwd <name>'. This script is compatible with Safeguard >= V7.4."
+  },
+  "DiscoverSshHostKey": {
+    "Parameters": [
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
+      { "Address": { "Type": "String", "Required": true } },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20 } },
+      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22 } }
+    ],
+    "Do": [
+      {
+        "Condition": {
+          "If": "string.IsNullOrEmpty(AssetName)",
+          "Then": { "Do": [ { "SetItem": { "Name": "AssetName", "Value": "%Address%" } } ] }
+        }
+      },
+      { "Status": { "Type": "Connecting", "Percent": 30, "Message": { "Name": "AssetConnectingWithAddress", "Parameters": [ "%AssetName%", "%Address%" ] } } },
+      {
+        "Try": {
+          "Do": [
+            {
+              "DiscoverSshHostKey": {
+                "HostKeyVariableName": "HostKey",
+                "Port": "%Port%",
+                "NetworkAddress": "%Address%",
+                "Timeout": "%Timeout%"
+              }
+            },
+            { "WriteResponseObject": { "Value": "%HostKey::$%" } }
+          ],
+          "Catch": [
+            { "Status": { "Type": "Connecting", "Percent": 95, "Message": { "Name": "AssetConnectFailedWithReasonAndAddress", "Parameters": [ "%AssetName%", "%Address%", "%Exception::$%" ] } } },
+            { "Throw": { "Value": "%Exception%" } }
+          ]
+        }
+      },
+      { "Return": { "Value": true } }
+    ]
+  },
+
+  "CheckSystem": {
+    "Parameters": [
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
+      { "Address": { "Type": "String", "Required": true } },
+      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22 } },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20 } },
+      { "FuncUserName": { "Type": "String", "Required": true } },
+      { "FuncPassword": { "Type": "Secret", "Required": false } },
+      { "UserKey": { "Type": "Secret", "Required": false, "DefaultValue": "" } },
+      { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "" } },
+      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+      { "HostKey": { "Type": "string", "Required": false } }
+    ],
+    "Do": [
+      { "Function": { "Name": "ConnectToAsset" } },
+      {
+        "Function": {
+          "Name": "RunCommand",
+          "Parameters": [ "/usr/bin/id %FuncUserName%", false, [ ],  false, false, false ],
+          "ResultVariable": "Result"
+        }
+      },
+      {
+        "Condition": {
+          "If": "(Result.rc == 0)",
+          "Then": { "Do": [ { "Return" : { "Value": true }} ] }
+        }
+      },
+      { "Status": { "Type": "Checking", "Percent": "90", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "Output: %{ Result.Stdout }%  Error: %{ Result.Stderr }%" ] }, } },
+      { "Return" : { "Value" : false } }
+    ]
+  },
+  "CheckPassword": {
+    "Parameters": [
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
+      { "Address": { "Type": "String", "Required": true } },
+      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22 } },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20 } },
+      { "FuncUserName": { "Type": "String", "Required": true } },
+      { "FuncPassword": { "Type": "Secret", "Required": false } },
+      { "UserKey": { "Type": "Secret", "Required": false, "DefaultValue": "" } },
+      { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "" } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+      { "HostKey": { "Type": "string", "Required": false } }
+    ],
+    "Do":[
+      { "Function": { "Name": "ConnectToAsset" } },
+      { "Function": { "Name": "LookupUser", "ResultVariable": "UserExists" }},
+      {
+        "Function": {
+          "Name": "VerifyAccountPassword",
+          "ResultVariable": "Matched"
+        }
+      },
+      { "Return" : { "Value" : "%{ Matched }%" }}
+    ]
+  },
+  "ChangePassword": {
+    "Parameters": [
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "" } },
+      { "Address": { "Type": "String", "Required": true } },
+      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22 } },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20 } },
+      { "FuncUserName": { "Type": "String", "Required": true } },
+      { "FuncPassword": { "Type": "Secret", "Required": false } },
+      { "UserKey": { "Type": "Secret", "Required": false, "DefaultValue": "" } },
+      { "DelegationPrefix": { "Type": "String", "Required": false, "DefaultValue": "" } },
+      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+      { "HostKey": { "Type": "string", "Required": false } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "NewPassword": { "Type": "Secret", "Required": true } }
+    ],
+    "Do": [
+      { "Function": { "Name": "ConnectToAsset" } },
+      { "Function": { "Name": "LookupUser", "ResultVariable": "UserExists" }},
+      {
+        "Function": {
+          "Name": "RunCommand",
+          "Parameters": [ "/usr/bin/passwd %{ AccountUserName }%", true, [ "%{ NewPassword }%", "%{ NewPassword }%" ], false, true, false ],
+          "ResultVariable": "Result"
+        }
+      },
+      {
+        "Condition": {
+          "If": "(Result.rc == 0) && (Regex.IsMatch(Result.Stderr, \"password updated successfully\"))",
+          "Then": {
+            "Do": [ { "Return": { "Value": true } } ]
+          }
+        }
+      },
+      { "Log": { "Text": "Failed to change password : output:%{ Result.Stdout }% , err: %{ Result.Stderr }%" } },
+      { "Status": { "Type": "Checking", "Percent": "90", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "Output: %{ Result.Stdout }%  Error: %{ Result.Stderr }%" ] }, } },
+      {
+        "Return": { "Value": false }
+      }
+    ]
+  },
+  "Functions": [
+    {
+      "Name": "ConnectToAsset",
+      "Do": [
+        { "SetItem": { "Name": "GLOBAL:ConnectSsh", "Value": null } },
+        { "SetItem": { "Name": "GLOBAL:ServerSoftwareName", "Value": "" } },
+        { "Status": { "Type": "Connecting", "Percent": 30, "Message": { "Name": "AssetConnectingWithAddress", "Parameters": [ "%AssetName%", "%Address%" ] } } },
+        {
+          "Try": {
+            "Do": [
+              {
+                "Connect": {
+                  "ConnectionObjectName": "Global:ConnectSsh",
+                  "Type": "Ssh",
+                  "Port": "%Port%",
+                  "NetworkAddress": "%Address%",
+                  "Login": "%FuncUserName%",
+                  "RequestTerminal": false,
+                  "Password": "%FuncPassword::$%",
+                  "UserKey": "%UserKey::$%",
+                  "CheckHostKey": "%CheckHostKey%",
+                  "Hostkey": "%HostKey::$%",
+                  "Timeout": "%Timeout%",
+                  "SoftwareVersionVariableName": "GLOBAL:ServerSoftwareName"
+                }
+              },
+              { "Log": { "Text": "Successfully connected to the asset using key authentication" } },
+              { "Status": { "Type": "Checking", "Percent": 40, "Message": { "Name": "SystemLoginCheck", "Parameters": [ "%Address%" ] } } },
+            ],
+            "Catch": [
+              { "Status": { "Type": "Connecting", "Percent": 95, "Message": { "Name": "AssetConnectFailedWithReasonAndAddress", "Parameters": [ "%AssetName%", "%Address%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Failed to connect" } }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "Name": "RunCommand",
+      "Parameters": [
+        { "Cmd": { "Type": "String" } },
+        { "UseSudo": { "Type": "Boolean" } },
+        { "StdinArgs": { "Type": "Array" } },
+        { "CommandContainsSecret": { "Type": "Boolean" } },
+        { "InputContainsSecret": { "Type": "Boolean" } },
+        { "OutputContainsSecret": { "Type": "Boolean" } },
+      ],
+      "Do": [
+        { "SetItem" : { "Name": "rc", "Value": 1 }},
+        { "SetItem" : { "Name": "Stdout", "Value": "" }},
+        { "SetItem" : { "Name": "Stderr", "Value": "" }},
+        {
+          "Try": {
+            "Do": [
+              { "SetItem": { "Name": "runcmd", "Value": "%{ Cmd }%" }},
+              { "Condition": { 
+                 "If" : "UseSudo && !string.IsNullOrEmpty(DelegationPrefix)", 
+                 "Then": { "Do": [ { "SetItem": { "Name": "runcmd", "Value": "%DelegationPrefix% %{ Cmd }%" }}, ]}}
+              },
+              {
+                "ExecuteCommand": {
+                  "ConnectionObjectName": "ConnectSsh",
+                  "Command": "%runcmd%",
+                  "Stdin": "%{ StdinArgs }%",
+                  "BufferName": "Stdout",
+                  "StderrBufferName": "Stderr",
+                  "ExitStatusBufferName": "rc",
+                  "CommandContainsSecret": "%{ CommandContainsSecret }%",
+                  "InputContainsSecret": false,
+                  "OutputContainsSecret": "%{ OutputContainsSecret }%"
+                }
+              },
+              {
+                "Condition": { 
+                  "If": "(rc != 0) && (Regex.IsMatch(Stderr, \"(a terminal is required to read the password)\"))",
+                  "Then": {
+                    "Do": [
+                      { "Condition": {
+                        "If": "string.IsNullOrEmpty(FuncPassword)",
+                        "Then": {
+                          "Do": [
+                            { "Status": { "Type": "Checking", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "Account %FuncUserName% requires a password to run sudo; this script requires password-less sudo access" ] }, "Percent": "90" } },
+                            { "Throw": { "Value": "Sudo credentials are required" } }
+                       ]}}},
+    
+                       { "SetItem": { "Name": "runcmd", "Value": "%DelegationPrefix% -S %{ Cmd }%" }},
+                       { "SetItem": { "Name": "Stdin", "Value": "%{ StdinArgs.ToList() }%" }},
+                       { "Eval": { "Expression": "Stdin.Insert(0, FuncPassword)" }},
+                       { "SetItem": { "Name": "StdinArray", "Value": "%{ Stdin.ToArray() }%" }},
+                       {
+                         "ExecuteCommand": {
+                           "ConnectionObjectName": "ConnectSsh",
+                           "Command": "%runcmd%",
+                           "Stdin": "%{ StdinArray }%",
+                           "BufferName": "Stdout",
+                           "StderrBufferName": "Stderr",
+                           "ExitStatusBufferName": "rc",
+                           "CommandContainsSecret": "%{ CommandContainsSecret }%",
+                           "InputContainsSecret": false,
+                           "OutputContainsSecret": "%{ OutputContainsSecret }%"
+                         }
+                       }
+                     ]
+                  }
+                }
+              }
+            ],
+            "Catch": [
+              { "Status": { "Type": "Checking", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "Command failed with error %Exception::$%" ] }, "Percent": "90" } },
+              { "Throw": { "Value": "Command failed" } }
+            ]
+          }
+        },
+        { 
+          "Condition": {
+            "If": "rc == 0",
+            "Then": {
+              "Do": [
+                { "Return": { "Value": { "rc": "%{ rc }%", "Stdout": "%{ Stdout }%", "Stderr": "%{ Stderr }%", } } }
+              ]
+            }
+          }
+        },
+        {
+          "Condition": {
+            "If": "Regex.IsMatch(Stderr, \"(Permission denied)|(Sorry, try again)|(is not in the sudoers file)|(may not view or modify password information)\")",
+            "Then": {
+              "Do": [
+                { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "InsufficientPrivilegesAccessPassword" } } },
+                { "Throw" : { "Value": "Insufficient permission" }}
+              ]
+            }
+          }
+        },
+        { "Return": { "Value": { "rc": "%{ rc }%", "Stdout": "%{ Stdout }%", "Stderr": "%{ Stderr }%", } } }
+      ]
+    },
+    {
+      "Name": "LookupUser",
+      "Do": [
+        { "Status": { "Type": "Checking", "Percent": 50, "Message": { "Name": "LookingUpUser", "Parameters": [ "%AccountUserName%" ] } } },
+        {
+          "Function": {
+            "Name": "RunCommand",
+            "Parameters": [ "/usr/bin/id %AccountUserName%", false, [],  false, false, false ],
+            "ResultVariable": "Result"
+          }
+        },
+        {
+          "Condition": {
+            "If": "(Result.rc == 0)", 
+            "Then": { "Do": [ { "Return" : { "Value": true }} ] }
+          }
+        },
+        { "Log": { "Text": "User not found" } },
+        { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "AccountNotFound", "Parameters": [ "%AccountUserName%" ] } } },
+        { "Throw": { "Value": "User not found" } }
+      ]
+    },
+    {
+      "Name": "VerifyAccountPassword",
+      "Do": [
+        {
+          "Function": {
+            "Name": "RunCommand",
+            "Parameters": [ "/usr/bin/cat /etc/shadow", true, [ ], false, true, true ],
+            "ResultVariable": "Result"
+          }
+        },
+        {
+          "Condition": {
+            "If": "Result.rc != 0",
+            "Then": {
+              "Do": [
+                { "Status": { "Type": "Checking", "Percent": "90", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "rc : ${ rc }%  Error: %{ Result.Stderr }%" ] }, } },
+                { "Throw" : { "Value" : "Failed to check password" } }
+              ]
+            }
+          }
+        },
+                 
+        { "SetItem": { "Name": "MatchLine", "Value": "%{ Regex.Match(Result.Stdout, $\"^{AccountUserName}:([^:]+)\", RegexOptions.MultiLine) }%", } },
+        { "Condition": {
+            "If": "!MatchLine.Success",
+            "Then": {
+              "Do": [
+                { "Log" : { "Text": "Failed to retrieve password hash for account" }}, 
+                { "Status": { "Type": "Checking", "Percent": "90", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "Failed to retrieve password hash for account" ] }, } },
+                { "Throw" : { "Value" : "Failed to check password" } }
+              ] 
+            } 
+          } 
+        }, 
+        { "SetItem" : { "Name": "Entry", "Value": "%{ MatchLine.Groups[1].Value }%" }}, 
+        {
+          "ComparePasswordHash": {
+            "Password": "%AccountPassword%",
+            "SaltedHash": "%Entry%",
+            "ResultVariable": "PasswordHashMatched"
+          }
+        },
+        { "Return": { "Value": "%{ PasswordHashMatched }%" }}
+      ]
+    }
+  ]
+}
