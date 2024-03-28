@@ -52,7 +52,6 @@
       { "Condition": {
           "If": "!LoginResult", "Then": 
           [
-            { "Status": { "Type": "Changing", "Percent": 70, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
             { "Return": { "Value": false } }
           ]
         }
@@ -125,15 +124,6 @@
         },
         { "ExtractJsonObject": { "JsonObjectName": "LoginPostResponse", "Name": "LoginResultJson" } },
         { "Condition": {
-            "If": "!LoginResultJson.login.result.Value.Equals(\"Success\")", "Then": 
-            [
-              { "Log": { "Text": "%{ LoginResultJson.login.reason.Value }%" } },
-              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AccountUserName%" ] } } },
-              { "Return": { "Value": false } }
-            ]
-          }
-        },
-        { "Condition": {
             "If": "LoginResultJson.login.result.Value.Equals(\"Success\")", "Then": 
             [
               { "Log": { "Text": "Authentication successful" } },
@@ -141,7 +131,8 @@
             ]
           }
         },
-        { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AccountUserName%" ] } } },
+        { "Log": { "Text": "%{ LoginResultJson.ToString() }%" } },
+        { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
         { "Return": { "Value": false } }
       ]
     },
@@ -207,13 +198,7 @@
             ]
           }
         },
-        { "Condition": {
-            "If": "PasswordResponseJson.ToString().Contains(\"error\")", "Then": 
-            [
-              { "Log": { "Text": "%{ PasswordResponseJson.error.code.Value }%" } }
-            ]
-          }
-        },
+        { "Log": { "Text": "%{ PasswordResponseJson.ToString() }%" } },
         { "Return": { "Value": false } } 
       ]
     }
