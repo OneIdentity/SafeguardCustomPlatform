@@ -21,13 +21,6 @@
     "Do": [
       { "Status": { "Type": "Checking", "Percent": 10, "Message": { "Name": "VerifyingPassword", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
       { "Function": { "Name": "Login", "ResultVariable": "IsLoggedIn" } },  
-      { "Condition": {
-          "If": "!IsLoggedIn", "Then": 
-          [
-            { "Log": { "Text": "Unsuccessful Login" } }
-          ]
-        }
-      },	
       { "Return": { "Value": "%IsLoggedIn%" } }
     ]
   },
@@ -44,17 +37,17 @@
       { "HttpProxyPassword": { "Type": "Secret", "Description": "HTTP Proxy Password", "Required": false } }
     ],
     "Do": [
-      { "Status": { "Type": "Changing", "Percent": 20, "Message": { "Name": "ChangingPassword", "Parameters": [ "%AccountUserName%" ] } } },
+      { "Status": { "Type": "Changing", "Percent": 10, "Message": { "Name": "ChangingPassword", "Parameters": [ "%AccountUserName%" ] } } },
       { "Condition": {
           "If": "AccountPassword.Equals(NewPassword)", "Then": 
           [
             { "Status": { "Type": "Changing", "Percent": 80, "Message": { "Name": "CurrentAndNewPasswordsAreIdentical", "Parameters": [ "%AccountUserName%" ] } } },
-            { "Log": { "Text": "Current and New Password are Identical" } },
+            { "Log": { "Text": "The current and new password are identical." } },
             { "Return": { "Value": false } }
           ]
         }
       },
-      { "Status": { "Type": "Changing", "Percent": 20, "Message": { "Name": "LoggingInToService" } } },
+      { "Status": { "Type": "Changing", "Percent": 20, "Message": { "Name": "LoggingInToService", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
       { "Function": { "Name": "Login", "ResultVariable": "LoginResult" } },
       { "Condition": {
           "If": "!LoginResult", "Then": 
@@ -112,7 +105,7 @@
             "ResultVariable": "EncodedUserName"
           }
         },
-        { "SetItem": { "Name": "RequestBody", "Value": "lgpassword=%{EncodedPassword}%&lgtoken=%{EncodedLoginToken}%" , "IsSecret": true } },
+        { "SetItem": { "Name": "RequestBody", "Value": "lgpassword=%EncodedPassword%&lgtoken=%EncodedLoginToken%" , "IsSecret": true } },
         { "Request": {
             "Verb": "Post",
             "Url": "w/api.php?action=login&lgname=%{EncodedUserName}%&format=json",
@@ -134,7 +127,8 @@
         { "Condition": {
             "If": "!LoginResultJson.login.result.Value.Equals(\"Success\")", "Then": 
             [
-              { "Log": { "Text": "Unsuccessful Login" } },
+              { "Log": { "Text": "%{ LoginResultJson.login.reason.Value }%" } },
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AccountUserName%" ] } } },
               { "Return": { "Value": false } }
             ]
           }
@@ -187,7 +181,7 @@
              "IsSecret":  true
            }
          },
-         { "SetItem": { "Name": "RequestBody", "Value": "changeauthtoken=%{EncodedCsrfToken}%&password=%EncodedNewPassword%&retype=%EncodedNewPassword%" , "IsSecret": true} },
+         { "SetItem": { "Name": "RequestBody", "Value": "changeauthtoken=%EncodedCsrfToken%&password=%EncodedNewPassword%&retype=%EncodedNewPassword%", "IsSecret": true} },
          { "Request": {
              "Verb": "Post",
              "Url": "w/api.php?action=changeauthenticationdata&changeauthrequest=MediaWiki%5CAuth%5CPasswordAuthenticationRequest&format=json",
@@ -216,8 +210,7 @@
         { "Condition": {
             "If": "PasswordResponseJson.ToString().Contains(\"error\")", "Then": 
             [
-              { "Log": { "Text": "%{ PasswordResponseJson.error.code.Value }%" } },
-              { "Return": { "Value": false } } 
+              { "Log": { "Text": "%{ PasswordResponseJson.error.code.Value }%" } }
             ]
           }
         },
