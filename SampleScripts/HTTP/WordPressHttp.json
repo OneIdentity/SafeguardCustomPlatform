@@ -18,7 +18,7 @@
       { "ProxyIp": { "Type": "String", "Required": false } },
 	  { "ProxyPort": { "Type": "String", "Required": false } },
 	  { "ProxyUser": { "Type": "String", "Required": false } },
-	  { "ProxyPassword": { "Type": "String", "Required": false } }
+	  { "ProxyPassword": { "Type": "Secret", "Required": false } }
     ],
     "Do": [
       { "Condition": {
@@ -71,7 +71,7 @@
       { "ProxyIp": { "Type": "String", "Required": false } },
 	  { "ProxyPort": { "Type": "String", "Required": false } },
 	  { "ProxyUser": { "Type": "String", "Required": false } },
-	  { "ProxyPassword": { "Type": "String", "Required": false } }
+	  { "ProxyPassword": { "Type": "Secret", "Required": false } }
     ],
     "Do": [
       { "Condition": {
@@ -129,7 +129,7 @@
       { "ProxyIp": { "Type": "String", "Required": false } },
 	  { "ProxyPort": { "Type": "String", "Required": false } },
 	  { "ProxyUser": { "Type": "String", "Required": false } },
-	  { "ProxyPassword": { "Type": "String", "Required": false } }
+	  { "ProxyPassword": { "Type": "Secret", "Required": false } }
     ],
     "Do": [
       { "Condition": {
