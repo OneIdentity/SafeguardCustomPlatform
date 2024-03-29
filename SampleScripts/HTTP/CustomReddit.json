@@ -1,0 +1,219 @@
+{
+  "Id": "CustomReddit",
+  "BackEnd": "Scriptable",
+  "Meta": {
+    "Author": "Dinesh Thangarajan, One Identity",
+    "ScriptVersion": "1.0",
+    "Last Updated": "2024-03-28",
+    "Description": "Platform script to support Reddit web application, this is tested with SPP version 7.5 and above."
+  },
+  "CheckPassword": {
+    "Parameters": [
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 30 } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "Reddit" } },
+      { "HttpProxyAddress": { "Type": "String", "Description": "HTTP Proxy Address", "Required": false } },
+      { "HttpProxyPort": { "Type": "String", "Description": "HTTP Proxy Port", "Required": false } },
+      { "HttpProxyUserName": { "Type": "String", "Description": "HTTP Proxy UserName", "Required": false } },
+      { "HttpProxyPassword": { "Type": "Secret", "Description": "HTTP Proxy Password", "Required": false } }
+    ],
+    "Do": [
+      { "Status": { "Type": "Checking", "Percent": 20, "Message": { "Name": "VerifyingPassword", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
+      { "Function": { "Name": "Login", "ResultVariable": "LoginResult" } },
+      { "Condition": {
+          "If": "!LoginResult",
+          "Then": [
+            { "Status": { "Type": "Checking", "Percent": 70, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } }
+          ]
+        }
+      },
+      { "Return": { "Value": "%LoginResult%" } }
+    ]
+  },
+  "ChangePassword": {
+    "Parameters": [
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 30 } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "NewPassword": { "Type": "Secret", "Required": true } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "Reddit" } },
+      { "HttpProxyAddress": { "Type": "String", "Description": "HTTP Proxy Address", "Required": false } },
+      { "HttpProxyPort": { "Type": "String", "Description": "HTTP Proxy Port", "Required": false } },
+      { "HttpProxyUserName": { "Type": "String", "Description": "HTTP Proxy UserName", "Required": false } },
+      { "HttpProxyPassword": { "Type": "Secret", "Description": "HTTP Proxy Password", "Required": false } }
+    ],
+    "Do": [
+      { "Status": { "Type": "Changing", "Percent": 10, "Message": { "Name": "ChangingPassword", "Parameters": [ "%AccountUserName%" ] } } },
+      { "Condition": {
+          "If": "AccountPassword.Equals(NewPassword)",
+          "Then": [
+            { "Status": { "Type": "Changing", "Percent": 80, "Message": { "Name": "CurrentAndNewPasswordsAreIdentical", "Parameters": [ "%AccountUserName%" ] } } },
+            { "Return": { "Value": false } }
+          ]
+        }
+      },
+      { "Status": { "Type": "Changing", "Percent": 20, "Message": { "Name": "LoggingInToService", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
+      { "Function": { "Name": "Login", "ResultVariable": "LoginResult" } },
+      { "Condition": {
+          "If": "!LoginResult",
+          "Then": [
+            { "Status": { "Type": "Changing", "Percent": 70, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
+            { "Return": { "Value": false } }
+          ]
+        }
+      },
+      { "Function": { "Name": "ChangeUserPassword", "ResultVariable": "CheckResult" } },
+      { "Return": { "Value": "%CheckResult%" } }
+    ]
+  },
+  "Functions": [
+    {
+      "Name": "Login",
+      "Do": [
+        { "BaseAddress": { "Address": "https://www.reddit.com/" } },
+        { "NewHttpRequest": { "ObjectName": "LoginRequest" } },
+        { "Headers": { "RequestObjectName": "LoginRequest", "AddHeaders": { "User-Agent": "Safeguard" } } },
+        { "Try": {
+            "Do": [
+              { "Request": {
+                  "Verb": "Get",
+                  "Url": "login/",
+                  "RequestObjectName": "LoginRequest",
+                  "ResponseObjectName": "Global:LoginResponse",
+                  "AllowRedirect": true,
+                  "ProxyIp": "%HttpProxyAddress%",
+                  "ProxyPort": "%HttpProxyPort%",
+                  "ProxyUser": "%HttpProxyUserName%",
+                  "ProxyPassword": "%HttpProxyPassword%"
+                }
+              }
+            ],
+            "Catch": [
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Error logging in" } }
+            ]
+          }
+        },
+        { "GetCookie": { "Name": "csrf_token", "Domain": "https://reddit.com", "VariableName": "Login_csrf_token" } },
+        { "SetFormValue": { "FormObjectName": "LoginForm", "InputName": "recaptchaToken", "Value": "" } },
+        { "SetFormValue": { "FormObjectName": "LoginForm", "InputName": "username", "Value": "%AccountUserName%" } },
+        { "SetFormValue": { "FormObjectName": "LoginForm", "InputName": "password", "Value": "%AccountPassword%", "IsSecret": true } },
+        { "SetFormValue": { "FormObjectName": "LoginForm", "InputName": "csrf_token", "Value": "%Login_csrf_token%" } },
+        { "NewHttpRequest": { "ObjectName": "LoginPostRequest" } },
+        { "Headers": { "RequestObjectName": "LoginPostRequest", "AddHeaders": { "User-Agent": "Safeguard" } } },
+        { "Try": {
+            "Do": [
+              { "Request": {
+                  "Verb": "Post",
+                  "Url": "svc/shreddit/account/login",
+                  "RequestObjectName": "LoginPostRequest",
+                  "ResponseObjectName": "Global:LoginPostResponse",
+                  "AllowRedirect": false,
+                  "Content": {
+                    "ContentObjectName": "LoginForm",
+                    "ContentType": "application/x-www-form-urlencoded"
+                  },
+                  "ProxyIp": "%HttpProxyAddress%",
+                  "ProxyPort": "%HttpProxyPort%",
+                  "ProxyUser": "%HttpProxyUserName%",
+                  "ProxyPassword": "%HttpProxyPassword%"
+                }
+              }
+            ],
+            "Catch": [
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Error logging in" } }
+            ]
+          }
+        },
+        { "Condition": {
+            "If": "!LoginPostResponse.StatusCode.ToString().Equals(\"OK\")",
+            "Then": [
+              { "Log": { "Text": "Login Failed" } },
+              { "Return": { "Value": false } }
+            ]
+          }
+        },
+        { "Return": { "Value": true } }
+      ]
+    },
+    {
+      "Name": "ChangeUserPassword",
+      "Do": [
+        { "NewHttpRequest": { "ObjectName": "ChangeRequest" } },
+        { "Headers": { "RequestObjectName": "ChangeRequest", "AddHeaders": { "User-Agent": "Safeguard" } } },
+        { "Try": {
+            "Do": [
+              { "Request": {
+                  "Verb": "Get",
+                  "Url": "change_password/?experiment_d2x_2020ify_buttons=enabled&use_accountmanager=true&experiment_d2x_onboarding=enabled",
+                  "RequestObjectName": "ChangeRequest",
+                  "ResponseObjectName": "Global:ChangeResponse",
+                  "AllowRedirect": true,
+                  "ProxyIp": "%HttpProxyAddress%",
+                  "ProxyPort": "%HttpProxyPort%",
+                  "ProxyUser": "%HttpProxyUserName%",
+                  "ProxyPassword": "%HttpProxyPassword%"
+                }
+              }
+            ],
+            "Catch": [
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Failed to change password" } }
+            ]
+          }
+        },
+        { "ExtractFormData": { "ResponseObjectName": "ChangeResponse", "FormObjectName": "ChangeForm" } },
+        { "Condition": {
+            "If": "ChangeForm==null",
+            "Then": [
+              { "Log": { "Text": "Error, password form not found" } },
+              { "Throw": { "Value": "Error password form not found" } }
+            ]
+          }
+        },
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "current_password", "Value": "%AccountPassword%", "IsSecret": true } },
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "new_password", "Value": "%NewPassword%", "IsSecret": true } },
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "verify_password", "Value": "%NewPassword%", "IsSecret": true } },
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "invalidate_oauth", "Value": false } },
+        { "NewHttpRequest": { "ObjectName": "ChangePostRequest" } },
+        { "Headers": { "RequestObjectName": "ChangePostRequest", "AddHeaders": { "User-Agent": "Safeguard" } } },
+        { "Try": {
+            "Do": [
+              { "Request": {
+                  "Verb": "Post",
+                  "Url": "change_password",
+                  "RequestObjectName": "ChangePostRequest",
+                  "ResponseObjectName": "Global:ChangePostResponse",
+                  "AllowRedirect": false,
+                  "Content": {
+                    "ContentObjectName": "ChangeForm",
+                    "ContentType": "application/x-www-form-urlencoded"
+                  },
+                  "ProxyIp": "%HttpProxyAddress%",
+                  "ProxyPort": "%HttpProxyPort%",
+                  "ProxyUser": "%HttpProxyUserName%",
+                  "ProxyPassword": "%HttpProxyPassword%"
+                }
+              }
+            ],
+            "Catch": [
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Failed to change password" } }
+            ]
+          }
+        },
+        { "Condition": {
+            "If": "!ChangePostResponse.StatusCode.ToString().Equals(\"OK\")",
+            "Then": [
+              { "Log": { "Text": "Failed to change password" } },
+              { "Return": { "Value": false } }
+            ]
+          }
+        },
+        { "Return": { "Value": true } }
+      ]
+    }
+  ]
+}
