@@ -1,0 +1,495 @@
+{
+    "Id": "forgerockopenam",
+    "BackEnd": "Scriptable",
+    "Meta": {
+        "Author": "Viktor Varga (One Identity)",
+        "Description": "Delivered as-is, tested with AM 7.5"
+    },
+    "CheckSystem": {
+        "Parameters": [{
+                "FuncUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "FuncPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            }, {
+                "UseSsl": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "Port": {
+                    "Type": "Integer",
+                    "Required": false
+                }
+            }, {
+                "Realm": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }
+        ],
+        "Do": [{
+                "Try": {
+                    "Do": [{
+                            "Function": {
+                                "Name": "ApiAuth",
+                                "Parameters": ["%Address%", "%FuncUsername%", "%FuncPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%", "%{Port}%", "%{Realm}%"],
+                                "ResultVariable": "ApiAuthResult"
+                            }
+                        }, {
+                            "Return": {
+                                "Value": true
+                            }
+                        }
+                    ],
+                    "Catch": [{
+                            "Return": {
+                                "Value": false
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "CheckPassword": {
+        "Parameters": [{
+                "AccountUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "AccountPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            }, {
+                "UseSsl": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "Port": {
+                    "Type": "Integer",
+                    "Required": false
+                }
+            }, {
+                "Realm": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }
+        ],
+        "Do": [{
+                "Try": {
+                    "Do": [{
+                            "Function": {
+                                "Name": "ApiAuth",
+                                "Parameters": ["%Address%", "%AccountUsername%", "%AccountPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%", "%{Port}%", "%{Realm}%"],
+                                "ResultVariable": "ApiAuthResult"
+                            }
+                        }, {
+                            "Return": {
+                                "Value": true
+                            }
+                        }
+                    ],
+                    "Catch": [{
+                            "Return": {
+                                "Value": false
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "ChangePassword": {
+        "Parameters": [{
+                "AccountUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "AccountPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            }, {
+                "FuncUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "FuncPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            }, {
+                "NewPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            }, {
+                "UseSsl": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": true
+                }
+            }, {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }, {
+                "Port": {
+                    "Type": "Integer",
+                    "Required": false
+                }
+            }, {
+                "Realm": {
+                    "Type": "String",
+                    "Required": true
+                }
+            }
+        ],
+        "Do": [{
+                "Try": {
+                    "Do": [{
+                            "Function": {
+                                "Name": "ApiAuth",
+                                "Parameters": ["%Address%", "%FuncUsername%", "%FuncPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%", "%{Port}%", "%{Realm}%"],
+                                "ResultVariable": "ApiAuthResult"
+                            }
+                        }, {
+                            "Function": {
+                                "Name": "UpdatePassword",
+                                "Parameters": ["%Address%", "%AccountUsername%", "%{SkipServerCertValidation}%", "%{UseSsl}%", "%NewPassword%", "%{Port}%", "%{Realm}%"],
+                                "ResultVariable": "UpdatePasswordResult"
+                            }
+                        }, {
+                            "Return": {
+                                "Value": "%UpdatePasswordResult%"
+                            }
+                        }
+                    ],
+                    "Catch": [{
+                            "Return": {
+                                "Value": false
+                            }
+                        }
+                    ]
+                }
+            }
+
+        ]
+    },
+    "Functions": [{
+            "Name": "ApiAuth",
+            "Parameters": [{
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "AccountUsername": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "AccountPassword": {
+                        "Type": "Secret",
+                        "Required": true
+
+                    }
+                }, {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "UseSsl": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "Port": {
+                        "Type": "Integer",
+                        "Required": false
+                    }
+                }, {
+                    "Realm": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }
+
+            ],
+            "Do": [{
+                    "Condition": {
+                        "If": "Port != null",
+                        "Then": {
+                            "Do": [{
+                                    "SetItem": {
+                                        "Name": "Address",
+                                        "Value": "%Address%:%Port%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "Condition": {
+                        "If": "UseSsl",
+                        "Then": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "https://%Address%"
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "http://%Address%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                }, {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Accept-API-Version": "resource=2.0, protocol=1.0",
+                            "X-OpenAM-Username": "%AccountUsername%",
+                            "X-OpenAM-Password": "%AccountPassword%"
+                        }
+                    }
+                }, {
+                    "SetItem": {
+                        "Name": "url",
+                        "Value": "openam/json/realms/%Realm%/authenticate"
+                    }
+
+                }, {
+                    "Request": {
+                        "RequestObjectName": "SystemRequest",
+                        "ResponseObjectName": "SystemResponse",
+                        "Verb": "POST",
+                        "Url": "%url%",
+                        "SubstitutionInUrl": true,
+                        "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                        "Content": {
+                            "ContentType": "application/json"
+                        }
+                    }
+                }, {
+                    "ExtractJsonObject": {
+                        "JsonObjectName": "SystemResponse",
+                        "Name": "AuthResponseJson"
+                    }
+                }, {
+                    "Condition": {
+                        "If": "SystemResponse.StatusCode == 200",
+                        "Then": {
+                            "Do": [{
+                                    "Return": {
+                                        "Value": true
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "Throw": {
+                                        "Value": "Error: %{SystemResponse.StatusCode}%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+
+            ]
+        }, {
+            "Name": "UpdatePassword",
+            "Parameters": [{
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "Username": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }, {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "UseSsl": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": true
+                    }
+                }, {
+                    "NewPassword": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                }, {
+                    "Port": {
+                        "Type": "Integer",
+                        "Required": false
+                    }
+                }, {
+                    "Realm": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }
+            ],
+            "Do": [{
+                    "Condition": {
+                        "If": "Port != null",
+                        "Then": {
+                            "Do": [{
+                                    "SetItem": {
+                                        "Name": "Address",
+                                        "Value": "%Address%:%Port%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "Condition": {
+                        "If": "UseSsl",
+                        "Then": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "https://%Address%"
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "BaseAddress": {
+                                        "Address": "http://%Address%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                }, {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Accept-API-Version": "resource=2.0, protocol=1.0"
+                        }
+                    }
+                }, {
+                    "SetItem": {
+                        "Name": "url",
+                        "Value": "openam/json/realms/%Realm%/users/%Username%"
+                    }
+
+                }, {
+                    "SetItem": {
+                        "Name": "UpdateJson",
+                        "Value": {
+                            "userpassword": "%NewPassword%"
+                        },
+                        "IsSecret": true
+                    }
+
+                }, {
+                    "Request": {
+                        "RequestObjectName": "SystemRequest",
+                        "ResponseObjectName": "SystemResponse",
+                        "Verb": "PUT",
+                        "Url": "%url%",
+                        "SubstitutionInUrl": true,
+                        "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                        "IsSecret": true,
+                        "Content": {
+                            "ContentType": "application/json",
+                            "ContentObjectName": "UpdateJson"
+                        }
+                    }
+                }, {
+                    "Condition": {
+                        "If": "SystemResponse.StatusCode == 200",
+                        "Then": {
+                            "Do": [{
+                                    "Return": {
+                                        "Value": true
+                                    }
+                                }
+                            ]
+                        },
+                        "Else": {
+                            "Do": [{
+                                    "Throw": {
+                                        "Value": "Error: %{SystemResponse.StatusCode}%"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
