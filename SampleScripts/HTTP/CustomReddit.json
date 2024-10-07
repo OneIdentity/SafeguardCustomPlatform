@@ -1,0 +1,266 @@
+{
+  "Id": "CustomReddit",
+  "BackEnd": "Scriptable",
+  "Meta": {
+    "Author": "Jatinder Singh, One Identity",
+    "Description": "Reddit login and change password script, this is tested with SPP version 7.5 and above."
+  },
+  "CheckPassword": {
+    "Parameters": [    
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 30 } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "Reddit" } },     
+      { "ProxyPort": { "Type": "String", "Required": false, "DefaultValue": "6060" } },
+      { "ProxyIp": { "Type": "String", "Required": false } },
+      { "ProxyUser": { "Type": "String", "Required": false } },
+      { "ProxyPassword": { "Type": "Secret", "Required": false } }
+    ],
+    "Do": [
+      { "Status": { "Type": "Checking", "Percent": 10, "Message": { "Name": "VerifyingPassword" } } },
+      { "Function": { "Name": "CheckAccountLogin", "Parameters": [ "%AccountUserName%","%AccountPassword%" ], "ResultVariable": "CheckResult" } },
+      { "Return": { "Value": "%CheckResult%" } }
+    ]
+  },
+  "ChangePassword": {
+    "Parameters": [     
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "NewPassword": { "Type": "Secret", "Required": true } },      
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 30 } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "Reddit" } },      
+      { "ProxyPort": { "Type": "String", "Required": false, "DefaultValue": "6060" } },
+      { "ProxyIp": { "Type": "String", "Required": false } },
+      { "ProxyUser": { "Type": "String", "Required": false } },
+      { "ProxyPassword": { "Type": "Secret", "Required": false } }
+    ],
+    "Do": [
+      { "Status": { "Type": "Changing", "Percent": 20, "Message": { "Name": "ChangingPassword", "Parameters": [ "%AccountUserName%" ] } } },
+      { "Condition": {
+          "If": "AccountPassword.Equals(NewPassword)",
+          "Then": 
+          [
+              { "Status": { "Type": "Changing", "Percent": 80, "Message": { "Name": "CurrentAndNewPasswordsAreIdentical", "Parameters": [ "%AccountUserName%" ] } } },
+              { "Return": { "Value": false } }
+          ]         
+        }
+      },
+      { "Status": { "Type": "Changing", "Percent": 20, "Message": { "Name": "LoggingInToService", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
+      { "Function": { "Name": "Login", "Parameters": [ "%AccountUserName%", "%AccountPassword%" ], "ResultVariable": "LoginResult" } },
+      { "Condition": {
+          "If": "!LoginResult",
+          "Then": 
+          [
+              { "Status": { "Type": "Changing", "Percent": 70, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
+              { "Return": { "Value": false } }
+          ]          
+        }
+      },
+      { "Try": {
+          "Do": [
+            { "Function": { "Name": "ChangeUserPassword", "ResultVariable": "CheckResult" } },
+            { "Return": { "Value": "%CheckResult%" } }
+          ],
+          "Catch": [             
+            { "Throw": { "Value": "Error changing password." } }
+          ]
+        }
+      }
+    ]
+  },
+  "Functions": [
+    {
+      "Name": "CheckAccountLogin",
+      "Parameters": [ { "UserName": { "Type": "String" } },{ "Password": { "Type": "Secret" } } ],
+      "Do": [
+        { "Status": { "Type": "Checking", "Percent": 20, "Message": { "Name": "LoggingInToService", "Parameters": [ "%AssetName%", "%UserName%" ] } } },
+        { "Function": { "Name": "Login", "Parameters": [ "%UserName%", "%Password%" ], "ResultVariable": "LoginResult" } },
+        { "Condition": {
+            "If": "!LoginResult",
+            "Then": 
+            [
+                { "Status": { "Type": "Checking", "Percent": 70, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AssetName%", "%UserName%" ] } } }
+            ]            
+          }
+        },      
+        { "Return": { "Value": "%LoginResult%" } }
+      ]
+    },
+    {
+      "Name": "Login",
+      "Parameters": [ {"UserName": { "Type": "string" } },{ "Password": { "Type": "secret"} } ],
+      "Do": [
+        { "BaseAddress": {"Address": "https://www.reddit.com/" } },
+        { "NewHttpRequest": { "ObjectName": "LoginRequest" } },
+        { "Headers": { "RequestObjectName": "LoginRequest", "AddHeaders": { "User-Agent": "Safeguard" } } },
+        { "Try": {
+            "Do": [
+              { "Request": {
+                  "Verb": "Get",
+                  "Url": "login/",
+                  "RequestObjectName": "LoginRequest",
+                  "ResponseObjectName": "Global:LoginResponse", 
+                  "AllowRedirect": true,
+                  "ProxyPort": "%ProxyPort%",
+                  "ProxyIp": "%ProxyIp%",
+                  "ProxyUser": "%ProxyUser%",
+                  "ProxyPassword": "%ProxyPassword%"
+                }
+              }
+            ],
+            "Catch": [
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Error logging in." } }
+            ] 
+          } 
+        },
+        { "ExtractFormData": { "ResponseObjectName": "LoginResponse", "FormObjectName": "LoginForm" } },
+        {
+          "Condition": {
+            "If": "LoginForm == null",
+            "Then": 
+            [
+                { "Log": { "Text": "Error, login form not found." } },
+                { "Throw": { "Value": "Login form not found." } }
+            ]            
+          }
+        }, 
+        { "Comment": { "Text": "To complete the login process, we need first get the csrf_token from Reddit website then send it to with post login request." } },
+        { "GetCookie": { "Name": "csrf_token", "Domain": "https://reddit.com", "VariableName": "Login_csrfToken" } },
+        { "SetFormValue": { "FormObjectName": "LoginForm", "CreateForm": "DoNotCreate", "InputName": "username", "Value": "%UserName%" } },
+        { "SetFormValue": { "FormObjectName": "LoginForm", "CreateForm": "DoNotCreate", "InputName": "password", "Value": "%Password%", "IsSecret": true } },
+        { "SetFormValue": { "FormObjectName": "LoginForm", "InputName": "recaptchaToken", "Value": "" } },    
+        { "SetFormValue": { "FormObjectName": "LoginForm", "InputName": "csrf_token", "Value": "%Login_csrfToken%" } },        
+        { "NewHttpRequest": { "ObjectName": "LoginPostRequest" } },
+        { "Headers": { "RequestObjectName": "LoginPostRequest", "AddHeaders": { "User-Agent": "Safeguard" } } },
+        { "Try": {
+            "Do": [
+              { "Request": {
+                  "Verb": "Post",
+                  "Url": "svc/shreddit/account/login",
+                  "RequestObjectName": "LoginPostRequest",
+                  "ResponseObjectName": "Global:LoginPostResponse",
+                  "AllowRedirect": false,
+                  "Content": {
+                    "ContentObjectName": "LoginForm",
+                    "ContentType": "application/x-www-form-urlencoded"
+                  },
+                  "ProxyPort": "%ProxyPort%",
+                  "ProxyIp": "%ProxyIp%",
+                  "ProxyUser": "%ProxyUser%",
+                  "ProxyPassword": "%ProxyPassword%"
+                }
+              }
+            ],
+            "Catch": [
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Error logging in." } }
+            ]
+          }
+        },
+        { "Condition": {
+            "If": "!LoginPostResponse.StatusCode.ToString().Equals(\"OK\")",
+            "Then": 
+            [
+                { "Log": { "Text": "Login failed, something went wrong." } },
+                { "Return": { "Value": false } }
+            ]           
+          }
+        },      
+        { "Condition": {
+            "If": "LoginPostResponse.StatusCode.ToString().Equals(\"OK\")",
+            "Then": 
+            [
+                { "Log": { "Text": "Login successfully." } },
+                { "Return": { "Value": true } }
+            ]           
+          }
+        }       
+      ]
+    },
+    {
+      "Name": "ChangeUserPassword",
+      "Do": [
+        { "NewHttpRequest": { "ObjectName": "ChangeRequest" } },
+        { "Headers": { "RequestObjectName": "ChangeRequest", "AddHeaders": { "User-Agent": "Safeguard" } } },
+        { "Try": {
+            "Do": [
+              {
+                "Request": {
+                  "Verb": "Get",
+                  "Url": "change_password/?experiment_d2x_2020ify_buttons=enabled&use_accountmanager=true&experiment_d2x_onboarding=enabled",
+                  "RequestObjectName": "ChangeRequest",
+                  "ResponseObjectName": "Global:ChangeResponse",
+                  "AllowRedirect": true,
+                  "ProxyPort": "%ProxyPort%",
+                  "ProxyIp": "%ProxyIp%",
+                  "ProxyUser": "%ProxyUser%",
+                  "ProxyPassword": "%ProxyPassword%"
+                }
+              }
+            ],
+            "Catch": [
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Failed to change password, something went wrong." } }
+            ]
+          } 
+        },
+        { "ExtractFormData": { "ResponseObjectName": "ChangeResponse", "FormObjectName": "ChangeForm" } },
+        { "Condition": {
+            "If": "ChangeForm==null",
+            "Then": 
+            [
+                { "Log": { "Text": "Error, password form not found." } },
+                { "Throw": { "Value": "Error password form not found." } }
+            ]
+          }
+        },
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "invalidate_oauth", "Value": false } },
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "current_password", "Value": "%AccountPassword%", "IsSecret": true } },
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "new_password", "Value": "%NewPassword%", "IsSecret": true } },
+        { "SetFormValue": { "FormObjectName": "ChangeForm", "CreateForm": "DoNotCreate", "InputName": "verify_password", "Value": "%NewPassword%", "IsSecret": true } },
+        { "NewHttpRequest": { "ObjectName": "ChangePostRequest" } },
+        { "Headers": { "RequestObjectName": "ChangePostRequest", "AddHeaders": { "User-Agent": "Safeguard" } } },
+        { "Try": {
+            "Do": [
+              { "Request": {
+                  "Verb": "Post",
+                  "Url": "change_password",
+                  "RequestObjectName": "ChangePostRequest",
+                  "ResponseObjectName": "Global:ChangePostResponse",
+                  "AllowRedirect": false,
+                  "Content": {
+                    "ContentObjectName": "ChangeForm",
+                    "ContentType": "application/x-www-form-urlencoded"
+                  },
+                  "ProxyPort": "%ProxyPort%",
+                  "ProxyIp": "%ProxyIp%",
+                  "ProxyUser": "%ProxyUser%",
+                  "ProxyPassword": "%ProxyPassword%"
+                }
+              }
+            ],
+            "Catch": [
+              { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "ConnectionFailed", "Parameters": [ "%AssetName%", "%Exception%" ] } } },
+              { "Throw": { "Value": "Failed to change password, something went wrong." } }
+            ] 
+          } 
+        },   
+        { "Condition": {
+            "If": "ChangePostResponse.StatusCode.ToString().Equals(\"OK\")",
+            "Then": 
+            [
+                { "Log": { "Text": "Password updated successfully." } },
+                { "Return": { "Value": true } }
+            ]           
+          }
+        },   
+        { "Comment": { "Text": "Test the new password." } },
+        { "Function": { "Name": "Login", "Parameters": [ "%AccountUserName%", "%NewPassword%" ], "ResultVariable": "LoginResult" } },       
+        { "Return": { "Value": "%LoginResult%" } }
+      ]
+    }
+  ]
+}
+
+
