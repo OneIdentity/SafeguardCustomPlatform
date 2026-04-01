@@ -40,7 +40,6 @@ if ($uploadScript) {
 if ($restore) {
     $tasklog = Invoke-SafeguardMethod -Method Post -RelativeUrl $("AssetAccounts/" + $accountid + "/RestoreAccount?extendedLogging=true") -Service Core -AccessToken $AccessToken -Appliance $appliance
     write-host "Restore task log id: " $tasklog.id
-    LogTaskLog $tasklog.id
 }
 
 if ($elevate) {
