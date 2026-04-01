@@ -31,7 +31,35 @@
                     "Type": "String",
                     "Required": true
                 }
-            }
+            },
+			{ 
+				"HttpProxyUri": { 
+					"Type": "String", 
+					"Description": "HTTP Proxy Address", 
+					"Required": false 
+				}
+			},
+			{
+				"HttpProxyPort": { 
+					"Type": "Integer",
+					"Description": "HTTP Proxy Port",
+					"Required": false
+				}
+			},
+			{
+				"HttpProxyUserName": { 
+					"Type": "String",
+					"Description": "HTTP Proxy UserName",
+					"Required": false
+				}
+			},
+			{
+				"HttpProxyPassword": {
+					"Type": "Secret",
+					"Description": "HTTP Proxy Password",
+					"Required": false
+				}
+			}
         ],
         "Do": [
             {
@@ -121,7 +149,36 @@
                     "Type": "String",
                     "Required": true
                 }
-            }
+            },
+			{ 
+				"HttpProxyUri": { 
+					"Type": "String", 
+					"Description": "HTTP Proxy Address", 
+					"Required": false 
+				}
+			},
+			{
+				"HttpProxyPort": { 
+					"Type": "Integer",
+					"Description": "HTTP Proxy Port",
+					"Required": false,
+					"DefaultValue": 443
+				}
+			},
+			{
+				"HttpProxyUserName": { 
+					"Type": "String",
+					"Description": "HTTP Proxy UserName",
+					"Required": false
+				}
+			},
+			{
+				"HttpProxyPassword": {
+					"Type": "Secret",
+					"Description": "HTTP Proxy Password",
+					"Required": false
+				}
+			}
         ],
         "Do": [
             {
@@ -168,7 +225,36 @@
                     "Type": "String",
                     "Required": true
                 }
-            }
+            },
+			{ 
+				"HttpProxyUri": { 
+					"Type": "String", 
+					"Description": "HTTP Proxy Address", 
+					"Required": false 
+				}
+			},
+			{
+				"HttpProxyPort": { 
+					"Type": "Integer",
+					"Description": "HTTP Proxy Port",
+					"Required": false,
+					"DefaultValue": 443
+				}
+			},
+			{
+				"HttpProxyUserName": { 
+					"Type": "String",
+					"Description": "HTTP Proxy UserName",
+					"Required": false
+				}
+			},
+			{
+				"HttpProxyPassword": {
+					"Type": "Secret",
+					"Description": "HTTP Proxy Password",
+					"Required": false
+				}
+			}
         ],
         "Do": [
             {
@@ -318,7 +404,36 @@
                     "Type": "String",
                     "Required": true
                 }
-            }
+            },
+			{ 
+				"HttpProxyUri": { 
+					"Type": "String", 
+					"Description": "HTTP Proxy Address", 
+					"Required": false 
+				}
+			},
+			{
+				"HttpProxyPort": { 
+					"Type": "Integer",
+					"Description": "HTTP Proxy Port",
+					"Required": false,
+					"DefaultValue": 443
+				}
+			},
+			{
+				"HttpProxyUserName": { 
+					"Type": "String",
+					"Description": "HTTP Proxy UserName",
+					"Required": false
+				}
+			},
+			{
+				"HttpProxyPassword": {
+					"Type": "Secret",
+					"Description": "HTTP Proxy Password",
+					"Required": false
+				}
+			}
         ],
         "Do": [
             {
@@ -484,7 +599,36 @@
                     "Required": false,
                     "DefaultValue": 5
                 }
-            }
+            },
+			{ 
+				"HttpProxyUri": { 
+					"Type": "String", 
+					"Description": "HTTP Proxy Address", 
+					"Required": false 
+				}
+			},
+			{
+				"HttpProxyPort": { 
+					"Type": "Integer",
+					"Description": "HTTP Proxy Port",
+					"Required": false,
+					"DefaultValue": 443
+				}
+			},
+			{
+				"HttpProxyUserName": { 
+					"Type": "String",
+					"Description": "HTTP Proxy UserName",
+					"Required": false
+				}
+			},
+			{
+				"HttpProxyPassword": {
+					"Type": "Secret",
+					"Description": "HTTP Proxy Password",
+					"Required": false
+				}
+			}
         ],
         "Do": [
             {
@@ -627,7 +771,36 @@
                     "Required": false,
                     "DefaultValue": 5
                 }
-            }
+            },
+			{ 
+				"HttpProxyUri": { 
+					"Type": "String", 
+					"Description": "HTTP Proxy Address", 
+					"Required": false 
+				}
+			},
+			{
+				"HttpProxyPort": { 
+					"Type": "Integer",
+					"Description": "HTTP Proxy Port",
+					"Required": false,
+					"DefaultValue": 443
+				}
+			},
+			{
+				"HttpProxyUserName": { 
+					"Type": "String",
+					"Description": "HTTP Proxy UserName",
+					"Required": false
+				}
+			},
+			{
+				"HttpProxyPassword": {
+					"Type": "Secret",
+					"Description": "HTTP Proxy Password",
+					"Required": false
+				}
+			}
         ],
         "Do": [
             {
@@ -1269,7 +1442,11 @@
 									"Content": {
 										"ContentType": "application/json",
 										"ContentObjectName": "Content"
-									}
+									},
+									"ProxyIp": "%HttpProxyUri%",
+									"ProxyPort": "%HttpProxyPort%",
+									"ProxyUser": "%HttpProxyUserName%",
+									"ProxyPassword": "%HttpProxyPassword%"
 								}
 							},
 							{
@@ -1395,7 +1572,11 @@
 									"Content": {
 										"ContentType": "application/json",
 										"ContentObjectName": "Content"
-									}
+									},
+									"ProxyIp": "%HttpProxyUri%",
+									"ProxyPort": "%HttpProxyPort%",
+									"ProxyUser": "%HttpProxyUserName%",
+									"ProxyPassword": "%HttpProxyPassword%"
 								}
 							},
 							{
@@ -1528,7 +1709,11 @@
 										"Content": {
 											"ContentType": "application/json",
 											"ContentObjectName": "Content"
-										}
+										},
+										"ProxyIp": "%HttpProxyUri%",
+										"ProxyPort": "%HttpProxyPort%",
+										"ProxyUser": "%HttpProxyUserName%",
+										"ProxyPassword": "%HttpProxyPassword%"
 									}
 								},
 								{
@@ -1686,7 +1871,11 @@
 									"Content": {
 										"ContentType": "application/json",
 										"ContentObjectName": "Content"
-									}
+									},
+									"ProxyIp": "%HttpProxyUri%",
+									"ProxyPort": "%HttpProxyPort%",
+									"ProxyUser": "%HttpProxyUserName%",
+									"ProxyPassword": "%HttpProxyPassword%"
 								}
 							},
 							{
@@ -1845,7 +2034,11 @@
 													"Verb": "GET",
 													"Url": "api/2/roles/%{RoleId}%/users?name=%{Username}%",
 													"SubstitutionInUrl": true,
-													"IgnoreServerCertAuthentication": "%SkipServerCertValidation%"
+													"IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+													"ProxyIp": "%HttpProxyUri%",
+													"ProxyPort": "%HttpProxyPort%",
+													"ProxyUser": "%HttpProxyUserName%",
+													"ProxyPassword": "%HttpProxyPassword%"
 												}
 											},{
 												"ExtractJsonObject": {
@@ -2012,7 +2205,11 @@
 													"SubstitutionInUrl": true,
 													"IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
 													"Content": {
-													}
+													},
+													"ProxyIp": "%HttpProxyUri%",
+													"ProxyPort": "%HttpProxyPort%",
+													"ProxyUser": "%HttpProxyUserName%",
+													"ProxyPassword": "%HttpProxyPassword%"
 												},
 												
 											},
@@ -2138,7 +2335,11 @@
 									"SubstitutionInUrl": true,
 									"IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
 									"Content": {
-									}
+									},
+									"ProxyIp": "%HttpProxyUri%",
+									"ProxyPort": "%HttpProxyPort%",
+									"ProxyUser": "%HttpProxyUserName%",
+									"ProxyPassword": "%HttpProxyPassword%"
 								}
 							},
 							{
@@ -2268,7 +2469,11 @@
                                     "SubstitutionInUrl": true,
                                     "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
                                     "Content": {
-                                    }
+                                    },
+									"ProxyIp": "%HttpProxyUri%",
+									"ProxyPort": "%HttpProxyPort%",
+									"ProxyUser": "%HttpProxyUserName%",
+									"ProxyPassword": "%HttpProxyPassword%"
                                 },
 								
                             },
@@ -2409,7 +2614,11 @@
                                         "ContentType": "application/json",
                                         "ContentObjectName": "Content"
                                     },
-									"IsSecret": true
+									"IsSecret": true,
+									"ProxyIp": "%HttpProxyUri%",
+									"ProxyPort": "%HttpProxyPort%",
+									"ProxyUser": "%HttpProxyUserName%",
+									"ProxyPassword": "%HttpProxyPassword%"
 								}
                             },
                             {
@@ -2555,7 +2764,11 @@
                                     "Content": {
                                         "ContentType": "application/json",
                                         "ContentObjectName": "Content"
-                                    }
+                                    },
+									"ProxyIp": "%HttpProxyUri%",
+									"ProxyPort": "%HttpProxyPort%",
+									"ProxyUser": "%HttpProxyUserName%",
+									"ProxyPassword": "%HttpProxyPassword%"
                                 }
                             },
                             {
