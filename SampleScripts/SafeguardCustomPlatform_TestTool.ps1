@@ -38,21 +38,25 @@ if ($uploadScript) {
  }
 
 if ($restore) {
+    sleep 4
     $tasklog = Invoke-SafeguardMethod -Method Post -RelativeUrl $("AssetAccounts/" + $accountid + "/RestoreAccount?extendedLogging=true") -Service Core -AccessToken $AccessToken -Appliance $appliance
     write-host "Restore task log id: " $tasklog.id
 }
 
 if ($elevate) {
+    sleep 4
     $tasklog = Invoke-SafeguardMethod -Method Post -RelativeUrl $("AssetAccounts/" + $accountid + "/ElevateAccount?extendedLogging=true") -Service Core -AccessToken $AccessToken -Appliance $appliance
     write-host "Elevate task log id: " $tasklog.id
 }
 
 if ($demote) {
+    sleep 4
     $tasklog = Invoke-SafeguardMethod -Method Post -RelativeUrl $("AssetAccounts/" + $accountid + "/DemoteAccount?extendedLogging=true") -Service Core -AccessToken $AccessToken -Appliance $appliance
     write-host "Demote task log id: " $tasklog.id
 }
 
 if ($suspend) {
+    sleep 4
     $tasklog = Invoke-SafeguardMethod -Method Post -RelativeUrl $("AssetAccounts/" + $accountid + "/SuspendAccount?extendedLogging=true") -Service Core -AccessToken $AccessToken -Appliance $appliance
     write-host "Suspend task log id: " $tasklog.id
 }

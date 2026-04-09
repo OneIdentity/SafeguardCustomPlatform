@@ -75,38 +75,27 @@
                 }
             },
             {
-                "Condition": {
-                    "If": "!AccessTokenResult",
-                    "Then": {
-                        "Do": [
-                            {
-                                "Return": {
-                                    "Value": false
-                                }
-                            }
-                        ]
-                    },
-                    "Else": {
-                        "Do": [
-                            {
-                                "Function": {
-                                    "Name": "Disconnect",
-                                    "Parameters": [
-                                        "%Address%",
-                                        "%FuncUsername%",
-                                        "%FuncPassword%",
-                                        "%{AccessToken}%",
-                                        "%{SkipServerCertValidation}%"
-                                    ],
-                                    "ResultVariable": "Disconnected"
-                                }
-                            }, {
-                                "Return": {
-                                    "Value": true
-                                }
-                            }
-                        ]
-                    }
+                "Function": {
+                    "Name": "Disconnect",
+                    "Parameters": [
+                        "%Address%",
+                        "%FuncUsername%",
+                        "%FuncPassword%",
+                        "%{AccessToken}%",
+                        "%{SkipServerCertValidation}%"
+                    ],
+                    "ResultVariable": "Disconnected"
+                }
+            }, {
+                "Return": {
+                    "Value": true
+                }
+            }
+        ],
+        "Catch": [
+            {
+                "Throw": { 
+                    "Message": "%Exception%"
                 }
             }
         ]
@@ -271,47 +260,20 @@
                                 ],
                                 "ResultVariable": "AccessTokenResult"
                             }
-                        }, 
-                        {
-                            "Condition": {
-                                    "If": "!AccessTokenResult",
-                                    "Then": {
-                                        "Do": [
-                                            {
-                                                "Throw": {
-                                                    "Value": "[Error] Authentication failed"
-                                                }
-                                            }
-                                        ]
-                                    }
-                            }
                         }, {
                             "Function": {
-                                "Name": "GetUserId",
+                                "Name": "GetUser",
                                 "Parameters": [
                                     "%Address%",
                                     "%AccountUsername%",
                                     "%AccessToken%",
                                     "%{SkipServerCertValidation}%"
                                 ],
-                                "ResultVariable": "GetUserIdResult"
-                            }
-                        }, {
-                            "Condition": {
-                                    "If": "GetUserIdResult == null",
-                                    "Then": {
-                                        "Do": [
-                                            {
-                                                "Throw": {
-                                                    "Value": "[Error] User Id not found"
-                                                }
-                                            }
-                                        ]
-                                    }
+                                "ResultVariable": "GetUserResult"
                             }
                         }, {
                             "Log": {
-                                "Text": "User Id found for user '%{AccountUsername}%': %{GetUserIdResult}%"
+                                "Text": "User Id found for user '%{AccountUsername}%': %{GetUserResult.id}%"
                             }
                         },
                         {
@@ -319,52 +281,34 @@
                                 "Name": "ActivateUser",
                                 "Parameters": [
                                     "%Address%",
-                                    "%GetUserIdResult%",
+                                    "%{GetUserResult.id}%",
                                     "%AccessToken%",
                                     "%{SkipServerCertValidation}%"
                                 ],
                                 "ResultVariable": "ActivateUserResult"
                             }
-                        }, {
-                            "Condition": {
-                                    "If": "ActivateUserResult == true",
-                                    "Then": {
-                                        "Do": [
-                                            {
-                                                "Function": {
-                                                    "Name": "Disconnect",
-                                                    "Parameters": [
-                                                        "%Address%",
-                                                        "%FuncUsername%",
-                                                        "%FuncPassword%",
-                                                        "%{AccessToken}%",
-                                                        "%{SkipServerCertValidation}%"
-                                                    ],
-                                                    "ResultVariable": "Disconnected"
-                                                }
-                                            }, {
-                                                "Return": {
-                                                    "Value": true
-                                                }
-                                            }
-                                        ]
-                                    },
-                                    "Else": {
-                                        "Do": [
-                                            {
-                                                "Throw": {
-                                                    "Value": "[Error] Activating the user was not successful"
-                                                }
-                                            }
-                                        ]
-                                    }
-                            }
                         }
                     ],
                     "Catch": [
                         {
-                            "Return": {
-                                "Value": false
+                            "Throw": { 
+                                "Message": "%Exception%",
+                                "Value": "[Error] Activating the user was not successful"
+                            }
+                        }
+                    ],
+                    "Finally": [
+                        {
+                            "Function": {
+                                "Name": "Disconnect",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%FuncUsername%",
+                                    "%FuncPassword%",
+                                    "%{AccessToken}%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "Disconnected"
                             }
                         }
                     ]
@@ -452,47 +396,20 @@
                             }
                         }, 
                         {
-                            "Condition": {
-                                    "If": "!AccessTokenResult",
-                                    "Then": {
-                                        "Do": [
-                                            {
-                                                "Throw": {
-                                                    "Value": "[Error] Authentication failed"
-                                                }
-                                            }
-                                        ]
-                                    }
-                            }
-                        },
-                        {
                             "Function": {
-                                "Name": "GetUserId",
+                                "Name": "GetUser",
                                 "Parameters": [
                                     "%Address%",
                                     "%AccountUsername%",
                                     "%AccessToken%",
                                     "%{SkipServerCertValidation}%"
                                 ],
-                                "ResultVariable": "GetUserIdResult"
-                            }
-                        }, {
-                            "Condition": {
-                                    "If": "GetUserIdResult == null",
-                                    "Then": {
-                                        "Do": [
-                                            {
-                                                "Throw": {
-                                                    "Value": "[Error] User Id not found"
-                                                }
-                                            }
-                                        ]
-                                    }
+                                "ResultVariable": "GetUserResult"
                             }
                         },
                         {
                             "Log": {
-                                "Text": "User Id found for user '%{AccountUsername}%': %{GetUserIdResult}%"
+                                "Text": "User Id found for user '%{AccountUsername}%': %{GetUserResult.id}%"
                             }
                         },
                         {
@@ -500,52 +417,34 @@
                                 "Name": "DeactivateUser",
                                 "Parameters": [
                                     "%Address%",
-                                    "%GetUserIdResult%",
+                                    "%{GetUserResult.id}%",
                                     "%AccessToken%",
                                     "%{SkipServerCertValidation}%"
                                 ],
                                 "ResultVariable": "DeactivateUserResult"
                             }
-                        }, {
-                            "Condition": {
-                                    "If": "DeactivateUserResult == true",
-                                    "Then": {
-                                        "Do": [
-                                            {
-                                                "Function": {
-                                                    "Name": "Disconnect",
-                                                    "Parameters": [
-                                                        "%Address%",
-                                                        "%FuncUsername%",
-                                                        "%FuncPassword%",
-                                                        "%{AccessToken}%",
-                                                        "%{SkipServerCertValidation}%"
-                                                    ],
-                                                    "ResultVariable": "Disconnected"
-                                                }
-                                            }, {
-                                                "Return": {
-                                                    "Value": true
-                                                }
-                                            }
-                                        ]
-                                    },
-                                    "Else": {
-                                        "Do": [
-                                            {
-                                                "Throw": {
-                                                    "Value": "[Error] Deactivating the user was not successful"
-                                                }
-                                            }
-                                        ]
-                                    }
-                            }
                         }
                     ],
                     "Catch": [
                         {
-                            "Return": {
-                                "Value": false
+                            "Throw": { 
+                                "Message": "%Exception%",
+                                "Value": "[Error] Deactivating the user was not successful"
+                            }
+                        }
+                    ],
+                    "Finally": [
+                        {
+                            "Function": {
+                                "Name": "Disconnect",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%FuncUsername%",
+                                    "%FuncPassword%",
+                                    "%{AccessToken}%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "Disconnected"
                             }
                         }
                     ]
@@ -651,20 +550,6 @@
                                 ],
                                 "ResultVariable": "AccessTokenResult"
                             }
-                        }, 
-                        {
-                            "Condition": {
-                                    "If": "!AccessTokenResult",
-                                    "Then": {
-                                        "Do": [
-                                            {
-                                                "Throw": {
-                                                    "Value": "[Error] Authentication failed"
-                                                }
-                                            }
-                                        ]
-                                    }
-                            }
                         },
                         {
                             "Function": {
@@ -678,46 +563,28 @@
                                 ],
                                 "ResultVariable": "AssignRolesResult"
                             }
-                        }, {
-                            "Condition": {
-                                    "If": "AssignRolesResult == true",
-                                    "Then": {
-                                        "Do": [
-                                            {
-                                                "Function": {
-                                                    "Name": "Disconnect",
-                                                    "Parameters": [
-                                                        "%Address%",
-                                                        "%FuncUsername%",
-                                                        "%FuncPassword%",
-                                                        "%{AccessToken}%",
-                                                        "%{SkipServerCertValidation}%"
-                                                    ],
-                                                    "ResultVariable": "Disconnected"
-                                                }
-                                            }, {
-                                                "Return": {
-                                                    "Value": true
-                                                }
-                                            }
-                                        ]
-                                    },
-                                    "Else": {
-                                        "Do": [
-                                            {
-                                                "Throw": {
-                                                    "Value": "[Error] Assigning roles to the user failed"
-                                                }
-                                            }
-                                        ]
-                                    }
-                            }
                         }
                     ],
                     "Catch": [
                         {
-                            "Return": {
-                                "Value": false
+                            "Throw": { 
+                                "Message": "%Exception%",
+                                "Value": "[Error] Assigning roles to the user failed"
+                            }
+                        }
+                    ],
+                    "Finally": [
+                        {
+                            "Function": {
+                                "Name": "Disconnect",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%FuncUsername%",
+                                    "%FuncPassword%",
+                                    "%{AccessToken}%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "Disconnected"
                             }
                         }
                     ]
@@ -825,20 +692,6 @@
                             }
                         }, 
                         {
-                            "Condition": {
-                                    "If": "!AccessTokenResult",
-                                    "Then": {
-                                        "Do": [
-                                            {
-                                                "Throw": {
-                                                    "Value": "[Error] Authentication failed"
-                                                }
-                                            }
-                                        ]
-                                    }
-                            }
-                        },
-                        {
                             "Function": {
                                 "Name": "DeassignRoles",
                                 "Parameters": [
@@ -850,46 +703,28 @@
                                 ],
                                 "ResultVariable": "DeassignRolesResult"
                             }
-                        }, {
-                            "Condition": {
-                                    "If": "DeassignRolesResult == true",
-                                    "Then": {
-                                        "Do": [
-                                            {
-                                                "Function": {
-                                                    "Name": "Disconnect",
-                                                    "Parameters": [
-                                                        "%Address%",
-                                                        "%FuncUsername%",
-                                                        "%FuncPassword%",
-                                                        "%{AccessToken}%",
-                                                        "%{SkipServerCertValidation}%"
-                                                    ],
-                                                    "ResultVariable": "Disconnected"
-                                                }
-                                            }, {
-                                                "Return": {
-                                                    "Value": true
-                                                }
-                                            }
-                                        ]
-                                    },
-                                    "Else": {
-                                        "Do": [
-                                            {
-                                                "Throw": {
-                                                    "Value": "[Error] Deassigning roles from the user failed"
-                                                }
-                                            }
-                                        ]
-                                    }
-                            }
                         }
                     ],
                     "Catch": [
                         {
-                            "Return": {
-                                "Value": false
+                            "Throw": { 
+                                "Message": "%Exception%",
+                                "Value": "[Error] Deassigning roles from the user failed"
+                            }
+                        }
+                    ],
+                    "Finally": [
+                        {
+                            "Function": {
+                                "Name": "Disconnect",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%FuncUsername%",
+                                    "%FuncPassword%",
+                                    "%{AccessToken}%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "Disconnected"
                             }
                         }
                     ]
@@ -939,32 +774,19 @@
                         "Do": [
                                 {
                                     "Function": {
-                                        "Name": "GetUserId",
+                                        "Name": "GetUser",
                                         "Parameters": [
                                             "%Address%",
                                             "%AccountUsername%",
                                             "%AccessToken%",
                                             "%{SkipServerCertValidation}%"
                                         ],
-                                        "ResultVariable": "UserId"
-                                    }
-                                }, {
-                                    "Condition": {
-                                            "If": "UserId == null",
-                                            "Then": {
-                                                "Do": [
-                                                    {
-                                                        "Throw": {
-                                                            "Value": "[Error] User Id not found"
-                                                        }
-                                                    }
-                                                ]
-                                            }
+                                        "ResultVariable": "User"
                                     }
                                 },
                                 {
                                     "Log": {
-                                        "Text": "User Id found for user '%{AccountUsername}%': %{UserId}%"
+                                        "Text": "User Id found for user '%{AccountUsername}%': %{User.id}%"
                                     }
                                 },{
                                     "SetItem": {
@@ -1015,7 +837,7 @@
                                                                     "Parameters": [
                                                                         "%Address%",
                                                                         "%RoleId%",
-                                                                        "%UserId%",
+                                                                        "%{User.id}%",
                                                                         "%AccessToken%",
                                                                         "%{SkipServerCertValidation}%",
                                                                         "%{AccountUsername}%"
@@ -1107,8 +929,9 @@
                             ],
                             "Catch": [
                                 {
-                                    "Return": {
-                                        "Value": false
+                                    "Throw": {
+                                        "Message": "%Exception%",
+                                        "Value": "Role Deassignment failed"
                                     }
                                 }
                             ]
@@ -1158,52 +981,39 @@
                     
                             {
                                 "Function": {
-                                    "Name": "GetUserId",
+                                    "Name": "GetUser",
                                     "Parameters": [
                                         "%Address%",
                                         "%AccountUsername%",
                                         "%AccessToken%",
                                         "%{SkipServerCertValidation}%"
                                     ],
-                                    "ResultVariable": "UserId"
-                                }
-                            }, {
-                                "Condition": {
-                                        "If": "UserId == null",
-                                        "Then": {
-                                            "Do": [
-                                                {
-                                                    "Throw": {
-                                                        "Value": "[Error] User Id not found"
-                                                    }
-                                                }
-                                            ]
-                                        }
+                                    "ResultVariable": "User"
                                 }
                             },
                             {
                                 "Log": {
-                                    "Text": "User Id found for user '%{AccountUsername}%': %{UserId}%"
-                                }
-                            },{
-                                "Function": {
-                                    "Name": "IsUserActive",
-                                    "Parameters": [
-                                        "%Address%",
-                                        "%AccountUsername%",
-                                        "%AccessToken%",
-                                        "%{SkipServerCertValidation}%"
-                                    ],
-                                    "ResultVariable": "IsUserActiveResult"
+                                    "Text": "User Id found for user '%{AccountUsername}%': %{User.id}%"
                                 }
                             },{
                                 "Condition": {
-                                    "If": "!IsUserActiveResult",
+                                    "If": "%{User.status != 1}%",
                                     "Then": {
                                         "Do": [
-                                            {
+                                                {
+                                                  "Status": {
+                                                    "Type": "Changing",
+                                                    "Percent": 30,
+                                                    "Message": {
+                                                      "Name": "LookingUpUser",
+                                                      "Parameters": [ "required active status" ]
+                                                    }
+                                                  }
+                                                },
+                                                {
                                                     "Throw": {
-                                                        "Value": "[Error] User is inactive, roles don't get assigned to avoid subsequent provisioning errors inside OneLogin"
+                                                        "Value": "[Error] User is inactive, roles don't get assigned to avoid subsequent provisioning errors inside OneLogin",
+                                                        "Message": "[Error] User is inactive, roles don't get assigned to avoid subsequent provisioning errors inside OneLogin"
                                                     }
                                                 }
                                         ]
@@ -1262,7 +1072,7 @@
                                                                     "Parameters": [
                                                                         "%Address%",
                                                                         "%RoleId%",
-                                                                        "%UserId%",
+                                                                        "%{User.id}%",
                                                                         "%AccessToken%",
                                                                         "%{SkipServerCertValidation}%",
                                                                         "%{AccountUsername}%"
@@ -1355,8 +1165,9 @@
                         ],
                         "Catch": [
                             {
-                                "Return": {
-                                    "Value": false
+                                "Throw": {
+                                    "Message": "%Exception%",
+                                    "Value": "%Exception%"
                                 }
                             }
                         ]
@@ -1375,7 +1186,7 @@
                 },
                 {
                     "UserId": {
-                        "Type": "String",
+                        "Type": "Integer",
                         "Required": true
                     }
                 },
@@ -1476,6 +1287,7 @@
                                         "Do": [
                                             {
                                                 "Throw": {
+                                                    "Message": "[Error] User activation failed",
                                                     "Value": "[Error] User activation failed"
                                                 }
                                             }
@@ -1486,8 +1298,9 @@
                         ],
                         "Catch": [
                             {
-                                "Return": {
-                                    "Value": false
+                                "Throw": {
+                                    "Message": "[Error] User activation failed",
+                                    "Value": "[Error] User activation failed"
                                 }
                             }
                         ]
@@ -1506,7 +1319,7 @@
                 },
                 {
                     "UserId": {
-                        "Type": "String",
+                        "Type": "Integer",
                         "Required": true
                     }
                 },
@@ -1606,7 +1419,8 @@
                                         "Do": [
                                             {
                                                 "Throw": {
-                                                    "Value": "[Error] User deactivation failed"
+                                                    "Value": "[Error] User deactivation failed",
+                                                    "Message": "[Error] User deactivation failed"
                                                 }
                                             }
                                         ]
@@ -1616,8 +1430,9 @@
                         ],
                         "Catch": [
                             {
-                                "Return": {
-                                    "Value": false
+                                "Throw": {
+                                    "Value": "[Error] User deactivation failed",
+                                    "Message": "[Error] User deactivation failed"
                                 }
                             }
                         ]
@@ -1642,7 +1457,7 @@
                 },
                 {
                     "UserId": {
-                        "Type": "String",
+                        "Type": "Integer",
                         "Required": true
                     }
                 },
@@ -1804,7 +1619,7 @@
                 },
                 {
                     "UserId": {
-                        "Type": "String",
+                        "Type": "Integer",
                         "Required": true
                     }
                 },
@@ -2028,6 +1843,15 @@
                                     "Body": {
                                       "Do": [
                                             {
+                                              "Status": {
+                                                "Type": "Changing",
+                                                "Percent": 75,
+                                                "Message": {
+                                                  "Name": "LookingUpGroup",
+                                                  "Parameters": [ "checking the completeness of role assignment/deassignment" ]
+                                                }
+                                              }
+                                            }, {
                                                 "Request": {
                                                     "RequestObjectName": "SystemRequest",
                                                     "ResponseObjectName": "SystemResponse",
@@ -2094,15 +1918,6 @@
                                                     }
                                                 }
                                             }, {
-                                              "Status": {
-                                                "Type": "Changing",
-                                                "Percent": 75,
-                                                "Message": {
-                                                  "Name": "LookingUpGroup",
-                                                  "Parameters": [ "%{Role}%, whether the role assignment/deassignment completed" ]
-                                                }
-                                              }
-                                            }, {
                                                 "Wait": { "Seconds": "%{RetrySeconds}%" }
                                             }
                                         
@@ -2133,132 +1948,6 @@
                                             }
                                         ]
                                     }
-                                }
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "Name": "IsUserActive",
-            "Parameters": [
-                {
-                    "Address": {
-                        "Type": "String",
-                        "Required": true
-                    }
-                },
-                {
-                    "AccountUsername": {
-                        "Type": "String",
-                        "Required": true
-                    }
-                },
-                {
-                    "AccessToken": {
-                        "Type": "Secret",
-                        "Required": true
-                    }
-                },
-                {
-                    "SkipServerCertValidation": {
-                        "Type": "boolean",
-                        "Required": false,
-                        "DefaultValue": false
-                    }
-                }
-            ],
-            "Do": [
-                {
-                    "BaseAddress": {
-                        "Address": "https://%Address%"
-                    }
-                },
-                {
-                    "NewHttpRequest": {
-                        "ObjectName": "SystemRequest"
-                    }
-                },
-                {
-                    "Headers": {
-                        "RequestObjectName": "SystemRequest",
-                        "AddHeaders": {
-                            "Authorization": "Bearer %AccessToken%"
-                        }
-                    }
-                },
-                {
-                    "Try": {
-                        "Do": [
-                            {
-                                "For": {
-                                    "Condition": true,
-                                    "Body": {
-                                      "Do": [
-                                            {
-                                                "Request": {
-                                                    "RequestObjectName": "SystemRequest",
-                                                    "ResponseObjectName": "SystemResponse",
-                                                    "Verb": "GET",
-                                                    "Url": "api/2/users?username=%AccountUsername%",
-                                                    "SubstitutionInUrl": true,
-                                                    "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
-                                                    "Content": {
-                                                    },
-                                                    "ProxyIp": "%HttpProxyUri%",
-                                                    "ProxyPort": "%HttpProxyPort%",
-                                                    "ProxyUser": "%HttpProxyUserName%",
-                                                    "ProxyPassword": "%HttpProxyPassword%"
-                                                },
-                                                
-                                            },
-                                            {
-                                                "ExtractJsonObject": {
-                                                    "JsonObjectName": "SystemResponse",
-                                                    "Name": "GetUserIdResponseJson"
-                                                }
-                                            },
-                                            {
-                                                "Log": {
-                                                    "Text": "%{SystemResponse.StatusCode}%"
-                                                }
-                                            },
-                                            {
-                                                "Condition": {
-                                                    "If": "GetUserIdResponseJson[0].status == 1",
-                                                    "Then": {
-                                                        "Do": [
-                                                            {
-                                                                "Return": {
-                                                                    "Value": true
-                                                                }
-                                                            }
-                                                        ]
-                                                    }
-                                                }
-                                            },{
-                                                "Status": {
-                                                    "Type": "Changing",
-                                                    "Percent": 45,
-                                                    "Message": {
-                                                        "Name": "LookingUpUser",
-                                                        "Parameters": [ "%{AccountUsername}%, which must be active in OneLogin before assigning roles" ]
-                                                    }
-                                                 }
-                                            }, {
-                                                "Wait": { "Seconds": "%{RetrySeconds}%" }
-                                            }
-                                        
-                                        ]
-                                    }
-                                }
-                            }
-                        ],
-                        "Catch": [
-                            {
-                                "Return": {
-                                    "Value": null
                                 }
                             }
                         ]
@@ -2400,7 +2089,7 @@
             ]
         },
         {
-            "Name": "GetUserId",
+            "Name": "GetUser",
             "Parameters": [
                 {
                     "Address": {
@@ -2480,7 +2169,7 @@
                             {
                                 "ExtractJsonObject": {
                                     "JsonObjectName": "SystemResponse",
-                                    "Name": "GetUserIdResponseJson"
+                                    "Name": "GetUserResponseJson"
                                 }
                             },
                             {
@@ -2490,12 +2179,12 @@
                             },
                             {
                                 "Condition": {
-                                    "If": "GetUserIdResponseJson.count != 0",
+                                    "If": "GetUserResponseJson.count != 0",
                                     "Then": {
                                         "Do": [
                                             {
                                                 "Return": {
-                                                    "Value": "%{GetUserIdResponseJson[0].id}%"
+                                                    "Value": {"id": "%{GetUserResponseJson[0].id}%","status": "%{GetUserResponseJson[0].status}%"}
                                                 }
                                             }
                                         ]
@@ -2514,6 +2203,7 @@
                                             },
                                             {
                                                 "Throw": {
+                                                    "Message": "[Error] User not found: %AccountUsername%",
                                                     "Value": "[Error] User not found: %AccountUsername%"
                                                 }
                                             }
@@ -2524,8 +2214,9 @@
                         ],
                         "Catch": [
                             {
-                                "Return": {
-                                    "Value": null
+                                "Throw": {
+                                    "Message": "[Error] User not found: %AccountUsername%",
+                                    "Value": "[Error] User not found: %AccountUsername%"
                                 }
                             }
                         ]
@@ -2664,12 +2355,13 @@
                                                 "Percent": 90,
                                                 "Message": {
                                                   "Name": "AssetConnectFailedWithReason",
-                                                  "Parameters": [ "%{Address}%", "%{AuthResponseJson.message}%" ]
+                                                  "Parameters": [ "%{Address}%", "[Error] %{SystemResponse.StatusCode}%" ]
                                                 }
                                               }
                                             },
                                             {
                                                 "Throw": {
+                                                    "Message": "[Error] %{SystemResponse.StatusCode}%",
                                                     "Value": "[Error] %{SystemResponse.StatusCode}%"
                                                 }
                                             }
@@ -2680,8 +2372,9 @@
                         ],
                         "Catch": [
                             {
-                                "Return": {
-                                    "Value": false
+                                "Throw": {
+                                    "Message": "%Exception%",
+                                    "Value": "%Exception%"
                                 }
                             }
                         ]
@@ -2768,7 +2461,8 @@
                                     "ProxyIp": "%HttpProxyUri%",
                                     "ProxyPort": "%HttpProxyPort%",
                                     "ProxyUser": "%HttpProxyUserName%",
-                                    "ProxyPassword": "%HttpProxyPassword%"
+                                    "ProxyPassword": "%HttpProxyPassword%",
+                                    "IsSecret": true
                                 }
                             },
                             {
@@ -2793,7 +2487,7 @@
                                         "Do": [
                                             {
                                                 "Throw": {
-                                                    "Value": "[Error] %{SystemResponse.StatusCode}%, Message: %{AuthResponseJson.status.message}%"
+                                                    "Message": "[Error] %{SystemResponse.StatusCode}%, Message: %{AuthResponseJson.status.message}%"
                                                 }
                                             }
                                         ]
@@ -2803,8 +2497,8 @@
                         ],
                         "Catch": [
                             {
-                                "Return": {
-                                    "Value": null
+                                "Throw": {
+                                    "Message": "%Exception%"
                                 }
                             }
                         ]
