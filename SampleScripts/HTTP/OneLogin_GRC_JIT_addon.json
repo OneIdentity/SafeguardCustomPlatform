@@ -1,0 +1,2510 @@
+{
+    "Id": "onelogingrdcjitaddon",
+    "BackEnd": "Scriptable",
+    "Meta": {
+        "Author": "Viktor Varga (One Identity)",
+        "Description": "This Solution Accelerator connector implements activation of OneLogin Accounts and Role elevation. It is to be used in a PIAM/PIdP use-case where a OneLogin Generic REST Connector manages Assets, Accounts, and Entitlements in Safeguard."
+    },
+    "CheckSystem": {
+        "Parameters": [
+            {
+                "FuncUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            {
+                "FuncPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            },
+            {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": false
+                }
+            },
+            {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            { 
+                "HttpProxyUri": { 
+                    "Type": "String", 
+                    "Description": "HTTP Proxy Address", 
+                    "Required": false 
+                }
+            },
+            {
+                "HttpProxyPort": { 
+                    "Type": "Integer",
+                    "Description": "HTTP Proxy Port",
+                    "Required": false
+                }
+            },
+            {
+                "HttpProxyUserName": { 
+                    "Type": "String",
+                    "Description": "HTTP Proxy UserName",
+                    "Required": false
+                }
+            },
+            {
+                "HttpProxyPassword": {
+                    "Type": "Secret",
+                    "Description": "HTTP Proxy Password",
+                    "Required": false
+                }
+            }
+        ],
+        "Do": [
+            {
+                "Function": {
+                    "Name": "ApiAuth",
+                    "Parameters": [
+                        "%Address%",
+                        "%FuncUsername%",
+                        "%FuncPassword%",
+                        "%{SkipServerCertValidation}%"
+                    ],
+                    "ResultVariable": "AccessTokenResult"
+                }
+            },
+            {
+                "Function": {
+                    "Name": "Disconnect",
+                    "Parameters": [
+                        "%Address%",
+                        "%FuncUsername%",
+                        "%FuncPassword%",
+                        "%{AccessToken}%",
+                        "%{SkipServerCertValidation}%"
+                    ],
+                    "ResultVariable": "Disconnected"
+                }
+            }, {
+                "Return": {
+                    "Value": true
+                }
+            }
+        ],
+        "Catch": [
+            {
+                "Throw": { 
+                    "Message": "%Exception%"
+                }
+            }
+        ]
+    },
+    "ChangePassword": {
+        "Parameters": [
+            {
+                "AccountUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            {
+                "FuncUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            {
+                "FuncPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            },
+            {
+                "NewPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            },
+            {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": false
+                }
+            },
+            {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            { 
+                "HttpProxyUri": { 
+                    "Type": "String", 
+                    "Description": "HTTP Proxy Address", 
+                    "Required": false 
+                }
+            },
+            {
+                "HttpProxyPort": { 
+                    "Type": "Integer",
+                    "Description": "HTTP Proxy Port",
+                    "Required": false,
+                    "DefaultValue": 443
+                }
+            },
+            {
+                "HttpProxyUserName": { 
+                    "Type": "String",
+                    "Description": "HTTP Proxy UserName",
+                    "Required": false
+                }
+            },
+            {
+                "HttpProxyPassword": {
+                    "Type": "Secret",
+                    "Description": "HTTP Proxy Password",
+                    "Required": false
+                }
+            }
+        ],
+        "Do": [
+            {
+                "Log": {
+                    "Text": "ChangePassword does not do anything. A dummy password is set on the Account by OneLogin but in practice these Accounts will only have TOTP configured and used. Do not use the ChangePassword task."
+                }
+            },
+            {
+                "Return": {
+                    "Value": false
+                }
+            }
+        ]
+    },
+    "EnableAccount": {
+        "Parameters": [
+            {
+                "FuncUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            {
+                "FuncPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            },
+            {
+                "AccountUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": false
+                }
+            },
+            {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            { 
+                "HttpProxyUri": { 
+                    "Type": "String", 
+                    "Description": "HTTP Proxy Address", 
+                    "Required": false 
+                }
+            },
+            {
+                "HttpProxyPort": { 
+                    "Type": "Integer",
+                    "Description": "HTTP Proxy Port",
+                    "Required": false,
+                    "DefaultValue": 443
+                }
+            },
+            {
+                "HttpProxyUserName": { 
+                    "Type": "String",
+                    "Description": "HTTP Proxy UserName",
+                    "Required": false
+                }
+            },
+            {
+                "HttpProxyPassword": {
+                    "Type": "Secret",
+                    "Description": "HTTP Proxy Password",
+                    "Required": false
+                }
+            }
+        ],
+        "Do": [
+            {
+                "Try": {
+                    "Do": [
+                        {
+                            "Function": {
+                                "Name": "ApiAuth",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%FuncUsername%",
+                                    "%FuncPassword%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "AccessTokenResult"
+                            }
+                        }, {
+                            "Function": {
+                                "Name": "GetUser",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%AccountUsername%",
+                                    "%AccessToken%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "GetUserResult"
+                            }
+                        }, {
+                            "Log": {
+                                "Text": "User Id found for user '%{AccountUsername}%': %{GetUserResult.id}%"
+                            }
+                        },
+                        {
+                            "Function": {
+                                "Name": "ActivateUser",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%{GetUserResult.id}%",
+                                    "%AccessToken%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "ActivateUserResult"
+                            }
+                        }
+                    ],
+                    "Catch": [
+                        {
+                            "Throw": { 
+                                "Message": "%Exception%",
+                                "Value": "[Error] Activating the user was not successful"
+                            }
+                        }
+                    ],
+                    "Finally": [
+                        {
+                            "Function": {
+                                "Name": "Disconnect",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%FuncUsername%",
+                                    "%FuncPassword%",
+                                    "%{AccessToken}%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "Disconnected"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "DisableAccount": {
+        "Parameters": [
+            {
+                "FuncUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            {
+                "FuncPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            },
+            {
+                "AccountUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": false
+                }
+            },
+            {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            { 
+                "HttpProxyUri": { 
+                    "Type": "String", 
+                    "Description": "HTTP Proxy Address", 
+                    "Required": false 
+                }
+            },
+            {
+                "HttpProxyPort": { 
+                    "Type": "Integer",
+                    "Description": "HTTP Proxy Port",
+                    "Required": false,
+                    "DefaultValue": 443
+                }
+            },
+            {
+                "HttpProxyUserName": { 
+                    "Type": "String",
+                    "Description": "HTTP Proxy UserName",
+                    "Required": false
+                }
+            },
+            {
+                "HttpProxyPassword": {
+                    "Type": "Secret",
+                    "Description": "HTTP Proxy Password",
+                    "Required": false
+                }
+            }
+        ],
+        "Do": [
+            {
+                "Try": {
+                    "Do": [
+                        {
+                            "Function": {
+                                "Name": "ApiAuth",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%FuncUsername%",
+                                    "%FuncPassword%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "AccessTokenResult"
+                            }
+                        }, 
+                        {
+                            "Function": {
+                                "Name": "GetUser",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%AccountUsername%",
+                                    "%AccessToken%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "GetUserResult"
+                            }
+                        },
+                        {
+                            "Log": {
+                                "Text": "User Id found for user '%{AccountUsername}%': %{GetUserResult.id}%"
+                            }
+                        },
+                        {
+                            "Function": {
+                                "Name": "DeactivateUser",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%{GetUserResult.id}%",
+                                    "%AccessToken%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "DeactivateUserResult"
+                            }
+                        }
+                    ],
+                    "Catch": [
+                        {
+                            "Throw": { 
+                                "Message": "%Exception%",
+                                "Value": "[Error] Deactivating the user was not successful"
+                            }
+                        }
+                    ],
+                    "Finally": [
+                        {
+                            "Function": {
+                                "Name": "Disconnect",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%FuncUsername%",
+                                    "%FuncPassword%",
+                                    "%{AccessToken}%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "Disconnected"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "ElevateAccount": {
+        "Parameters": [
+            {
+                "FuncUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            {
+                "FuncPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            },
+            {
+                "AccountUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": false
+                }
+            },
+            {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            {
+                "PrivilegeGroupMembership": {
+                    "Type": "Array",
+                    "Required": true
+                }
+            },
+            {
+                "RetryIntervalSeconds": {
+                    "Type": "integer",
+                    "Description": "The number of seconds to wait between each retries when checking the completion of activating the user or assigning a role. Default value is 5. Note: there is no maximum iteration configured, if hitting a problem on the OneLogin side, the Elevate task will hang in Pending state.",
+                    "Required": false,
+                    "DefaultValue": 5
+                }
+            },
+            { 
+                "HttpProxyUri": { 
+                    "Type": "String", 
+                    "Description": "HTTP Proxy Address", 
+                    "Required": false 
+                }
+            },
+            {
+                "HttpProxyPort": { 
+                    "Type": "Integer",
+                    "Description": "HTTP Proxy Port",
+                    "Required": false,
+                    "DefaultValue": 443
+                }
+            },
+            {
+                "HttpProxyUserName": { 
+                    "Type": "String",
+                    "Description": "HTTP Proxy UserName",
+                    "Required": false
+                }
+            },
+            {
+                "HttpProxyPassword": {
+                    "Type": "Secret",
+                    "Description": "HTTP Proxy Password",
+                    "Required": false
+                }
+            }
+        ],
+        "Do": [
+            {
+                "Try": {
+                    "Do": [
+                        {
+                            "SetItem": {
+                                "Name": "Global:RetrySeconds",
+                                "Value": "%{RetryIntervalSeconds}%"
+                            }
+                        },
+                        {
+                            "Function": {
+                                "Name": "ApiAuth",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%FuncUsername%",
+                                    "%FuncPassword%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "AccessTokenResult"
+                            }
+                        },
+                        {
+                            "Function": {
+                                "Name": "AssignRoles",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%AccountUsername%",
+                                    "%AccessToken%",
+                                    "%{PrivilegeGroupMembership}%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "AssignRolesResult"
+                            }
+                        }
+                    ],
+                    "Catch": [
+                        {
+                            "Throw": { 
+                                "Message": "%Exception%",
+                                "Value": "[Error] Assigning roles to the user failed"
+                            }
+                        }
+                    ],
+                    "Finally": [
+                        {
+                            "Function": {
+                                "Name": "Disconnect",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%FuncUsername%",
+                                    "%FuncPassword%",
+                                    "%{AccessToken}%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "Disconnected"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "DemoteAccount": {
+        "Parameters": [
+            {
+                "FuncUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            {
+                "FuncPassword": {
+                    "Type": "Secret",
+                    "Required": true
+                }
+            },
+            {
+                "AccountUsername": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            {
+                "SkipServerCertValidation": {
+                    "Type": "boolean",
+                    "Required": false,
+                    "DefaultValue": false
+                }
+            },
+            {
+                "Address": {
+                    "Type": "String",
+                    "Required": true
+                }
+            },
+            {
+                "PrivilegeGroupMembership": {
+                    "Type": "Array",
+                    "Required": true
+                }
+            },
+            {
+                "RetryIntervalSeconds": {
+                    "Type": "integer",
+                    "Description": "The number of seconds to wait between each retries when checking the completion of deassigning a role. Default value is 5. Note: there is no maximum iteration configured, if hitting a problem on the OneLogin side, the Demote task will hang in Pending state.",
+                    "Required": false,
+                    "DefaultValue": 5
+                }
+            },
+            { 
+                "HttpProxyUri": { 
+                    "Type": "String", 
+                    "Description": "HTTP Proxy Address", 
+                    "Required": false 
+                }
+            },
+            {
+                "HttpProxyPort": { 
+                    "Type": "Integer",
+                    "Description": "HTTP Proxy Port",
+                    "Required": false,
+                    "DefaultValue": 443
+                }
+            },
+            {
+                "HttpProxyUserName": { 
+                    "Type": "String",
+                    "Description": "HTTP Proxy UserName",
+                    "Required": false
+                }
+            },
+            {
+                "HttpProxyPassword": {
+                    "Type": "Secret",
+                    "Description": "HTTP Proxy Password",
+                    "Required": false
+                }
+            }
+        ],
+        "Do": [
+            {
+                "Try": {
+                    "Do": [
+                        {
+                            "SetItem": {
+                                "Name": "Global:RetrySeconds",
+                                "Value": "%{RetryIntervalSeconds}%"
+                            }
+                        },
+                        {
+                            "Function": {
+                                "Name": "ApiAuth",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%FuncUsername%",
+                                    "%FuncPassword%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "AccessTokenResult"
+                            }
+                        }, 
+                        {
+                            "Function": {
+                                "Name": "DeassignRoles",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%AccountUsername%",
+                                    "%AccessToken%",
+                                    "%{PrivilegeGroupMembership}%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "DeassignRolesResult"
+                            }
+                        }
+                    ],
+                    "Catch": [
+                        {
+                            "Throw": { 
+                                "Message": "%Exception%",
+                                "Value": "[Error] Deassigning roles from the user failed"
+                            }
+                        }
+                    ],
+                    "Finally": [
+                        {
+                            "Function": {
+                                "Name": "Disconnect",
+                                "Parameters": [
+                                    "%Address%",
+                                    "%FuncUsername%",
+                                    "%FuncPassword%",
+                                    "%{AccessToken}%",
+                                    "%{SkipServerCertValidation}%"
+                                ],
+                                "ResultVariable": "Disconnected"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "Functions": [
+        {
+            "Name": "DeassignRoles",
+            "Parameters": [
+                {
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "AccountUsername": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "AccessToken": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                },
+                {
+                    "PrivilegeGroupMembership": {
+                        "Type": "Array",
+                        "Required": true
+                    }
+                },
+                {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": false
+                    }
+                }
+            ],
+            "Do": [
+                {
+                    "Try": {
+                        "Do": [
+                                {
+                                    "Function": {
+                                        "Name": "GetUser",
+                                        "Parameters": [
+                                            "%Address%",
+                                            "%AccountUsername%",
+                                            "%AccessToken%",
+                                            "%{SkipServerCertValidation}%"
+                                        ],
+                                        "ResultVariable": "User"
+                                    }
+                                },
+                                {
+                                    "Log": {
+                                        "Text": "User Id found for user '%{AccountUsername}%': %{User.id}%"
+                                    }
+                                },{
+                                    "SetItem": {
+                                        "Name": "RoleDeassignmentFailure",
+                                        "Value": false
+                                    }
+                                }, {
+                                    "ForEach": {
+                                        "CollectionName": "PrivilegeGroupMembership",
+                                        "ElementName": "role",
+                                        "Body": {
+                                            "Do": [
+                                                {
+                                                    "Function": {
+                                                        "Name": "GetRoleId",
+                                                        "Parameters": [
+                                                            "%Address%",
+                                                            "%role%",
+                                                            "%AccessToken%",
+                                                            "%{SkipServerCertValidation}%"
+                                                        ],
+                                                        "ResultVariable": "RoleId"
+                                                    }
+                                                }, {
+                                                "Condition": {
+                                                    "If": "RoleId != null",
+                                                    "Then": {
+                                                        "Do": [
+                                                            {
+                                                                "Log": {
+                                                                    "Text": "Role Id found for role '%role%': %{RoleId}%"
+                                                                }
+                                                            },
+                                                            {
+                                                              "Status": {
+                                                                "Type": "Changing",
+                                                                "Percent": 70,
+                                                                "Message": {
+                                                                  "Name": "DemotingAccount",
+                                                                  "Parameters": [ "%{AccountUsername}%", "%{role}%" ]
+                                                                }
+                                                              }
+                                                            },
+                                                            ,
+                                                            {
+                                                                "Function": {
+                                                                    "Name": "DeleteUserFromRole",
+                                                                    "Parameters": [
+                                                                        "%Address%",
+                                                                        "%RoleId%",
+                                                                        "%{User.id}%",
+                                                                        "%AccessToken%",
+                                                                        "%{SkipServerCertValidation}%",
+                                                                        "%{AccountUsername}%"
+                                                                    ],
+                                                                    "ResultVariable": "DeleteUserFromRoleResult"
+                                                                }
+                                                            }, {
+                                                                "Condition": {
+                                                                    "If": "DeleteUserFromRoleResult != true",
+                                                                    "Then": {
+                                                                        "Do": [
+                                                                            {
+                                                                                "Log": {
+                                                                                    "Text": "User '%{AccountUsername}%' could not be removed from role '%{role}%', looking up next configured role."
+                                                                                }
+                                                                            },{
+                                                                                "Status": {
+                                                                                    "Type": "Changing",
+                                                                                    "Percent": 80,
+                                                                                    "Message": {
+                                                                                      "Name": "AccountMembershipDemoteFailed",
+                                                                                      "Parameters": [ "%{AccountUsername}%", "%{role}%" ]
+                                                                                    }
+                                                                                  }
+                                                                            }, {
+                                                                                "SetItem": {
+                                                                                    "Name": "RoleDeassignmentFailure",
+                                                                                    "Value": true
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "Else": {
+                                                                        "Do": [
+                                                                            {
+                                                                                    "Status": {
+                                                                                        "Type": "Changing",
+                                                                                        "Percent": 80,
+                                                                                        "Message": {
+                                                                                          "Name": "AccountMembershipDemoted",
+                                                                                          "Parameters": [ "%{AccountUsername}%", "%{role}%" ]
+                                                                                        }
+                                                                                      }
+                                                                                
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
+                                                    },
+                                                    "Else": {
+                                                        "Do": [
+                                                            {
+                                                                "Log": {
+                                                                    "Text": "Role '%role%' not found, looking up next configured role."
+                                                                }
+                                                            }, {
+                                                                "SetItem": {
+                                                                    "Name": "RoleDeassignmentFailure",
+                                                                    "Value": true
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                            ]
+                                        }
+                                    }
+                                }, {
+                                    "Condition": {
+                                        "If": "RoleDeassignmentFailure == true",
+                                        "Then": {
+                                            "Do": [
+                                                {
+                                                    "Log": {
+                                                        "Text": "At least one of the configured roles could not be removed from the user '%{AccountUsername}%'"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }, {
+                                    "Return": {
+                                        "Value": true
+                                    }
+                                }
+                            ],
+                            "Catch": [
+                                {
+                                    "Throw": {
+                                        "Message": "%Exception%",
+                                        "Value": "Role Deassignment failed"
+                                    }
+                                }
+                            ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "AssignRoles",
+            "Parameters": [
+                {
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "AccountUsername": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "AccessToken": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                },
+                {
+                    "PrivilegeGroupMembership": {
+                        "Type": "Array",
+                        "Required": true
+                    }
+                },
+                {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": false
+                    }
+                }
+            ],
+            "Do": [
+                {
+                    "Try": {
+                        "Do": [
+                    
+                            {
+                                "Function": {
+                                    "Name": "GetUser",
+                                    "Parameters": [
+                                        "%Address%",
+                                        "%AccountUsername%",
+                                        "%AccessToken%",
+                                        "%{SkipServerCertValidation}%"
+                                    ],
+                                    "ResultVariable": "User"
+                                }
+                            },
+                            {
+                                "Log": {
+                                    "Text": "User Id found for user '%{AccountUsername}%': %{User.id}%"
+                                }
+                            },{
+                                "Condition": {
+                                    "If": "%{User.status != 1}%",
+                                    "Then": {
+                                        "Do": [
+                                                {
+                                                  "Status": {
+                                                    "Type": "Changing",
+                                                    "Percent": 30,
+                                                    "Message": {
+                                                      "Name": "LookingUpUser",
+                                                      "Parameters": [ "required active status" ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                    "Throw": {
+                                                        "Value": "[Error] User is inactive, roles don't get assigned to avoid subsequent provisioning errors inside OneLogin",
+                                                        "Message": "[Error] User is inactive, roles don't get assigned to avoid subsequent provisioning errors inside OneLogin"
+                                                    }
+                                                }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "Log": {
+                                    "Text": "User is active, assigning roles."
+                                }
+                            },{
+                                "SetItem": {
+                                    "Name": "RoleAssignmentFailure",
+                                    "Value": false
+                                }
+                            }, {
+                                "ForEach": {
+                                    "CollectionName": "PrivilegeGroupMembership",
+                                    "ElementName": "role",
+                                    "Body": {
+                                        "Do": [
+                                            {
+                                                "Function": {
+                                                    "Name": "GetRoleId",
+                                                    "Parameters": [
+                                                        "%Address%",
+                                                        "%role%",
+                                                        "%AccessToken%",
+                                                        "%{SkipServerCertValidation}%"
+                                                    ],
+                                                    "ResultVariable": "RoleId"
+                                                }
+                                            }, {
+                                                "Condition": {
+                                                    "If": "RoleId != null",
+                                                    "Then": {
+                                                        "Do": [
+                                                            {
+                                                                "Log": {
+                                                                    "Text": "Role Id found for role '%role%': %{RoleId}%"
+                                                                }
+                                                            },
+                                                            {
+                                                              "Status": {
+                                                                "Type": "Changing",
+                                                                "Percent": 70,
+                                                                "Message": {
+                                                                  "Name": "ElevatingAccount",
+                                                                  "Parameters": [ "%{AccountUsername}%", "%{role}%" ]
+                                                                }
+                                                              }
+                                                            },
+                                                            {
+                                                                "Function": {
+                                                                    "Name": "AddUserToRole",
+                                                                    "Parameters": [
+                                                                        "%Address%",
+                                                                        "%RoleId%",
+                                                                        "%{User.id}%",
+                                                                        "%AccessToken%",
+                                                                        "%{SkipServerCertValidation}%",
+                                                                        "%{AccountUsername}%"
+                                                                    ],
+                                                                    "ResultVariable": "AddUserToRoleResult"
+                                                                }
+                                                            }, {
+                                                                "Condition": {
+                                                                    "If": "AddUserToRoleResult != true",
+                                                                    "Then": {
+                                                                        "Do": [
+                                                                            {
+                                                                                "Log": {
+                                                                                    "Text": "User '%{AccountUsername}%' could not be added to role '%{role}%', looking up next configured role."
+                                                                                }
+                                                                            },{
+                                                                                "Status": {
+                                                                                    "Type": "Changing",
+                                                                                    "Percent": 80,
+                                                                                    "Message": {
+                                                                                      "Name": "AccountMembershipElevateFailed",
+                                                                                      "Parameters": [ "%{AccountUsername}%", "%{role}%" ]
+                                                                                    }
+                                                                                  }
+                                                                            }, {
+                                                                                "SetItem": {
+                                                                                    "Name": "RoleAssignmentFailure",
+                                                                                    "Value": true
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "Else": {
+                                                                        "Do": [
+                                                                            
+                                                                                {
+                                                                                    "Status": {
+                                                                                        "Type": "Changing",
+                                                                                        "Percent": 80,
+                                                                                        "Message": {
+                                                                                          "Name": "AccountMembershipElevated",
+                                                                                          "Parameters": [ "%{AccountUsername}%", "%{role}%" ]
+                                                                                        }
+                                                                                      }
+                                                                                }
+                                                                            
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
+                                                    },
+                                                    "Else": {
+                                                        "Do": [
+                                                            {
+                                                                "Log": {
+                                                                    "Text": "Role '%role%' not found, looking up next configured role."
+                                                                }
+                                                            }, {
+                                                                "SetItem": {
+                                                                    "Name": "RoleAssignmentFailure",
+                                                                    "Value": true
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }, {
+                                "Condition": {
+                                    "If": "RoleAssignmentFailure == true",
+                                    "Then": {
+                                        "Do": [
+                                            {
+                                                "Log": {
+                                                    "Text": "At least one of the configured roles could not be assigned to the user '%{AccountUsername}%'"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }, {
+                                    "Return": {
+                                        "Value": true
+                                    }
+                            }
+                        ],
+                        "Catch": [
+                            {
+                                "Throw": {
+                                    "Message": "%Exception%",
+                                    "Value": "%Exception%"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "ActivateUser",
+            "Parameters": [
+                {
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "UserId": {
+                        "Type": "Integer",
+                        "Required": true
+                    }
+                },
+                {
+                    "AccessToken": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                },
+                {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": false
+                    }
+                }
+            ],
+            "Do": [
+                {
+                    "SetItem": {
+                        "Name": "Content",
+                        "Value": "{\"status\": 1}"
+                    }
+                },
+                {
+                    "BaseAddress": {
+                        "Address": "https://%Address%"
+                    }
+                },
+                {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                },
+                {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Authorization": "Bearer %AccessToken%"
+                        }
+                    }
+                },
+                {
+                    "Try": {
+                        "Do": [
+                            {
+                              "Status": {
+                                "Type": "Changing",
+                                "Percent": 70,
+                                "Message": {
+                                  "Name": "EnablingAccount",
+                                  "Parameters": [ "%{AccountUsername}%" ]
+                                }
+                              }
+                            },
+                            {
+                                "Request": {
+                                    "RequestObjectName": "SystemRequest",
+                                    "ResponseObjectName": "SystemResponse",
+                                    "Verb": "PUT",
+                                    "Url": "api/2/users/%UserId%",
+                                    "SubstitutionInUrl": true,
+                                    "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                                    "Content": {
+                                        "ContentType": "application/json",
+                                        "ContentObjectName": "Content"
+                                    },
+                                    "ProxyIp": "%HttpProxyUri%",
+                                    "ProxyPort": "%HttpProxyPort%",
+                                    "ProxyUser": "%HttpProxyUserName%",
+                                    "ProxyPassword": "%HttpProxyPassword%"
+                                }
+                            },
+                            {
+                                "ExtractJsonObject": {
+                                    "JsonObjectName": "SystemResponse",
+                                    "Name": "GetUserResponseJson"
+                                }
+                            },
+                            {
+                                "Log": {
+                                    "Text": "%{SystemResponse.StatusCode}%"
+                                }
+                            },
+                            {
+                                "Condition": {
+                                    "If": "GetUserResponseJson.state == 1",
+                                    "Then": {
+                                        "Do": [
+                                            {
+                                                "Return": {
+                                                    "Value": true
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "Else": {
+                                        "Do": [
+                                            {
+                                                "Throw": {
+                                                    "Message": "[Error] User activation failed",
+                                                    "Value": "[Error] User activation failed"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "Catch": [
+                            {
+                                "Throw": {
+                                    "Message": "[Error] User activation failed",
+                                    "Value": "[Error] User activation failed"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "DeactivateUser",
+            "Parameters": [
+                {
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "UserId": {
+                        "Type": "Integer",
+                        "Required": true
+                    }
+                },
+                {
+                    "AccessToken": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                },
+                {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": false
+                    }
+                }
+            ],
+            "Do": [
+                {
+                    "SetItem": {
+                        "Name": "Content",
+                        "Value": "{\"status\": 2}"
+                    }
+                },
+                {
+                    "BaseAddress": {
+                        "Address": "https://%Address%"
+                    }
+                },
+                {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                },
+                {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Authorization": "Bearer %AccessToken%"
+                        }
+                    }
+                }, {
+                    "Try": {
+                        "Do": [
+                            {
+                              "Status": {
+                                "Type": "Changing",
+                                "Percent": 70,
+                                "Message": {
+                                  "Name": "DisablingAccount",
+                                  "Parameters": [ "%{AccountUsername}%" ]
+                                }
+                              }
+                            },
+                            {
+                                "Request": {
+                                    "RequestObjectName": "SystemRequest",
+                                    "ResponseObjectName": "SystemResponse",
+                                    "Verb": "PUT",
+                                    "Url": "api/2/users/%UserId%",
+                                    "SubstitutionInUrl": true,
+                                    "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                                    "Content": {
+                                        "ContentType": "application/json",
+                                        "ContentObjectName": "Content"
+                                    },
+                                    "ProxyIp": "%HttpProxyUri%",
+                                    "ProxyPort": "%HttpProxyPort%",
+                                    "ProxyUser": "%HttpProxyUserName%",
+                                    "ProxyPassword": "%HttpProxyPassword%"
+                                }
+                            },
+                            {
+                                "ExtractJsonObject": {
+                                    "JsonObjectName": "SystemResponse",
+                                    "Name": "GetUserResponseJson"
+                                }
+                            },
+                            {
+                                "Log": {
+                                    "Text": "%{SystemResponse.StatusCode}%"
+                                }
+                            },
+                            {
+                                "Condition": {
+                                    "If": "GetUserResponseJson.status == 2",
+                                    "Then": {
+                                        "Do": [
+                                            {
+                                                "Return": {
+                                                    "Value": true
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "Else": {
+                                        "Do": [
+                                            {
+                                                "Throw": {
+                                                    "Value": "[Error] User deactivation failed",
+                                                    "Message": "[Error] User deactivation failed"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "Catch": [
+                            {
+                                "Throw": {
+                                    "Value": "[Error] User deactivation failed",
+                                    "Message": "[Error] User deactivation failed"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "DeleteUserFromRole",
+            "Parameters": [
+                {
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "RoleId": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "UserId": {
+                        "Type": "Integer",
+                        "Required": true
+                    }
+                },
+                {
+                    "AccessToken": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                },
+                {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": false
+                    }
+                },
+                {
+                    "Username": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }
+            ],
+            "Do": [
+                {
+                    "SetItem": {
+                        "Name": "Content",
+                        "Value": "[%UserId%]"
+                    }
+                },
+                {
+                    "Log": {
+                        "Text": "List of UserIds to delete from the role: %{Content}%"
+                    }
+                },
+                {
+                    "BaseAddress": {
+                        "Address": "https://%Address%"
+                    }
+                },
+                {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                },
+                {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Authorization": "Bearer %AccessToken%"
+                        }
+                    }
+                }, {
+                    "Try": {
+                        "Do": [
+                                {
+                                    "Request": {
+                                        "RequestObjectName": "SystemRequest",
+                                        "ResponseObjectName": "SystemResponse",
+                                        "Verb": "DELETE",
+                                        "Url": "api/2/roles/%{RoleId}%/users",
+                                        "SubstitutionInUrl": true,
+                                        "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                                        "Content": {
+                                            "ContentType": "application/json",
+                                            "ContentObjectName": "Content"
+                                        },
+                                        "ProxyIp": "%HttpProxyUri%",
+                                        "ProxyPort": "%HttpProxyPort%",
+                                        "ProxyUser": "%HttpProxyUserName%",
+                                        "ProxyPassword": "%HttpProxyPassword%"
+                                    }
+                                },
+                                {
+                                    "Log": {
+                                        "Text": "%{SystemResponse.StatusCode}%"
+                                    }
+                                },
+                                {
+                                    "Condition": {
+                                        "If": "SystemResponse.StatusCode == 204",
+                                        "Then": {
+                                        "Do": [
+                                            {
+                                                "Function": {
+                                                    "Name": "IsUserInRole",
+                                                        "Parameters": [
+                                                            "%Address%",
+                                                            "%RoleId%",
+                                                            "%Username%",
+                                                            "%AccessToken%",
+                                                            "%{SkipServerCertValidation}%",
+                                                            "Deassign"
+                                                        ],
+                                                        "ResultVariable": "IsUserInRoleResult"
+                                                }
+                                            },{
+                                                "Condition": {
+                                                    "If": "IsUserInRoleResult == false",
+                                                    "Then": {
+                                                        "Do": [
+                                                            {
+                                                                "Return": {
+                                                                    "Value": true
+                                                                }
+                                                            }
+                                                        ]
+                                                    },
+                                                    "Else": {
+                                                        "Do": [
+                                                            {
+                                                                "Return": {
+                                                                    "Value": false
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                        "Else": {
+                                            "Do": [
+                                                {
+                                                    "Throw": {
+                                                        "Value": "[Error] %{SystemResponse.StatusCode}%"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ],
+                            "Catch": [
+                                {
+                                    "Return": {
+                                        "Value": false
+                                    }
+                                }
+                            ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "AddUserToRole",
+            "Parameters": [
+                {
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "RoleId": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "UserId": {
+                        "Type": "Integer",
+                        "Required": true
+                    }
+                },
+                {
+                    "AccessToken": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                },
+                {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": false
+                    }
+                },
+                {
+                    "Username": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                }
+            ],
+            "Do": [
+                {
+                    "SetItem": {
+                        "Name": "Content",
+                        "Value": "[%UserId%]"
+                    }
+                },
+                {
+                    "Log": {
+                        "Text": "List of UserIds to add to the role: %{Content}%"
+                    }
+                },
+                {
+                    "BaseAddress": {
+                        "Address": "https://%Address%"
+                    }
+                },
+                {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                },
+                {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Authorization": "Bearer %AccessToken%"
+                        }
+                    }
+                }, {
+                    "Try": {
+                        "Do": [
+                            {
+                                "Request": {
+                                    "RequestObjectName": "SystemRequest",
+                                    "ResponseObjectName": "SystemResponse",
+                                    "Verb": "POST",
+                                    "Url": "api/2/roles/%{RoleId}%/users",
+                                    "SubstitutionInUrl": true,
+                                    "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                                    "Content": {
+                                        "ContentType": "application/json",
+                                        "ContentObjectName": "Content"
+                                    },
+                                    "ProxyIp": "%HttpProxyUri%",
+                                    "ProxyPort": "%HttpProxyPort%",
+                                    "ProxyUser": "%HttpProxyUserName%",
+                                    "ProxyPassword": "%HttpProxyPassword%"
+                                }
+                            },
+                            {
+                                "ExtractJsonObject": {
+                                    "JsonObjectName": "SystemResponse",
+                                    "Name": "GetRoleAssignResponseJson"
+                                }
+                            },
+                            {
+                                "Log": {
+                                    "Text": "%{SystemResponse.StatusCode}%"
+                                }
+                            },
+                            {
+                                "Condition": {
+                                    "If": "SystemResponse.StatusCode == 200 && GetRoleAssignResponseJson[0].id == UserId",
+                                    "Then": {
+                                        "Do": [
+                                            {
+                                                "Function": {
+                                                    "Name": "IsUserInRole",
+                                                        "Parameters": [
+                                                            "%Address%",
+                                                            "%RoleId%",
+                                                            "%Username%",
+                                                            "%AccessToken%",
+                                                            "%{SkipServerCertValidation}%",
+                                                            "Assign"
+                                                        ],
+                                                        "ResultVariable": "IsUserInRoleResult"
+                                                }
+                                            },{
+                                                "Condition": {
+                                                    "If": "IsUserInRoleResult == true",
+                                                    "Then": {
+                                                        "Do": [
+                                                            {
+                                                                "Return": {
+                                                                    "Value": true
+                                                                }
+                                                            }
+                                                        ]
+                                                    },
+                                                    "Else": {
+                                                        "Do": [
+                                                            {
+                                                                "Return": {
+                                                                    "Value": false
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "Else": {
+                                        "Do": [
+                                            {
+                                                "Throw": {
+                                                    "Value": "[Error] %{SystemResponse.StatusCode}%, Response: %{GetRoleAssignResponseJson}%"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "Catch": [
+                            {
+                                "Return": {
+                                    "Value": false
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "IsUserInRole",
+            "Parameters": [
+                {
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "RoleId": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "UserName": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "AccessToken": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                },
+                {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": false
+                    }
+                },
+                {
+                    "Task": {
+                        "Type": "string",
+                        "Required": true
+                    }
+                }
+            ],
+            "Do": [
+                {
+                    "Log": {
+                        "Text": "Checking if role with id: %RoleId% is assigned to user %UserName%"
+                    }
+                },
+                {
+                    "BaseAddress": {
+                        "Address": "https://%Address%"
+                    }
+                },
+                {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                },
+                {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Authorization": "Bearer %AccessToken%"
+                        }
+                    }
+                },{
+                    "Try": {
+                        "Do": [
+                            {
+                                "For": {
+                                    "Condition": true,
+                                    "Body": {
+                                      "Do": [
+                                            {
+                                              "Status": {
+                                                "Type": "Changing",
+                                                "Percent": 75,
+                                                "Message": {
+                                                  "Name": "LookingUpGroup",
+                                                  "Parameters": [ "checking the completeness of role assignment/deassignment" ]
+                                                }
+                                              }
+                                            }, {
+                                                "Request": {
+                                                    "RequestObjectName": "SystemRequest",
+                                                    "ResponseObjectName": "SystemResponse",
+                                                    "Verb": "GET",
+                                                    "Url": "api/2/roles/%{RoleId}%/users?name=%{Username}%",
+                                                    "SubstitutionInUrl": true,
+                                                    "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                                                    "ProxyIp": "%HttpProxyUri%",
+                                                    "ProxyPort": "%HttpProxyPort%",
+                                                    "ProxyUser": "%HttpProxyUserName%",
+                                                    "ProxyPassword": "%HttpProxyPassword%"
+                                                }
+                                            },{
+                                                "ExtractJsonObject": {
+                                                    "JsonObjectName": "SystemResponse",
+                                                    "Name": "ListRoleUsersResponseJson"
+                                                }
+                                            },{
+                                                "Log": {
+                                                    "Text": "%{SystemResponse.StatusCode}%"
+                                                }
+                                            },{
+                                                "Condition": {
+                                                    "If": "SystemResponse.StatusCode == 200",
+                                                    "Then": {
+                                                        "Do": [
+                                                            {
+                                                                "Condition": {
+                                                                    "If": "Task == 'Assign' && ListRoleUsersResponseJson.count == 1",
+                                                                    "Then": {
+                                                                        "Do": [
+                                                                            {
+                                                                                "Return": {
+                                                                                    "Value": true
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            }, {
+                                                                "Condition": {
+                                                                    "If": "Task == 'Deassign' && ListRoleUsersResponseJson.count == 0",
+                                                                    "Then": {
+                                                                        "Do": [
+                                                                            {
+                                                                                "Return": {
+                                                                                    "Value": false
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
+                                                    },
+                                                    "Else": {
+                                                        "Do": [
+                                                            {
+                                                                "Throw": {
+                                                                    "Value": "[Error] %{SystemResponse.StatusCode}%, Response: %{ListRoleUsersResponseJson}%"
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }, {
+                                                "Wait": { "Seconds": "%{RetrySeconds}%" }
+                                            }
+                                        
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "Catch": [
+                            {
+                                "Condition": {
+                                    "If": "Task == 'Assign'",
+                                    "Then": {
+                                        "Do": [
+                                            {
+                                                "Return": {
+                                                    "Value": false
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "Else": {
+                                        "Do": [
+                                            {
+                                                "Return": {
+                                                    "Value": true
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "GetRoleId",
+            "Parameters": [
+                {
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "Role": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "AccessToken": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                },
+                {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": false
+                    }
+                }
+            ],
+            "Do": [
+                {
+                    "BaseAddress": {
+                        "Address": "https://%Address%"
+                    }
+                },
+                {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                },
+                {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Authorization": "Bearer %AccessToken%"
+                        }
+                    }
+                }, {
+                    "Try": {
+                        "Do": [
+                            {
+                              "Status": {
+                                "Type": "Changing",
+                                "Percent": 50,
+                                "Message": {
+                                  "Name": "LookingUpGroup",
+                                  "Parameters": [ "%{Role}%" ]
+                                }
+                              }
+                            },
+                            {
+                                "Request": {
+                                    "RequestObjectName": "SystemRequest",
+                                    "ResponseObjectName": "SystemResponse",
+                                    "Verb": "GET",
+                                    "Url": "api/2/roles?name=%{Role}%",
+                                    "SubstitutionInUrl": true,
+                                    "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                                    "Content": {
+                                    },
+                                    "ProxyIp": "%HttpProxyUri%",
+                                    "ProxyPort": "%HttpProxyPort%",
+                                    "ProxyUser": "%HttpProxyUserName%",
+                                    "ProxyPassword": "%HttpProxyPassword%"
+                                }
+                            },
+                            {
+                                "ExtractJsonObject": {
+                                    "JsonObjectName": "SystemResponse",
+                                    "Name": "GetRoleIdResponseJson"
+                                }
+                            },
+                            {
+                                "Log": {
+                                    "Text": "%{SystemResponse.StatusCode}%"
+                                }
+                            },
+                            {
+                                "Condition": {
+                                    "If": "GetRoleIdResponseJson.count != 0",
+                                    "Then": {
+                                        "Do": [
+                                            {
+                                                "Return": {
+                                                    "Value": "%{GetRoleIdResponseJson[0].id}%"
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "Else": {
+                                        "Do": [
+                                            {
+                                              "Status": {
+                                                "Type": "Changing",
+                                                "Percent": 55,
+                                                "Message": {
+                                                  "Name": "GroupNotFound",
+                                                  "Parameters": [ "%{Role}%" ]
+                                                }
+                                              }
+                                            },
+                                            {
+                                                "Throw": {
+                                                    "Value": "[Error] Role not found: %{Role}%"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "Catch": [
+                            {
+                                "Return": {
+                                    "Value": null
+                                }
+                            }
+                        ]
+                        
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "GetUser",
+            "Parameters": [
+                {
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "AccountUsername": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "AccessToken": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                },
+                {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": false
+                    }
+                }
+            ],
+            "Do": [
+                {
+                    "BaseAddress": {
+                        "Address": "https://%Address%"
+                    }
+                },
+                {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                },
+                {
+                    "Headers": {
+                        "RequestObjectName": "SystemRequest",
+                        "AddHeaders": {
+                            "Authorization": "Bearer %AccessToken%"
+                        }
+                    }
+                },
+                {
+                    "Try": {
+                        "Do": [
+                            {
+                              "Status": {
+                                "Type": "Changing",
+                                "Percent": 30,
+                                "Message": {
+                                  "Name": "LookingUpUser",
+                                  "Parameters": [ "%{AccountUsername}%" ]
+                                }
+                              }
+                            },
+                            {
+                                "Request": {
+                                    "RequestObjectName": "SystemRequest",
+                                    "ResponseObjectName": "SystemResponse",
+                                    "Verb": "GET",
+                                    "Url": "api/2/users?username=%AccountUsername%",
+                                    "SubstitutionInUrl": true,
+                                    "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                                    "Content": {
+                                    },
+                                    "ProxyIp": "%HttpProxyUri%",
+                                    "ProxyPort": "%HttpProxyPort%",
+                                    "ProxyUser": "%HttpProxyUserName%",
+                                    "ProxyPassword": "%HttpProxyPassword%"
+                                },
+                                
+                            },
+                            {
+                                "ExtractJsonObject": {
+                                    "JsonObjectName": "SystemResponse",
+                                    "Name": "GetUserResponseJson"
+                                }
+                            },
+                            {
+                                "Log": {
+                                    "Text": "%{SystemResponse.StatusCode}%"
+                                }
+                            },
+                            {
+                                "Condition": {
+                                    "If": "GetUserResponseJson.count != 0",
+                                    "Then": {
+                                        "Do": [
+                                            {
+                                                "Return": {
+                                                    "Value": {"id": "%{GetUserResponseJson[0].id}%","status": "%{GetUserResponseJson[0].status}%"}
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "Else": {
+                                        "Do": [
+                                            {
+                                              "Status": {
+                                                "Type": "Changing",
+                                                "Percent": 35,
+                                                "Message": {
+                                                  "Name": "AccountNotFoundOnly",
+                                                  "Parameters": [ "%{AccountUsername}%" ]
+                                                }
+                                              }
+                                            },
+                                            {
+                                                "Throw": {
+                                                    "Message": "[Error] User not found: %AccountUsername%",
+                                                    "Value": "[Error] User not found: %AccountUsername%"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "Catch": [
+                            {
+                                "Throw": {
+                                    "Message": "[Error] User not found: %AccountUsername%",
+                                    "Value": "[Error] User not found: %AccountUsername%"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "ApiAuth",
+            "Parameters": [
+                {
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "FuncUsername": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "FuncPassword": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                },
+                {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": false
+                    }
+                }
+                
+            ],
+            "Do": [
+                {
+                    "SetItem": {
+                        "Name": "Content",
+                        "Value": "{\"grant_type\":\"client_credentials\"}"
+                    }
+                },
+                {
+                    "BaseAddress": {
+                        "Address": "https://%Address%"
+                    }
+                },
+                {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                },
+                {
+                    "HttpAuth": {
+                        "RequestObjectName": "SystemRequest",
+                        "Type": "Basic",
+                        "Credentials": {
+                            "Login": "%FuncUsername%",
+                            "Password": "%FuncPassword%"
+                        }
+                    }
+                },
+                {
+                    "Try": {
+                        "Do": [
+                            {
+                                "Status": {
+                                "Type": "Connecting",
+                                "Percent": 10,
+                                "Message": {
+                                    "Name": "AssetConnecting",
+                                    "Parameters": [ "%{Address}%" ]
+                                }
+                              }
+                            },
+                            {
+                                "Request": {
+                                    "RequestObjectName": "SystemRequest",
+                                    "ResponseObjectName": "SystemResponse",
+                                    "Verb": "POST",
+                                    "Url": "auth/oauth2/v2/token",
+                                    "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                                    "Content": {
+                                        "ContentType": "application/json",
+                                        "ContentObjectName": "Content"
+                                    },
+                                    "IsSecret": true,
+                                    "ProxyIp": "%HttpProxyUri%",
+                                    "ProxyPort": "%HttpProxyPort%",
+                                    "ProxyUser": "%HttpProxyUserName%",
+                                    "ProxyPassword": "%HttpProxyPassword%"
+                                }
+                            },
+                            {
+                                "ExtractJsonObject": {
+                                    "JsonObjectName": "SystemResponse",
+                                    "Name": "AuthResponseJson",
+                                    "ContainsSecret": true
+                                }
+                            },
+                            {
+                                "Condition": {
+                                    "If": "SystemResponse.StatusCode == 200",
+                                    "Then": {
+                                        "Do": [
+                                            {
+                                              "Status": {
+                                                "Type": "Connecting",
+                                                "Percent": 15,
+                                                "Message": {
+                                                  "Name": "AssetConnected",
+                                                  "Parameters": [ "%{Address}%" ]
+                                                }
+                                              }
+                                            },{
+                                                "SetItem": {
+                                                    "Name": "Global:AccessToken",
+                                                    "Value": "%{AuthResponseJson.access_token}%",
+                                                    "IsSecret": true
+                                                }
+                                            },
+                                            {
+                                                "Return": {
+                                                    "Value": true
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "Else": {
+                                        "Do": [
+                                            {
+                                              "Status": {
+                                                "Type": "Failure",
+                                                "Percent": 90,
+                                                "Message": {
+                                                  "Name": "AssetConnectFailedWithReason",
+                                                  "Parameters": [ "%{Address}%", "[Error] %{SystemResponse.StatusCode}%" ]
+                                                }
+                                              }
+                                            },
+                                            {
+                                                "Throw": {
+                                                    "Message": "[Error] %{SystemResponse.StatusCode}%",
+                                                    "Value": "[Error] %{SystemResponse.StatusCode}%"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "Catch": [
+                            {
+                                "Throw": {
+                                    "Message": "%Exception%",
+                                    "Value": "%Exception%"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Disconnect",
+            "Parameters": [
+                {
+                    "Address": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "FuncUsername": {
+                        "Type": "String",
+                        "Required": true
+                    }
+                },
+                {
+                    "FuncPassword": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                },
+                {
+                    "AccessToken": {
+                        "Type": "Secret",
+                        "Required": true
+                    }
+                },
+                {
+                    "SkipServerCertValidation": {
+                        "Type": "boolean",
+                        "Required": false,
+                        "DefaultValue": false
+                    }
+                }
+            ],
+            "Do": [
+                {
+                    "SetItem": {
+                        "Name": "Content",
+                        "Value": "{\"access_token\":\"%{AccessToken}%\"}"
+                    }
+                },
+                {
+                    "BaseAddress": {
+                        "Address": "https://%Address%"
+                    }
+                },
+                {
+                    "NewHttpRequest": {
+                        "ObjectName": "SystemRequest"
+                    }
+                },
+                {
+                    "HttpAuth": {
+                        "RequestObjectName": "SystemRequest",
+                        "Type": "Basic",
+                        "Credentials": {
+                            "Login": "%FuncUsername%",
+                            "Password": "%FuncPassword%"
+                        }
+                    }
+                },
+                {
+                    "Try": {
+                        "Do": [
+                            {
+                                "Request": {
+                                    "RequestObjectName": "SystemRequest",
+                                    "ResponseObjectName": "SystemResponse",
+                                    "Verb": "POST",
+                                    "Url": "auth/oauth2/revoke",
+                                    "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
+                                    "Content": {
+                                        "ContentType": "application/json",
+                                        "ContentObjectName": "Content"
+                                    },
+                                    "ProxyIp": "%HttpProxyUri%",
+                                    "ProxyPort": "%HttpProxyPort%",
+                                    "ProxyUser": "%HttpProxyUserName%",
+                                    "ProxyPassword": "%HttpProxyPassword%",
+                                    "IsSecret": true
+                                }
+                            },
+                            {
+                                "ExtractJsonObject": {
+                                    "JsonObjectName": "SystemResponse",
+                                    "Name": "AuthResponseJson"
+                                }
+                            },
+                            {
+                                "Condition": {
+                                    "If": "SystemResponse.StatusCode == 200 && AuthResponseJson.status.error == false",
+                                    "Then": {
+                                        "Do": [
+                                            {
+                                                "Return": {
+                                                    "Value": true
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "Else": {
+                                        "Do": [
+                                            {
+                                                "Throw": {
+                                                    "Message": "[Error] %{SystemResponse.StatusCode}%, Message: %{AuthResponseJson.status.message}%"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "Catch": [
+                            {
+                                "Throw": {
+                                    "Message": "%Exception%"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
