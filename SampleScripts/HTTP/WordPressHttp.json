@@ -14,7 +14,11 @@
       { "UseSsl": { "Type": "boolean", "Required": false, "DefaultValue": true } },
       { "SkipServerCertValidation": { "Type": "boolean", "Required": false, "DefaultValue": true } },
       { "Address": { "Type": "String", "Required": true } },
-      { "APIURL": { "Type": "String", "Required": true } }
+      { "APIURL": { "Type": "String", "Required": true } },
+      { "ProxyIp": { "Type": "String", "Required": false } },
+	  { "ProxyPort": { "Type": "String", "Required": false } },
+	  { "ProxyUser": { "Type": "String", "Required": false } },
+	  { "ProxyPassword": { "Type": "Secret", "Required": false } }
     ],
     "Do": [
       { "Condition": {
@@ -42,7 +46,12 @@
           "IgnoreServerCertAuthentication": "%{SkipServerCertValidation}%",
           "Content": {
             "ContentType": "application/json"
-          }
+          },
+		  "ProxyIp": "%{ProxyIp}%",
+		  "ProxyPort": "%{ProxyPort}%",
+		  "ProxyUser": "%{ProxyUser}%",
+		  "ProxyPassword": "%{ProxyPassword}%"
+
         }
       },
       { "Function": { "Name": "HandleResponse",
@@ -58,7 +67,11 @@
       { "UseSsl": { "Type": "boolean", "Required": false, "DefaultValue": true } },
       { "SkipServerCertValidation": { "Type": "boolean", "Required": false, "DefaultValue": true } },
       { "Address": { "Type": "String", "Required": true } },
-      { "APIURL": { "Type": "String", "Required": true } }
+      { "APIURL": { "Type": "String", "Required": true } },
+      { "ProxyIp": { "Type": "String", "Required": false } },
+	  { "ProxyPort": { "Type": "String", "Required": false } },
+	  { "ProxyUser": { "Type": "String", "Required": false } },
+	  { "ProxyPassword": { "Type": "Secret", "Required": false } }
     ],
     "Do": [
       { "Condition": {
@@ -86,7 +99,11 @@
           "IgnoreServerCertAuthentication": "%{SkipServerCertValidation}%",
           "Content": {
             "ContentType": "application/json"
-          }
+          },
+		  "ProxyIp": "%{ProxyIp}%",
+		  "ProxyPort": "%{ProxyPort}%",
+		  "ProxyUser": "%{ProxyUser}%",
+		  "ProxyPassword": "%{ProxyPassword}%"
         }
       },
       {
@@ -108,7 +125,11 @@
       { "UseSsl": { "Type": "boolean", "Required": false, "DefaultValue": true } },
       { "SkipServerCertValidation": { "Type": "boolean", "Required": false, "DefaultValue": true } },
       { "Address": { "Type": "String", "Required": true } },
-      { "APIURL": { "Type": "String", "Required": true } }
+      { "APIURL": { "Type": "String", "Required": true } },
+      { "ProxyIp": { "Type": "String", "Required": false } },
+	  { "ProxyPort": { "Type": "String", "Required": false } },
+	  { "ProxyUser": { "Type": "String", "Required": false } },
+	  { "ProxyPassword": { "Type": "Secret", "Required": false } }
     ],
     "Do": [
       { "Condition": {
@@ -137,7 +158,11 @@
           "IgnoreServerCertAuthentication": "%SkipServerCertValidation%",
           "Content": {
             "ContentType": "application/json"
-          }
+          },
+		  "ProxyIp": "%{ProxyIp}%",
+		  "ProxyPort": "%{ProxyPort}%",
+		  "ProxyUser": "%{ProxyUser}%",
+		  "ProxyPassword": "%{ProxyPassword}%"
         }
       },
       { "SetItem": { "Name": "ParsedUsers", "Value": "" } },
@@ -162,7 +187,11 @@
                           "Content": {
                             "ContentObjectName": "ChangePassJson",
                             "ContentType": "application/json"
-                          }
+                          },
+		                  "ProxyIp": "%{ProxyIp}%",
+		                  "ProxyPort": "%{ProxyPort}%",
+		                  "ProxyUser": "%{ProxyUser}%",
+		                  "ProxyPassword": "%{ProxyPassword}%"
                         }
                       },
                       { "Switch": {
