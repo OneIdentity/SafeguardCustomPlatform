@@ -38,10 +38,6 @@ Create a new file named `MyFirstFormPlatform.json` and start with this minimal s
 {
   "Id": "MyFirstFormPlatform",
   "BackEnd": "Scriptable",
-  "CheckSystem": {
-    "Parameters": [],
-    "Do": []
-  },
   "CheckPassword": {
     "Parameters": [],
     "Do": []
@@ -248,30 +244,17 @@ Now call the `Login` function from `CheckPassword`. The operation passes the man
 
 At this point, you can validate account credentials against a portal that only exposes a login form.
 
-## CheckSystem and CheckPassword in the Self-Service Model
+## Why There Is No CheckSystem
 
-When a form-based platform uses the managed account's own credentials (no separate service account), `CheckSystem` and `CheckPassword` are effectively the same test — both log in as the account and confirm the credentials work.
+You may notice this script has no `CheckSystem` operation. That is intentional.
 
-SPP still offers **Test Connection** in the UI, which triggers `CheckSystem`. You should implement it so administrators can verify connectivity. In the self-service model, the simplest approach is to have `CheckSystem` call the same `Login` function:
+`CheckSystem` is SPP's "Test Connection" operation. When SPP runs it, it passes the asset's **service account** credentials (`FuncUserName`/`FuncPassword`) — not the managed account's credentials. The purpose is to verify that SPP can reach the target system using a privileged account that manages other accounts.
 
-```json
-{
-  "CheckSystem": {
-    "Parameters": [
-      { "Address": { "Type": "String", "Required": true } },
-      { "AccountUserName": { "Type": "String", "Required": true } },
-      { "AccountPassword": { "Type": "Secret", "Required": true } },
-      { "UseSsl": { "Type": "Boolean", "Required": false, "DefaultValue": true } }
-    ],
-    "Do": [
-      { "Function": { "Name": "Login", "Parameters": [ "%Address%", "%UseSsl%", "%AccountUserName%", "%AccountPassword%" ], "ResultVariable": "LoginResult" } },
-      { "Condition": { "If": "LoginResult", "Then": { "Do": [ { "Return": { "Value": true } } ] }, "Else": { "Do": [ { "Throw": { "Value": "CheckSystem failed: could not log in to portal" } } ] } } }
-    ]
-  }
-}
-```
+Form-based platforms that use a self-service password change model have no separate service account. There is no admin API and no privileged user that resets other users' passwords — each account logs in and changes its own password. Because there are no service account credentials to test, `CheckSystem` has nothing meaningful to do and should be omitted.
 
-This is identical to `CheckPassword` in structure. The distinction matters to SPP because Test Connection runs `CheckSystem` while Check Password runs `CheckPassword`, but the underlying test is the same login attempt. Include both operations so the platform behaves as expected in the SPP UI.
+This matches the pattern used by existing form-based samples (CustomFacebook, CustomTwitter) which implement only `CheckPassword` and `ChangePassword`.
+
+> **Tip:** If your form-based platform *does* have an admin account that can verify system health (e.g., an admin status page), you can add `CheckSystem` with `FuncUserName`/`FuncPassword` parameters. But for the common self-service pattern, leave it out.
 
 ## Step 9: Add ChangePassword
 
@@ -324,18 +307,6 @@ Here is the complete script in one block:
 {
   "Id": "MyFirstFormPlatform",
   "BackEnd": "Scriptable",
-  "CheckSystem": {
-    "Parameters": [
-      { "Address": { "Type": "String", "Required": true } },
-      { "AccountUserName": { "Type": "String", "Required": true } },
-      { "AccountPassword": { "Type": "Secret", "Required": true } },
-      { "UseSsl": { "Type": "Boolean", "Required": false, "DefaultValue": true } }
-    ],
-    "Do": [
-      { "Function": { "Name": "Login", "Parameters": [ "%Address%", "%UseSsl%", "%AccountUserName%", "%AccountPassword%" ], "ResultVariable": "LoginResult" } },
-      { "Condition": { "If": "LoginResult", "Then": { "Do": [ { "Return": { "Value": true } } ] }, "Else": { "Do": [ { "Throw": { "Value": "CheckSystem failed: could not log in to portal" } } ] } } }
-    ]
-  },
   "CheckPassword": {
     "Parameters": [
       { "Address": { "Type": "String", "Required": true } },
@@ -400,16 +371,52 @@ Here is the complete script in one block:
 
 ## Validate, Upload, and Test
 
-Validate locally first, then upload the script to your custom platform:
+### Create the platform
+
+Validate the script locally, then create the custom platform:
 
 ```powershell
 Test-SafeguardCustomPlatformScript ".\MyFirstFormPlatform.json"
 New-SafeguardCustomPlatform -Name "My First Form Platform" -ScriptFile ".\MyFirstFormPlatform.json"
-Import-SafeguardCustomPlatformScript "My First Form Platform" -ScriptFile ".\MyFirstFormPlatform.json"
+```
+
+### Configure password change to use the account's own credentials
+
+Form-based platforms typically require the managed account to log in and change its own password. SPP needs to know to pass the account's current password to the `ChangePassword` operation. This is controlled by a **password change schedule** with the `-RequireCurrentPassword` flag:
+
+```powershell
+New-SafeguardPasswordChangeSchedule "Form Self-Service Change" `
+    -RequireCurrentPassword `
+    -Description "Account logs in and changes its own password via form submission"
+```
+
+Then assign this change schedule to the password profile used by the asset (or the partition's default profile):
+
+```powershell
+Edit-SafeguardPasswordProfile "Default Profile" -ChangeScheduleToSet "Form Self-Service Change"
+```
+
+When `-RequireCurrentPassword` is enabled, SPP supplies the account's current password as `AccountPassword` in the `ChangePassword` operation — which is exactly what the script uses to log in and fill the change form.
+
+### Create the asset and account
+
+```powershell
+New-SafeguardCustomPlatformAsset "My First Form Platform" "portal.example.com"
+New-SafeguardAssetAccount "portal.example.com" "testuser"
+Set-SafeguardAssetAccountPassword "portal.example.com" "testuser"
+```
+
+Because this platform has no separate service account, you do not need to configure service account credentials on the asset. The account manages itself.
+
+### Test
+
+```powershell
 Test-SafeguardAssetAccountPassword "portal.example.com" "testuser" -ExtendedLogging
 ```
 
-For the complete development loop, including asset setup and log review, see [Development Workflow](development-workflow.md).
+`Test-SafeguardAssetAccountPassword` runs `CheckPassword` — it logs in as the account and confirms the stored credentials are correct. There is no Test Connection (CheckSystem) for this platform because there is no service account.
+
+For the complete development loop and log review, see [Development Workflow](development-workflow.md).
 
 ## Key Differences from REST API Scripts
 
