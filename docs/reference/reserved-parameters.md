@@ -41,7 +41,7 @@ When a script declares a reserved parameter name, SPP uses that name as a contra
 2. **At runtime**
    - SPP checks which reserved parameters the operation requires.
    - It pulls the values from internal storage or generated credential context.
-   - Those values are passed to the Hercules scripting engine.
+   - Those values are passed to the platform task engine.
 
 3. **In the Asset editor UI**
    - System-owned parameters are filtered out of the **Custom Script Parameters** section.
