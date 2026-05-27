@@ -1,53 +1,62 @@
-# SafeguardCustomPlatform
+# Safeguard Custom Platform Scripts
 
-Support and documentation for custom platform management
+Build and adapt custom platform scripts for Safeguard when built-in platforms do not fit your target system.
 
------------
+## What is this?
 
-<p align="center">
-<i>Check out our <a href="../../wiki">wiki documentation</a> to get started with your own custom integration to Safeguard!</i>
-</p>
+Safeguard custom platform scripts are JSON-based definitions that tell Safeguard for Privileged Passwords (SPP) how to connect to a target, navigate its interface, and perform credential operations such as password changes, key updates, and account validation.
 
------------
+This repository is for asset administrators and automation teams who need to manage passwords or SSH keys on operating systems, appliances, network devices, web applications, or vendor-specific workflows not covered by built-in platforms. It includes practical guidance and examples for both SSH- and HTTP-based integrations, plus historical Telnet-related content.
+
+## Quick Start
+
+1. **Clone the repository.** Download the repo locally so you can review the documentation, compare samples, and edit scripts safely.
+
+   ```powershell
+   git clone https://github.com/OneIdentity/SafeguardCustomPlatform.git
+   cd SafeguardCustomPlatform
+   ```
+
+2. **Pick a template from `SampleScripts/Templates/`.** Start with the closest template for your target so you inherit the right protocol and operation flow, then use the other samples in `SampleScripts/` for reference as needed.
+
+3. **Customize for your target.** Update commands, prompts, parameters, and validation behavior to match the system or application you need Safeguard to manage.
+
+4. **Upload to SPP.** Import the finished script into Safeguard for Privileged Passwords (SPP) and associate it with the asset or platform you want to manage.
+
+5. **Test.** Validate the script against a safe test asset first, then confirm the full credential lifecycle works as expected before rolling it into production.
+
+## Documentation
+
+Start with [`docs/`](docs/) to find the right level of detail for your task:
+
+- [`docs/getting-started/`](docs/getting-started/) - Tutorials and first-script walkthroughs for new custom platform authors.
+- [`docs/reference/`](docs/reference/) - Script structure, supported operations, parameters, and command behavior.
+- [`docs/guides/`](docs/guides/) - SSH patterns, HTTP patterns, and advanced implementation topics.
+
+## Sample Scripts
+
+Browse [`SampleScripts/`](SampleScripts/) for working examples you can study or adapt. Samples are organized by protocol so you can quickly focus on the right category:
+
+- SSH
+- HTTP
+- Telnet
+
+## Tools
+
+Use [`tools/TestTool.ps1`](tools/TestTool.ps1) to test custom platform scripts locally before uploading them to SPP.
+
+## Telnet / Pattern Files
+
+Telnet pattern files have moved to [SafeguardAutomation](https://github.com/OneIdentity/SafeguardAutomation/tree/master/Terminal%20Pattern%20Files).
+
+## Contributing
+
+See `CONTRIBUTING.md` for contribution guidelines.
 
 ## Support
 
-One Identity open source projects are supported through [One Identity GitHub issues](https://github.com/OneIdentity/SafeguardCustomPlatform/issues) and the [One Identity Community](https://www.oneidentity.com/community/). This includes all scripts, plugins, SDKs, modules, code snippets or other solutions. For assistance with any One Identity GitHub project, please raise a new Issue on the [One Identity GitHub project](https://github.com/OneIdentity/SafeguardCustomPlatform/issues) page. You may also visit the [One Identity Community](https://www.oneidentity.com/community/) to ask questions.  Requests for assistance made through official One Identity Support will be referred back to GitHub and the One Identity Community forums where those requests can benefit all users.
+One Identity open source projects are supported through [GitHub issues](https://github.com/OneIdentity/SafeguardCustomPlatform/issues) and the [One Identity Community](https://www.oneidentity.com/community/). This includes all scripts, plugins, SDKs, modules, code snippets, and other solutions. For assistance with this project, please open a new issue in this repository or ask a question in the One Identity Community. Requests for assistance made through official One Identity Support will be referred back to GitHub and the One Identity Community forums where those requests can benefit all users.
 
-## Introduction
+## License
 
-Safeguard provides support for common platforms from which an asset
-administrator can create assets and asset accounts for managing privileged
-passwords.  However, sometimes customer environments include unique
-applications, uncommon platforms/operating systems, or specialized
-customizations that Safeguard does not include in its common platforms.  In
-order to support assets that represent these scenarios, Safeguard includes a
-custom platform feature which allows the asset administrator to write a
-platform definition that instructs Safeguard on how to communicate with these
-assets.  We call these platform definitions **custom platform scripts**.
-
-<i>Get started quickly with one of our <a href="SampleScripts">sample scripts</a>.</i>
-
-## Getting Started
-
-The best place to start is to read the <a href="../../wiki">wiki documentation</a>
-included in this repository.  The custom platform scripts themselves may be
-thought of as an object model representing an intermediate language that is
-executed by Safeguard to manage the asset.  The custom platform intermediate
-language is similar to a parsed syntax tree.  Safeguard uses JSON to represent
-this intermediate language object model to avoid complications and security
-vulnerabilities related to parsing and interpreting a domain-specific language
-or a common scripting language.
-
-After reading the <a href="../../wiki">wiki documentation</a>, rather than writing a
-custom platform script from scratch, the best approach may be to start with
-a sample and modify it.  We include <a href="SampleScripts">sample custom
-platform scripts</a> that are organized by the protocol used for managing the
-asset.  Currently, Safeguard custom platforms support:
-<a href="SampleScripts/SSH">SSH</a>,
-<a href="SampleScripts/Telnet">Telnet (TN3270)</a>, and
-<a href="SampleScripts/HTTP">HTTP</a>.
-
-## Telnet Sessions
-
-Telnet Pattern Files have been moved to the [SafeguardAutomation](https://github.com/OneIdentity/SafeguardAutomation/tree/master/Terminal%20Pattern%20Files) repository.
+See [LICENSE](LICENSE).
