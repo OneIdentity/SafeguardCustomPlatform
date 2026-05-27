@@ -23,6 +23,10 @@ Use this page as the navigation hub for the detailed command reference pages.
 | HTTP | `UrlEncode` | Encode text for safe use in URLs or form payloads. | [encoding.md](encoding.md) |
 | HTTP | `UrlDecode` | Decode previously encoded URL text. | [encoding.md](encoding.md) |
 | HTTP | `CryptMd5` | Generate an MD5 hash value from input text. | [encoding.md](encoding.md) |
+| Hashing | `CompareShadowHash` | Compare a password against a salted `/etc/shadow` hash entry. | [encoding.md](encoding.md) |
+| Hashing | `ComparePasswordHash` | Compare a password against a salted hash (batch-mode variant). | [encoding.md](encoding.md) |
+| Hashing | `CompareMacOsPasswordHash` | Compare a password against a macOS directory-service hash. | [encoding.md](encoding.md) |
+| Hashing | `CompareUnixPasswordHash` | Compare a password against a general Unix password hash. | [encoding.md](encoding.md) |
 | SSH/Telnet | `Connect` | Open an SSH or Telnet session and create a connection object. | [connect.md](connect.md) |
 | SSH/Telnet | `Disconnect` | Close an existing connection object and end the session. | [connect.md](connect.md) |
 | SSH/Telnet | `Send` | Send interactive text or commands to a terminal session. | [send-receive.md](send-receive.md) |
@@ -35,10 +39,12 @@ Use this page as the navigation hub for the detailed command reference pages.
 | Flow Control | `ForEach` | Iterate over each element in a collection. | [flow-control.md](flow-control.md) |
 | Functions | `Function` | Call a named reusable function block. | [functions.md](functions.md) |
 | Functions | `Return` | Exit a function or operation and optionally return a value. | [functions.md](functions.md) |
+| Functions | `Break` | Exit a loop or function early (alias for `Return`). | [functions.md](functions.md) |
 | Functions | `Eval` | Evaluate an expression for side effects or object manipulation. | [functions.md](functions.md) |
 | Error Handling | `Try` | Run a block with `Catch` and optional cleanup behavior. | [error-handling.md](error-handling.md) |
 | Error Handling | `Throw` | Raise an error to stop execution or trigger a catch block. | [error-handling.md](error-handling.md) |
 | Utilities | `SetItem` | Create or update a variable value in script state. | [utilities.md](utilities.md) |
+| Utilities | `Declare` | Alias for `SetItem` — create or update a variable. | [utilities.md](utilities.md) |
 | Utilities | `Split` | Split text into an array using a delimiter or pattern. | [utilities.md](utilities.md) |
 | Utilities | `Comment` | Add an in-script note with no runtime effect. | [utilities.md](utilities.md) |
 | Logging and Status | `Log` | Write a message to the task log. | [logging.md](logging.md) |
@@ -60,7 +66,7 @@ HTTP commands handle request construction, authentication, stateful web sessions
 - [Cookies](cookies.md): `GetCookie`, `SetCookie`, `ClearCookie`
 - [Forms](forms.md): `GetFormValue`, `SetFormValue`, `ExtractFormData`
 - [JSON](json.md): `ExtractJsonObject`
-- [Encoding](encoding.md): `UrlEncode`, `UrlDecode`, `CryptMd5`
+- [Encoding and hashing](encoding.md): `UrlEncode`, `UrlDecode`, `CryptMd5`, `CompareShadowHash`, `ComparePasswordHash`, `CompareMacOsPasswordHash`, `CompareUnixPasswordHash`
 
 ## SSH/Telnet Commands
 
@@ -81,7 +87,7 @@ Flow control commands decide which commands run next and how many times they run
 
 Function-related commands package reusable logic and return results to the caller. They are the main building blocks for keeping larger scripts organized.
 
-- [Functions](functions.md): `Function`, `Return`, `Eval`
+- [Functions](functions.md): `Function`, `Return`, `Break`, `Eval`
 
 ## Error Handling
 
@@ -93,7 +99,7 @@ Error handling commands let a script recover from expected failures or stop imme
 
 Utility commands support everyday script work such as variable assignment, string processing, and inline documentation.
 
-- [Utilities](utilities.md): `SetItem`, `Split`, `Comment`
+- [Utilities](utilities.md): `SetItem`, `Declare`, `Split`, `Comment`
 
 ## Logging and Status
 
