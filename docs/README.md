@@ -15,7 +15,8 @@ This documentation hub helps you learn, build, and maintain Safeguard Custom Pla
 | --- | --- |
 | [getting-started/overview.md](getting-started/overview.md) | Architecture, script execution flow, and guidance on whether you need a custom platform. |
 | [getting-started/your-first-ssh-script.md](getting-started/your-first-ssh-script.md) | Step-by-step tutorial for creating your first SSH custom platform script. |
-| [getting-started/your-first-http-script.md](getting-started/your-first-http-script.md) | Step-by-step tutorial for creating your first HTTP custom platform script. |
+| [getting-started/your-first-http-script.md](getting-started/your-first-http-script.md) | Step-by-step tutorial for creating your first HTTP custom platform script (REST API). |
+| [getting-started/your-first-form-script.md](getting-started/your-first-form-script.md) | Step-by-step tutorial for managing passwords on web portals with HTML form submission. |
 | [getting-started/development-workflow.md](getting-started/development-workflow.md) | End-to-end workflow from upload through testing and iteration. |
 | [getting-started/testing-and-debugging.md](getting-started/testing-and-debugging.md) | Test tools, logs, and `extendedLogging` techniques for troubleshooting. |
 
