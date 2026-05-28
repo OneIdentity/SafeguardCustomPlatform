@@ -1,0 +1,8 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": ["SampleScripts/**/*.json"],
+      "url": "./schema/custom-platform-script.schema.json"
+    }
+  ]
+}
