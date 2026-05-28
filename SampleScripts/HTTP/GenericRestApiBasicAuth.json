@@ -1,0 +1,730 @@
+{
+  "Id": "GenericRestApiBasicAuth",
+  "BackEnd": "Scriptable",
+  "Meta": {
+    "Author": "GitHub Copilot",
+    "Description": "Generic REST API example that uses HTTP Basic authentication for health checks, password management, and account discovery."
+  },
+  "CheckSystem": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "SetBaseAddress",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%"
+                ],
+                "ResultVariable": "SetBaseAddressResult"
+              }
+            },
+            {
+              "NewHttpRequest": {
+                "ObjectName": "SystemRequest"
+              }
+            },
+            {
+              "HttpAuth": {
+                "RequestObjectName": "SystemRequest",
+                "Type": "Basic",
+                "Credentials": {
+                  "Login": "%FuncUserName%",
+                  "Password": "%FuncPassword%"
+                }
+              }
+            },
+            {
+              "Headers": {
+                "RequestObjectName": "SystemRequest",
+                "AddHeaders": {
+                  "Accept": "application/json"
+                }
+              }
+            },
+            {
+              "Request": {
+                "RequestObjectName": "SystemRequest",
+                "ResponseObjectName": "SystemResponse",
+                "Verb": "GET",
+                "Url": "/api/health"
+              }
+            },
+            {
+              "Condition": {
+                "If": "SystemResponse.StatusCode == 200",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                },
+                "Else": {
+                  "Do": [
+                    {
+                      "Throw": {
+                        "Value": "CheckSystem failed with HTTP %{SystemResponse.StatusCode}%"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Return": {
+                "Value": false
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "CheckPassword": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "AccountUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "AccountPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "SetBaseAddress",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%"
+                ],
+                "ResultVariable": "SetBaseAddressResult"
+              }
+            },
+            {
+              "NewHttpRequest": {
+                "ObjectName": "CheckPasswordRequest"
+              }
+            },
+            {
+              "HttpAuth": {
+                "RequestObjectName": "CheckPasswordRequest",
+                "Type": "Basic",
+                "Credentials": {
+                  "Login": "%AccountUserName%",
+                  "Password": "%AccountPassword%"
+                }
+              }
+            },
+            {
+              "Headers": {
+                "RequestObjectName": "CheckPasswordRequest",
+                "AddHeaders": {
+                  "Accept": "application/json"
+                }
+              }
+            },
+            {
+              "Request": {
+                "RequestObjectName": "CheckPasswordRequest",
+                "ResponseObjectName": "CheckPasswordResponse",
+                "Verb": "GET",
+                "Url": "/api/users/me"
+              }
+            },
+            {
+              "Condition": {
+                "If": "CheckPasswordResponse.StatusCode == 200",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                },
+                "Else": {
+                  "Do": [
+                    {
+                      "Condition": {
+                        "If": "CheckPasswordResponse.StatusCode == 401",
+                        "Then": {
+                          "Do": [
+                            {
+                              "Return": {
+                                "Value": false
+                              }
+                            }
+                          ]
+                        },
+                        "Else": {
+                          "Do": [
+                            {
+                              "Throw": {
+                                "Value": "CheckPassword returned HTTP %{CheckPasswordResponse.StatusCode}%"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Return": {
+                "Value": false
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ChangePassword": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "AccountUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "AccountPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "NewPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Condition": {
+                "If": "AccountPassword.Equals(NewPassword)",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": false
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Function": {
+                "Name": "SetBaseAddress",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%"
+                ],
+                "ResultVariable": "SetBaseAddressResult"
+              }
+            },
+            {
+              "NewHttpRequest": {
+                "ObjectName": "ChangePasswordRequest"
+              }
+            },
+            {
+              "HttpAuth": {
+                "RequestObjectName": "ChangePasswordRequest",
+                "Type": "Basic",
+                "Credentials": {
+                  "Login": "%FuncUserName%",
+                  "Password": "%FuncPassword%"
+                }
+              }
+            },
+            {
+              "Headers": {
+                "RequestObjectName": "ChangePasswordRequest",
+                "AddHeaders": {
+                  "Accept": "application/json"
+                }
+              }
+            },
+            {
+              "SetItem": {
+                "Name": "PasswordChangeBody",
+                "Value": {
+                  "currentPassword": "%AccountPassword%",
+                  "newPassword": "%NewPassword%"
+                },
+                "IsSecret": true
+              }
+            },
+            {
+              "Request": {
+                "RequestObjectName": "ChangePasswordRequest",
+                "ResponseObjectName": "ChangePasswordResponse",
+                "Verb": "PUT",
+                "Url": "/api/users/%{Uri.EscapeDataString(AccountUserName)}%/password",
+                "SubstitutionInUrl": true,
+                "Content": {
+                  "ContentObjectName": "PasswordChangeBody",
+                  "ContentType": "application/json"
+                }
+              }
+            },
+            {
+              "Condition": {
+                "If": "ChangePasswordResponse.StatusCode == 200 || ChangePasswordResponse.StatusCode == 204",
+                "Then": {
+                  "Do": [
+                    {
+                      "NewHttpRequest": {
+                        "ObjectName": "VerifyPasswordRequest"
+                      }
+                    },
+                    {
+                      "HttpAuth": {
+                        "RequestObjectName": "VerifyPasswordRequest",
+                        "Type": "Basic",
+                        "Credentials": {
+                          "Login": "%AccountUserName%",
+                          "Password": "%NewPassword%"
+                        }
+                      }
+                    },
+                    {
+                      "Headers": {
+                        "RequestObjectName": "VerifyPasswordRequest",
+                        "AddHeaders": {
+                          "Accept": "application/json"
+                        }
+                      }
+                    },
+                    {
+                      "Request": {
+                        "RequestObjectName": "VerifyPasswordRequest",
+                        "ResponseObjectName": "VerifyPasswordResponse",
+                        "Verb": "GET",
+                        "Url": "/api/users/me"
+                      }
+                    },
+                    {
+                      "Condition": {
+                        "If": "VerifyPasswordResponse.StatusCode == 200",
+                        "Then": {
+                          "Do": [
+                            {
+                              "Return": {
+                                "Value": true
+                              }
+                            }
+                          ]
+                        },
+                        "Else": {
+                          "Do": [
+                            {
+                              "Throw": {
+                                "Value": "Password verification failed with HTTP %{VerifyPasswordResponse.StatusCode}%"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                "Else": {
+                  "Do": [
+                    {
+                      "Throw": {
+                        "Value": "ChangePassword failed with HTTP %{ChangePasswordResponse.StatusCode}%"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Throw": {
+                "Value": "%Exception%"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "DiscoverAccounts": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "SetBaseAddress",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%"
+                ],
+                "ResultVariable": "SetBaseAddressResult"
+              }
+            },
+            {
+              "SetItem": {
+                "Name": "Offset",
+                "Value": 0
+              }
+            },
+            {
+              "SetItem": {
+                "Name": "PageSize",
+                "Value": 100
+              }
+            },
+            {
+              "SetItem": {
+                "Name": "HasMore",
+                "Value": true
+              }
+            },
+            {
+              "For": {
+                "Condition": "HasMore",
+                "Body": {
+                  "Do": [
+                    {
+                      "NewHttpRequest": {
+                        "ObjectName": "DiscoverRequest"
+                      }
+                    },
+                    {
+                      "HttpAuth": {
+                        "RequestObjectName": "DiscoverRequest",
+                        "Type": "Basic",
+                        "Credentials": {
+                          "Login": "%FuncUserName%",
+                          "Password": "%FuncPassword%"
+                        }
+                      }
+                    },
+                    {
+                      "Headers": {
+                        "RequestObjectName": "DiscoverRequest",
+                        "AddHeaders": {
+                          "Accept": "application/json"
+                        }
+                      }
+                    },
+                    {
+                      "Request": {
+                        "RequestObjectName": "DiscoverRequest",
+                        "ResponseObjectName": "DiscoverResponse",
+                        "Verb": "GET",
+                        "Url": "/api/users?offset=%{Offset}%&limit=%{PageSize}%",
+                        "SubstitutionInUrl": true
+                      }
+                    },
+                    {
+                      "Condition": {
+                        "If": "DiscoverResponse.StatusCode == 200",
+                        "Then": {
+                          "Do": [
+                            {
+                              "ExtractJsonObject": {
+                                "JsonObjectName": "DiscoverResponse",
+                                "Name": "UsersPage"
+                              }
+                            },
+                            {
+                              "SetItem": {
+                                "Name": "DiscoveredUsers",
+                                "Value": "%{UsersPage.items}%"
+                              }
+                            },
+                            {
+                              "ForEach": {
+                                "CollectionName": "DiscoveredUsers",
+                                "ElementName": "User",
+                                "Body": {
+                                  "Do": [
+                                    {
+                                      "Condition": {
+                                        "If": "!User.isSystem && !User.userName.ToString().StartsWith(\"svc_\") && !User.userName.ToString().StartsWith(\"sys_\") && !User.userName.ToString().Equals(\"root\") && !User.userName.ToString().Equals(\"daemon\")",
+                                        "Then": {
+                                          "Do": [
+                                            {
+                                              "WriteDiscoveredAccount": {
+                                                "Name": "%{User.userName.ToString()}%",
+                                                "UserId": "%{User.id.ToString()}%"
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            {
+                              "SetItem": {
+                                "Name": "HasMore",
+                                "Value": "%{DiscoveredUsers != null && DiscoveredUsers.Count > 0 && UsersPage.hasMore != null && UsersPage.hasMore.ToString().ToLower().Equals(\"true\")}%"
+                              }
+                            },
+                            {
+                              "Condition": {
+                                "If": "HasMore",
+                                "Then": {
+                                  "Do": [
+                                    {
+                                      "SetItem": {
+                                        "Name": "Offset",
+                                        "Value": "%{Offset + PageSize}%"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "Else": {
+                          "Do": [
+                            {
+                              "Throw": {
+                                "Value": "DiscoverAccounts failed with HTTP %{DiscoverResponse.StatusCode}%"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Return": {
+                "Value": true
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Throw": {
+                "Value": "%Exception%"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "Functions": [
+    {
+      "Name": "SetBaseAddress",
+      "Parameters": [
+        {
+          "Address": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "UseSsl": {
+            "Type": "boolean",
+            "Required": false,
+            "DefaultValue": true
+          }
+        }
+      ],
+      "Do": [
+        {
+          "Condition": {
+            "If": "UseSsl",
+            "Then": {
+              "Do": [
+                {
+                  "BaseAddress": {
+                    "Address": "https://%Address%"
+                  }
+                }
+              ]
+            },
+            "Else": {
+              "Do": [
+                {
+                  "BaseAddress": {
+                    "Address": "http://%Address%"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Return": {
+            "Value": true
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,659 @@
+{
+  "Id": "GenericRestApiKeyRotation",
+  "BackEnd": "Scriptable",
+  "Meta": {
+    "Author": "GitHub Copilot",
+    "Description": "Generic REST API example that authenticates a service account, validates API keys, and rotates them for target users."
+  },
+  "CheckSystem": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "AuthenticateService",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%",
+                  "%{Timeout}%",
+                  "%FuncUserName%",
+                  "%FuncPassword%"
+                ],
+                "ResultVariable": "AuthenticateServiceResult"
+              }
+            },
+            {
+              "NewHttpRequest": {
+                "ObjectName": "SystemRequest"
+              }
+            },
+            {
+              "Headers": {
+                "RequestObjectName": "SystemRequest",
+                "AddHeaders": {
+                  "Accept": "application/json",
+                  "Authorization": "Bearer %AdminToken%"
+                }
+              }
+            },
+            {
+              "Request": {
+                "RequestObjectName": "SystemRequest",
+                "ResponseObjectName": "SystemResponse",
+                "Verb": "GET",
+                "Url": "/api/admin/health"
+              }
+            },
+            {
+              "Condition": {
+                "If": "SystemResponse.StatusCode == 200",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                },
+                "Else": {
+                  "Do": [
+                    {
+                      "Throw": {
+                        "Value": "CheckSystem failed with HTTP %{SystemResponse.StatusCode}%"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Return": {
+                "Value": false
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "CheckApiKey": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "AccountUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "ApiKey": {
+          "Type": "Secret",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "SetBaseAddress",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%"
+                ],
+                "ResultVariable": "SetBaseAddressResult"
+              }
+            },
+            {
+              "NewHttpRequest": {
+                "ObjectName": "CheckApiKeyRequest"
+              }
+            },
+            {
+              "Headers": {
+                "RequestObjectName": "CheckApiKeyRequest",
+                "AddHeaders": {
+                  "Accept": "application/json",
+                  "X-API-Key": "%ApiKey%"
+                }
+              }
+            },
+            {
+              "Request": {
+                "RequestObjectName": "CheckApiKeyRequest",
+                "ResponseObjectName": "CheckApiKeyResponse",
+                "Verb": "GET",
+                "Url": "/api/users/me"
+              }
+            },
+            {
+              "Condition": {
+                "If": "CheckApiKeyResponse.StatusCode == 200",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                },
+                "Else": {
+                  "Do": [
+                    {
+                      "Condition": {
+                        "If": "CheckApiKeyResponse.StatusCode == 401",
+                        "Then": {
+                          "Do": [
+                            {
+                              "Return": {
+                                "Value": false
+                              }
+                            }
+                          ]
+                        },
+                        "Else": {
+                          "Do": [
+                            {
+                              "Throw": {
+                                "Value": "CheckApiKey returned HTTP %{CheckApiKeyResponse.StatusCode}%"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Return": {
+                "Value": false
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ChangeApiKey": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "AccountUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "ApiKey": {
+          "Type": "Secret",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "AuthenticateService",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%",
+                  "%{Timeout}%",
+                  "%FuncUserName%",
+                  "%FuncPassword%"
+                ],
+                "ResultVariable": "AuthenticateServiceResult"
+              }
+            },
+            {
+              "NewHttpRequest": {
+                "ObjectName": "RotateApiKeyRequest"
+              }
+            },
+            {
+              "Headers": {
+                "RequestObjectName": "RotateApiKeyRequest",
+                "AddHeaders": {
+                  "Accept": "application/json",
+                  "Authorization": "Bearer %AdminToken%"
+                }
+              }
+            },
+            {
+              "SetItem": {
+                "Name": "RotateApiKeyBody",
+                "Value": {
+                  "rotate": true,
+                  "currentApiKey": "%ApiKey%",
+                  "reason": "Safeguard credential rotation"
+                },
+                "IsSecret": true
+              }
+            },
+            {
+              "Request": {
+                "RequestObjectName": "RotateApiKeyRequest",
+                "ResponseObjectName": "RotateApiKeyResponse",
+                "Verb": "POST",
+                "Url": "/api/admin/users/%{Uri.EscapeDataString(AccountUserName)}%/api-keys/rotate",
+                "SubstitutionInUrl": true,
+                "Content": {
+                  "ContentObjectName": "RotateApiKeyBody",
+                  "ContentType": "application/json"
+                }
+              }
+            },
+            {
+              "Condition": {
+                "If": "RotateApiKeyResponse.StatusCode == 200 || RotateApiKeyResponse.StatusCode == 201",
+                "Then": {
+                  "Do": [
+                    {
+                      "ExtractJsonObject": {
+                        "JsonObjectName": "RotateApiKeyResponse",
+                        "Name": "RotateApiKeyResponseJson",
+                        "ContainsSecret": true
+                      }
+                    },
+                    {
+                      "Condition": {
+                        "If": "RotateApiKeyResponseJson.apiKey != null && !string.IsNullOrWhiteSpace(RotateApiKeyResponseJson.apiKey.ToString())",
+                        "Then": {
+                          "Do": [
+                            {
+                              "SetItem": {
+                                "Name": "RotatedApiKey",
+                                "Value": "%{RotateApiKeyResponseJson.apiKey.ToString()}%",
+                                "IsSecret": true
+                              }
+                            },
+                            {
+                              "NewHttpRequest": {
+                                "ObjectName": "VerifyApiKeyRequest"
+                              }
+                            },
+                            {
+                              "Headers": {
+                                "RequestObjectName": "VerifyApiKeyRequest",
+                                "AddHeaders": {
+                                  "Accept": "application/json",
+                                  "X-API-Key": "%RotatedApiKey%"
+                                }
+                              }
+                            },
+                            {
+                              "Request": {
+                                "RequestObjectName": "VerifyApiKeyRequest",
+                                "ResponseObjectName": "VerifyApiKeyResponse",
+                                "Verb": "GET",
+                                "Url": "/api/users/me"
+                              }
+                            },
+                            {
+                              "Condition": {
+                                "If": "VerifyApiKeyResponse.StatusCode == 200",
+                                "Then": {
+                                  "Do": [
+                                    {
+                                      "WriteResponseObject": {
+                                        "Value": {
+                                          "ApiKey": "%RotatedApiKey%",
+                                          "NewApiKey": "%RotatedApiKey%"
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "Return": {
+                                        "Value": true
+                                      }
+                                    }
+                                  ]
+                                },
+                                "Else": {
+                                  "Do": [
+                                    {
+                                      "Throw": {
+                                        "Value": "Rotated API key verification failed with HTTP %{VerifyApiKeyResponse.StatusCode}%"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "Else": {
+                          "Do": [
+                            {
+                              "Throw": {
+                                "Value": "Rotate API key response did not include a replacement key."
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                "Else": {
+                  "Do": [
+                    {
+                      "Throw": {
+                        "Value": "ChangeApiKey failed with HTTP %{RotateApiKeyResponse.StatusCode}%"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Throw": {
+                "Value": "%Exception%"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "Functions": [
+    {
+      "Name": "SetBaseAddress",
+      "Parameters": [
+        {
+          "Address": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "UseSsl": {
+            "Type": "boolean",
+            "Required": false,
+            "DefaultValue": true
+          }
+        }
+      ],
+      "Do": [
+        {
+          "Condition": {
+            "If": "UseSsl",
+            "Then": {
+              "Do": [
+                {
+                  "BaseAddress": {
+                    "Address": "https://%Address%"
+                  }
+                }
+              ]
+            },
+            "Else": {
+              "Do": [
+                {
+                  "BaseAddress": {
+                    "Address": "http://%Address%"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Return": {
+            "Value": true
+          }
+        }
+      ]
+    },
+    {
+      "Name": "AuthenticateService",
+      "Parameters": [
+        {
+          "Address": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "UseSsl": {
+            "Type": "boolean",
+            "Required": false,
+            "DefaultValue": true
+          }
+        },
+        {
+          "Timeout": {
+            "Type": "Integer",
+            "Required": false,
+            "DefaultValue": 30
+          }
+        },
+        {
+          "FuncUserName": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "FuncPassword": {
+            "Type": "Secret",
+            "Required": true
+          }
+        }
+      ],
+      "Do": [
+        {
+          "Function": {
+            "Name": "SetBaseAddress",
+            "Parameters": [
+              "%Address%",
+              "%{UseSsl}%"
+            ],
+            "ResultVariable": "SetBaseAddressResult"
+          }
+        },
+        {
+          "SetItem": {
+            "Name": "ServiceLoginBody",
+            "Value": {
+              "username": "%FuncUserName%",
+              "password": "%FuncPassword%"
+            },
+            "IsSecret": true
+          }
+        },
+        {
+          "NewHttpRequest": {
+            "ObjectName": "ServiceLoginRequest"
+          }
+        },
+        {
+          "Headers": {
+            "RequestObjectName": "ServiceLoginRequest",
+            "AddHeaders": {
+              "Accept": "application/json"
+            }
+          }
+        },
+        {
+          "Request": {
+            "RequestObjectName": "ServiceLoginRequest",
+            "ResponseObjectName": "ServiceLoginResponse",
+            "Verb": "POST",
+            "Url": "/api/session/login",
+            "Content": {
+              "ContentObjectName": "ServiceLoginBody",
+              "ContentType": "application/json"
+            }
+          }
+        },
+        {
+          "Condition": {
+            "If": "ServiceLoginResponse.StatusCode == 200",
+            "Then": {
+              "Do": [
+                {
+                  "ExtractJsonObject": {
+                    "JsonObjectName": "ServiceLoginResponse",
+                    "Name": "ServiceLoginResponseJson",
+                    "ContainsSecret": true
+                  }
+                },
+                {
+                  "Condition": {
+                    "If": "ServiceLoginResponseJson.sessionToken != null && !string.IsNullOrWhiteSpace(ServiceLoginResponseJson.sessionToken.ToString())",
+                    "Then": {
+                      "Do": [
+                        {
+                          "SetItem": {
+                            "Name": "Global:AdminToken",
+                            "Value": "%{ServiceLoginResponseJson.sessionToken.ToString()}%",
+                            "IsSecret": true
+                          }
+                        },
+                        {
+                          "Return": {
+                            "Value": true
+                          }
+                        }
+                      ]
+                    },
+                    "Else": {
+                      "Do": [
+                        {
+                          "Throw": {
+                            "Value": "Service login response did not include a session token."
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            "Else": {
+              "Do": [
+                {
+                  "Throw": {
+                    "Value": "Service login failed with HTTP %{ServiceLoginResponse.StatusCode}%"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

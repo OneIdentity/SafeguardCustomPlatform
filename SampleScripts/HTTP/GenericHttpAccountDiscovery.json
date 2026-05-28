@@ -1,0 +1,498 @@
+{
+  "Id": "GenericHttpAccountDiscovery",
+  "BackEnd": "Scriptable",
+  "Meta": {
+    "Author": "GitHub Copilot",
+    "Description": "Generic REST API example that authenticates a service account, walks paginated user listings, and reports discovered accounts."
+  },
+  "CheckSystem": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "AuthenticateService",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%",
+                  "%{Timeout}%",
+                  "%FuncUserName%",
+                  "%FuncPassword%"
+                ],
+                "ResultVariable": "AuthenticateServiceResult"
+              }
+            },
+            {
+              "NewHttpRequest": {
+                "ObjectName": "SystemRequest"
+              }
+            },
+            {
+              "Headers": {
+                "RequestObjectName": "SystemRequest",
+                "AddHeaders": {
+                  "Accept": "application/json",
+                  "X-Session-Token": "%ServiceToken%"
+                }
+              }
+            },
+            {
+              "Request": {
+                "RequestObjectName": "SystemRequest",
+                "ResponseObjectName": "SystemResponse",
+                "Verb": "GET",
+                "Url": "/api/system/health"
+              }
+            },
+            {
+              "Condition": {
+                "If": "SystemResponse.StatusCode == 200",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                },
+                "Else": {
+                  "Do": [
+                    {
+                      "Throw": {
+                        "Value": "CheckSystem failed with HTTP %{SystemResponse.StatusCode}%"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Return": {
+                "Value": false
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "DiscoverAccounts": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "AuthenticateService",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%",
+                  "%{Timeout}%",
+                  "%FuncUserName%",
+                  "%FuncPassword%"
+                ],
+                "ResultVariable": "AuthenticateServiceResult"
+              }
+            },
+            {
+              "SetItem": {
+                "Name": "NextPageToken",
+                "Value": ""
+              }
+            },
+            {
+              "SetItem": {
+                "Name": "PageSize",
+                "Value": 200
+              }
+            },
+            {
+              "SetItem": {
+                "Name": "HasMore",
+                "Value": true
+              }
+            },
+            {
+              "For": {
+                "Condition": "HasMore",
+                "Body": {
+                  "Do": [
+                    {
+                      "SetItem": {
+                        "Name": "DiscoveryUrl",
+                        "Value": "%{string.IsNullOrWhiteSpace(NextPageToken) ? \"/api/users?limit=\" + PageSize.ToString() : \"/api/users?limit=\" + PageSize.ToString() + \"&pageToken=\" + Uri.EscapeDataString(NextPageToken)}%"
+                      }
+                    },
+                    {
+                      "NewHttpRequest": {
+                        "ObjectName": "DiscoverRequest"
+                      }
+                    },
+                    {
+                      "Headers": {
+                        "RequestObjectName": "DiscoverRequest",
+                        "AddHeaders": {
+                          "Accept": "application/json",
+                          "X-Session-Token": "%ServiceToken%"
+                        }
+                      }
+                    },
+                    {
+                      "Request": {
+                        "RequestObjectName": "DiscoverRequest",
+                        "ResponseObjectName": "DiscoverResponse",
+                        "Verb": "GET",
+                        "Url": "%{DiscoveryUrl}%",
+                        "SubstitutionInUrl": true
+                      }
+                    },
+                    {
+                      "Condition": {
+                        "If": "DiscoverResponse.StatusCode == 200",
+                        "Then": {
+                          "Do": [
+                            {
+                              "ExtractJsonObject": {
+                                "JsonObjectName": "DiscoverResponse",
+                                "Name": "UsersPage"
+                              }
+                            },
+                            {
+                              "SetItem": {
+                                "Name": "DiscoveredUsers",
+                                "Value": "%{UsersPage.items}%"
+                              }
+                            },
+                            {
+                              "ForEach": {
+                                "CollectionName": "DiscoveredUsers",
+                                "ElementName": "User",
+                                "Body": {
+                                  "Do": [
+                                    {
+                                      "Condition": {
+                                        "If": "!User.isSystem && !User.userName.ToString().StartsWith(\"svc_\") && !User.userName.ToString().StartsWith(\"sys_\") && User.status != null && User.status.ToString().ToLower().Equals(\"active\")",
+                                        "Then": {
+                                          "Do": [
+                                            {
+                                              "WriteDiscoveredAccount": {
+                                                "Name": "%{User.userName.ToString()}%",
+                                                "UserId": "%{User.id.ToString()}%"
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            {
+                              "SetItem": {
+                                "Name": "NextPageToken",
+                                "Value": "%{UsersPage.nextPageToken == null ? \"\" : UsersPage.nextPageToken.ToString()}%"
+                              }
+                            },
+                            {
+                              "SetItem": {
+                                "Name": "HasMore",
+                                "Value": "%{!string.IsNullOrWhiteSpace(NextPageToken)}%"
+                              }
+                            }
+                          ]
+                        },
+                        "Else": {
+                          "Do": [
+                            {
+                              "Throw": {
+                                "Value": "DiscoverAccounts failed with HTTP %{DiscoverResponse.StatusCode}%"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Return": {
+                "Value": true
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Throw": {
+                "Value": "%Exception%"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "Functions": [
+    {
+      "Name": "SetBaseAddress",
+      "Parameters": [
+        {
+          "Address": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "UseSsl": {
+            "Type": "boolean",
+            "Required": false,
+            "DefaultValue": true
+          }
+        }
+      ],
+      "Do": [
+        {
+          "Condition": {
+            "If": "UseSsl",
+            "Then": {
+              "Do": [
+                {
+                  "BaseAddress": {
+                    "Address": "https://%Address%"
+                  }
+                }
+              ]
+            },
+            "Else": {
+              "Do": [
+                {
+                  "BaseAddress": {
+                    "Address": "http://%Address%"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Return": {
+            "Value": true
+          }
+        }
+      ]
+    },
+    {
+      "Name": "AuthenticateService",
+      "Parameters": [
+        {
+          "Address": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "UseSsl": {
+            "Type": "boolean",
+            "Required": false,
+            "DefaultValue": true
+          }
+        },
+        {
+          "Timeout": {
+            "Type": "Integer",
+            "Required": false,
+            "DefaultValue": 30
+          }
+        },
+        {
+          "FuncUserName": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "FuncPassword": {
+            "Type": "Secret",
+            "Required": true
+          }
+        }
+      ],
+      "Do": [
+        {
+          "Function": {
+            "Name": "SetBaseAddress",
+            "Parameters": [
+              "%Address%",
+              "%{UseSsl}%"
+            ],
+            "ResultVariable": "SetBaseAddressResult"
+          }
+        },
+        {
+          "SetItem": {
+            "Name": "ServiceLoginBody",
+            "Value": {
+              "username": "%FuncUserName%",
+              "password": "%FuncPassword%"
+            },
+            "IsSecret": true
+          }
+        },
+        {
+          "NewHttpRequest": {
+            "ObjectName": "ServiceLoginRequest"
+          }
+        },
+        {
+          "Headers": {
+            "RequestObjectName": "ServiceLoginRequest",
+            "AddHeaders": {
+              "Accept": "application/json"
+            }
+          }
+        },
+        {
+          "Request": {
+            "RequestObjectName": "ServiceLoginRequest",
+            "ResponseObjectName": "ServiceLoginResponse",
+            "Verb": "POST",
+            "Url": "/api/session/login",
+            "Content": {
+              "ContentObjectName": "ServiceLoginBody",
+              "ContentType": "application/json"
+            }
+          }
+        },
+        {
+          "Condition": {
+            "If": "ServiceLoginResponse.StatusCode == 200",
+            "Then": {
+              "Do": [
+                {
+                  "ExtractJsonObject": {
+                    "JsonObjectName": "ServiceLoginResponse",
+                    "Name": "ServiceLoginResponseJson",
+                    "ContainsSecret": true
+                  }
+                },
+                {
+                  "Condition": {
+                    "If": "ServiceLoginResponseJson.sessionToken != null && !string.IsNullOrWhiteSpace(ServiceLoginResponseJson.sessionToken.ToString())",
+                    "Then": {
+                      "Do": [
+                        {
+                          "SetItem": {
+                            "Name": "Global:ServiceToken",
+                            "Value": "%{ServiceLoginResponseJson.sessionToken.ToString()}%",
+                            "IsSecret": true
+                          }
+                        },
+                        {
+                          "Return": {
+                            "Value": true
+                          }
+                        }
+                      ]
+                    },
+                    "Else": {
+                      "Do": [
+                        {
+                          "Throw": {
+                            "Value": "Service login response did not include a session token."
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            "Else": {
+              "Do": [
+                {
+                  "Throw": {
+                    "Value": "Service login failed with HTTP %{ServiceLoginResponse.StatusCode}%"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
