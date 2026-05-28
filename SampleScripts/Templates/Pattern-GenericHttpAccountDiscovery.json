@@ -3,7 +3,7 @@
   "BackEnd": "Scriptable",
   "Meta": {
     "Author": "GitHub Copilot",
-    "Description": "Generic REST API example that authenticates a service account, walks paginated user listings, and reports discovered accounts."
+    "Description": "PATTERN TEMPLATE — Illustrates paginated REST API account discovery with WriteDiscoveredAccount. Adapt endpoints and auth to your target system."
   },
   "CheckSystem": {
     "Parameters": [
@@ -245,14 +245,7 @@
                                       "Condition": {
                                         "If": "!User.isSystem && !User.userName.ToString().StartsWith(\"svc_\") && !User.userName.ToString().StartsWith(\"sys_\") && User.status != null && User.status.ToString().ToLower().Equals(\"active\")",
                                         "Then": {
-                                          "Do": [
-                                            {
-                                              "WriteDiscoveredAccount": {
-                                                "Name": "%{User.userName.ToString()}%",
-                                                "UserId": "%{User.id.ToString()}%"
-                                              }
-                                            }
-                                          ]
+                                          "Do": ""
                                         }
                                       }
                                     }

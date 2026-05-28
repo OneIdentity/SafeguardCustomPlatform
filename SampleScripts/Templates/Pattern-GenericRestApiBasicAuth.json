@@ -3,7 +3,7 @@
   "BackEnd": "Scriptable",
   "Meta": {
     "Author": "GitHub Copilot",
-    "Description": "Generic REST API example that uses HTTP Basic authentication for health checks, password management, and account discovery."
+    "Description": "PATTERN TEMPLATE — Illustrates REST API management using HTTP Basic auth for check/change/discover. Adapt endpoints to your target API."
   },
   "CheckSystem": {
     "Parameters": [
@@ -607,14 +607,7 @@
                                       "Condition": {
                                         "If": "!User.isSystem && !User.userName.ToString().StartsWith(\"svc_\") && !User.userName.ToString().StartsWith(\"sys_\") && !User.userName.ToString().Equals(\"root\") && !User.userName.ToString().Equals(\"daemon\")",
                                         "Then": {
-                                          "Do": [
-                                            {
-                                              "WriteDiscoveredAccount": {
-                                                "Name": "%{User.userName.ToString()}%",
-                                                "UserId": "%{User.id.ToString()}%"
-                                              }
-                                            }
-                                          ]
+                                          "Do": ""
                                         }
                                       }
                                     }

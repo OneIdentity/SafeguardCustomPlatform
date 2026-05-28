@@ -3,7 +3,7 @@
   "BackEnd": "Scriptable",
   "Meta": {
     "Author": "GitHub Copilot",
-    "Description": "Generic REST API example that adds and removes users from a privileged group using idempotent JIT elevation workflows."
+    "Description": "PATTERN TEMPLATE — Illustrates idempotent JIT elevation via REST API (add/remove group membership). Adapt endpoints and auth to your target system."
   },
   "CheckSystem": {
     "Parameters": [
