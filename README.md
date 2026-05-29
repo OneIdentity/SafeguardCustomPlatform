@@ -27,7 +27,8 @@ Start with [`docs/`](docs/) to find the right level of detail for your task:
 
 - [`docs/getting-started/`](docs/getting-started/) - Tutorials and first-script walkthroughs for new custom platform authors.
 - [`docs/reference/`](docs/reference/) - Script structure, supported operations, parameters, and command behavior.
-- [`docs/guides/`](docs/guides/) - SSH patterns, HTTP patterns, and advanced implementation topics.
+- [`docs/guides/`](docs/guides/) - SSH patterns, HTTP patterns, regex guidance, and advanced implementation topics.
+- [`docs/guides/regex-patterns.md`](docs/guides/regex-patterns.md) - Practical .NET regex patterns for prompts, parsing, and error detection.
 - [`docs/guides/feature-flags.md`](docs/guides/feature-flags.md) - Understand which operations and capabilities your platform advertises.
 - [`docs/guides/troubleshooting.md`](docs/guides/troubleshooting.md) - Common errors, diagnostic tips, and fixes.
 

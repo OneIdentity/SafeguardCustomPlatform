@@ -46,6 +46,7 @@ This documentation hub helps you learn, build, and maintain Safeguard Custom Pla
 | [guides/jit-elevation.md](guides/jit-elevation.md) | Implementing JIT elevation and demotion scenarios. |
 | [guides/dependent-systems.md](guides/dependent-systems.md) | Updating dependent systems as part of platform workflows. |
 | [guides/error-handling.md](guides/error-handling.md) | Try/Catch patterns for reliable error handling. |
+| [guides/regex-patterns.md](guides/regex-patterns.md) | Practical .NET regex patterns for prompts, parsing, and error detection. |
 | [guides/feature-flags.md](guides/feature-flags.md) | How script content enables and shapes platform capabilities. |
 | [guides/troubleshooting.md](guides/troubleshooting.md) | Common errors, diagnostics, and recommended fixes. |
 
