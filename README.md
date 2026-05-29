@@ -32,23 +32,6 @@ Start with [`docs/`](docs/) to find the right level of detail for your task:
 - [`docs/guides/feature-flags.md`](docs/guides/feature-flags.md) - Understand which operations and capabilities your platform advertises.
 - [`docs/guides/troubleshooting.md`](docs/guides/troubleshooting.md) - Common errors, diagnostic tips, and fixes.
 
-## Compatibility Matrix
-
-> Approximate only — check your SPP release notes for exact availability in your build.
-
-| SPP Version | Custom Platform Feature Added |
-| --- | --- |
-| 6.0 | Custom platforms introduced (SSH, Telnet) |
-| 6.7 | HTTP/REST custom platforms added |
-| 7.0 | `DiscoverAccounts` |
-| 7.0 | `DiscoverServices` |
-| 7.0 | `DiscoverSshHostKey` |
-| 7.4 | `ExecuteCommand` (SSH batch mode) |
-| 7.4 | `ExecuteDependentCommand` (dependent system workflows) |
-| 7.5 | `ElevateAccount` / `DemoteAccount` |
-| 7.5 | `EnableAccount` / `DisableAccount` |
-| 7.6 | `CheckFile` / `ChangeFile` |
-
 ## Sample Scripts
 
 Browse [`SampleScripts/`](SampleScripts/) for working examples you can study or adapt. Samples are organized by protocol so you can quickly focus on the right category:
@@ -76,3 +59,20 @@ One Identity open source projects are supported through [GitHub issues](https://
 ## License
 
 See [LICENSE](LICENSE).
+
+## Compatibility Matrix
+
+> Approximate only — check your SPP release notes for exact availability in your build.
+
+| SPP Version | Custom Platform Feature Added |
+| --- | --- |
+| 6.0 | Custom platforms introduced (SSH, Telnet) |
+| 6.7 | HTTP/REST custom platforms added |
+| 7.0 | `DiscoverAccounts` |
+| 7.0 | `DiscoverServices` |
+| 7.0 | `DiscoverSshHostKey` |
+| 7.4 | `ExecuteCommand` (SSH batch mode) |
+| 7.4 | `ExecuteDependentCommand` (dependent system workflows) |
+| 7.5 | `ElevateAccount` / `DemoteAccount` |
+| 7.5 | `EnableAccount` / `DisableAccount` |
+| 7.6 | `CheckFile` / `ChangeFile` |
