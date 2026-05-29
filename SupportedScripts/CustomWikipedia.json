@@ -1,0 +1,206 @@
+{
+  "Id": "CustomWikipedia",
+  "BackEnd": "Scriptable",
+  "Meta": {
+    "Author": "Prabha S, One Identity",
+    "ScriptVersion": "1.0",
+    "Last Updated": "2024-03-18",
+    "Description": "Platform script to support Wikipedia web application, this is tested with SPP version 7.5 and above."
+  },
+  "CheckPassword": {
+    "Parameters": [
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 30 } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "Wikipedia" } },
+      { "HttpProxyAddress": { "Type": "String", "Description": "HTTP Proxy Address", "Required": false } },
+      { "HttpProxyPort": { "Type": "Integer", "Description": "HTTP Proxy Port", "Required": false, "DefaultValue": 443 } },
+      { "HttpProxyUserName": { "Type": "String", "Description": "HTTP Proxy UserName", "Required": false } },
+      { "HttpProxyPassword": { "Type": "Secret", "Description": "HTTP Proxy Password", "Required": false } }
+    ],
+    "Do": [
+      { "Status": { "Type": "Checking", "Percent": 10, "Message": { "Name": "VerifyingPassword", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
+      { "Function": { "Name": "Login", "ResultVariable": "IsLoggedIn" } },  
+      { "Return": { "Value": "%IsLoggedIn%" } }
+    ]
+  },
+  "ChangePassword": {
+    "Parameters": [
+      { "Timeout": { "Type": "Integer", "Required": false,  "DefaultValue": 30 } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "AccountPassword": { "Type": "Secret", "Required": true } },
+      { "NewPassword": { "Type": "Secret", "Required": true } },
+      { "AssetName": { "Type": "String", "Required": false, "DefaultValue": "Wikipedia" } },
+      { "HttpProxyAddress": { "Type": "String", "Description": "HTTP Proxy Address", "Required": false } },
+      { "HttpProxyPort": { "Type": "Integer", "Description": "HTTP Proxy Port", "Required": false, "DefaultValue": 443 } },
+      { "HttpProxyUserName": { "Type": "String", "Description": "HTTP Proxy UserName", "Required": false } },
+      { "HttpProxyPassword": { "Type": "Secret", "Description": "HTTP Proxy Password", "Required": false } }
+    ],
+    "Do": [
+      { "Status": { "Type": "Changing", "Percent": 10, "Message": { "Name": "ChangingPassword", "Parameters": [ "%AccountUserName%" ] } } },
+      { "Condition": {
+          "If": "AccountPassword.Equals(NewPassword)", "Then": 
+          [
+            { "Status": { "Type": "Changing", "Percent": 80, "Message": { "Name": "CurrentAndNewPasswordsAreIdentical", "Parameters": [ "%AccountUserName%" ] } } },
+            { "Log": { "Text": "The current and new password are identical." } },
+            { "Return": { "Value": false } }
+          ]
+        }
+      },
+      { "Status": { "Type": "Changing", "Percent": 20, "Message": { "Name": "LoggingInToService", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
+      { "Function": { "Name": "Login", "ResultVariable": "LoginResult" } },
+      { "Condition": {
+          "If": "!LoginResult", "Then": 
+          [
+            { "Return": { "Value": false } }
+          ]
+        }
+      },
+      { "Function": { "Name": "ChangeUserPassword", "ResultVariable": "CheckResult" } },
+      { "Return": { "Value": "%CheckResult%" } }
+    ]
+  },
+  "Functions": [
+    {
+      "Name": "Login",
+      "Do": [
+        { "BaseAddress": { "Address": "https://en.wikipedia.org" } },
+        { "NewHttpRequest": { "ObjectName": "Global:SystemRequest" } },
+        { "Request": {
+            "Verb": "Get",
+            "Url": "w/api.php?action=query&meta=tokens&type=login&format=json",
+            "RequestObjectName": "SystemRequest",
+            "ResponseObjectName": "Global:LoginTokenResponse", 
+            "AllowRedirect": false,
+            "ProxyIp": "%HttpProxyAddress%",
+            "ProxyPort": "%HttpProxyPort%",
+            "ProxyUser": "%HttpProxyUserName%",
+            "ProxyPassword": "%HttpProxyPassword%"
+          }
+        },
+        { "ExtractJsonObject": { "JsonObjectName": "LoginTokenResponse", "Name": "LoginTokenJson" } },
+        { "SetItem": { "Name": "LoginToken", "Value": "%{ LoginTokenJson.query.tokens.logintoken.Value }%" } },
+        { "Condition": {
+            "If": "string.IsNullOrEmpty(LoginToken)", "Then": 
+            [
+              { "Log": { "Text": "Error, Login Token not found" } },
+              { "Return": { "Value": false } }
+            ]
+          }
+        },
+        { "UrlEncode": {
+            "Source": "%LoginToken%",
+            "ResultVariable": "EncodedLoginToken"
+          }
+        },
+        { "UrlEncode": {
+            "Source": "%AccountPassword%",
+            "ResultVariable": "EncodedPassword",
+            "IsSecret":  true
+          }
+        },
+        { "UrlEncode": {
+            "Source": "%AccountUserName%",
+            "ResultVariable": "EncodedUserName"
+          }
+        },
+        { "SetItem": { "Name": "RequestBody", "Value": "lgpassword=%EncodedPassword%&lgtoken=%EncodedLoginToken%" , "IsSecret": true } },
+        { "Request": {
+            "Verb": "Post",
+            "Url": "w/api.php?action=login&lgname=%{EncodedUserName}%&format=json",
+            "SubstitutionInUrl": true,
+            "RequestObjectName": "SystemRequest",
+            "ResponseObjectName": "Global:LoginPostResponse",
+            "AllowRedirect": false,
+            "Content": {
+              "ContentObjectName": "RequestBody",
+              "ContentType": "application/x-www-form-urlencoded"
+            },
+            "ProxyIp": "%HttpProxyAddress%",
+            "ProxyPort": "%HttpProxyPort%",
+            "ProxyUser": "%HttpProxyUserName%",
+            "ProxyPassword": "%HttpProxyPassword%"
+          }
+        },
+        { "ExtractJsonObject": { "JsonObjectName": "LoginPostResponse", "Name": "LoginResultJson" } },
+        { "Condition": {
+            "If": "LoginResultJson.login.result.Value.Equals(\"Success\")", "Then": 
+            [
+              { "Log": { "Text": "Authentication successful" } },
+              { "Return": { "Value": true } }
+            ]
+          }
+        },
+        { "Log": { "Text": "%{ LoginResultJson.ToString() }%" } },
+        { "Status": { "Type": "Checking", "Percent": 80, "Message": { "Name": "LoggingInWithAccountFailed", "Parameters": [ "%AssetName%", "%AccountUserName%" ] } } },
+        { "Return": { "Value": false } }
+      ]
+    },
+    {
+      "Name": "ChangeUserPassword",
+      "Do": [
+        { "Request": {
+            "Verb": "Get",
+            "Url": "w/api.php?action=query&meta=tokens&format=json",
+            "RequestObjectName": "SystemRequest",
+            "ResponseObjectName": "Global:CsrfTokenResponse", 
+            "AllowRedirect": false,
+            "ProxyIp": "%HttpProxyAddress%",
+            "ProxyPort": "%HttpProxyPort%",
+            "ProxyUser": "%HttpProxyUserName%",
+            "ProxyPassword": "%HttpProxyPassword%"
+          }
+        },
+        { "ExtractJsonObject": { "JsonObjectName": "CsrfTokenResponse", "Name": "CsrfTokenJson" } },
+        { "SetItem": { "Name": "CsrfToken", "Value": "%{ CsrfTokenJson.query.tokens.csrftoken.Value }%" } },
+        { "Condition": {
+            "If": "!(CsrfToken.Length > 2)", "Then": 
+            [
+              { "Log": { "Text": "Error, Csrf Token not found" } },
+              { "Throw": { "Value": "Error, Csrf Token not found" } }
+            ]
+          }
+        },
+        { "UrlEncode": {
+             "Source": "%CsrfToken%",
+             "ResultVariable": "EncodedCsrfToken"
+           }
+         },
+         { "UrlEncode": {
+             "Source": "%NewPassword%",
+             "ResultVariable": "EncodedNewPassword",
+             "IsSecret":  true
+           }
+         },
+         { "SetItem": { "Name": "RequestBody", "Value": "changeauthtoken=%EncodedCsrfToken%&password=%EncodedNewPassword%&retype=%EncodedNewPassword%", "IsSecret": true} },
+         { "Request": {
+             "Verb": "Post",
+             "Url": "w/api.php?action=changeauthenticationdata&changeauthrequest=MediaWiki%5CAuth%5CPasswordAuthenticationRequest&format=json",
+             "RequestObjectName": "SystemRequest",
+             "ResponseObjectName": "Global:ChangePasswordPostResponse",
+             "AllowRedirect": false,
+             "Content": {
+               "ContentObjectName": "RequestBody",
+               "ContentType": "application/x-www-form-urlencoded"
+             },
+            "ProxyIp": "%HttpProxyAddress%",
+            "ProxyPort": "%HttpProxyPort%",
+            "ProxyUser": "%HttpProxyUserName%",
+            "ProxyPassword": "%HttpProxyPassword%"
+           }
+        },
+        { "ExtractJsonObject": { "JsonObjectName": "ChangePasswordPostResponse", "Name": "PasswordResponseJson" } },
+        { "Condition": {
+            "If": "PasswordResponseJson.ToString().Contains(\"changeauthenticationdata\") && PasswordResponseJson.ToString().Contains(\"success\")", "Then": 
+            [
+              { "Log": { "Text": "Password changed successfully" } },
+              { "Return": { "Value": true } }              
+            ]
+          }
+        },
+        { "Log": { "Text": "%{ PasswordResponseJson.ToString() }%" } },
+        { "Return": { "Value": false } } 
+      ]
+    }
+  ]
+}
