@@ -1,0 +1,69 @@
+{
+  "Id": "TemplateSshMinimal",
+  "BackEnd": "Scriptable",
+  "Meta": {
+    "Description": "Minimal SSH starter template that validates connectivity with a single echo command."
+  },
+  "CheckSystem": {
+    "Parameters": [
+      { "Address": { "Type": "String", "Required": true, "Description": "Target host name or IP address." } },
+      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22, "Description": "SSH port." } },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20, "Description": "Operation timeout in seconds." } },
+      { "FuncUserName": { "Type": "String", "Required": true, "Description": "Service account used for the SSH connection." } },
+      { "FuncPassword": { "Type": "Secret", "Required": false, "Description": "Optional password for password-based authentication." } },
+      { "UserKey": { "Type": "Secret", "Required": false, "Description": "Optional private key for key-based authentication." } },
+      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true, "Description": "Validate the SSH host key before connecting." } },
+      { "HostKey": { "Type": "String", "Required": false, "Description": "Expected SSH host key when host key validation is enabled." } }
+    ],
+    "Do": [
+      { "SetItem": { "Name": "GLOBAL:ConnectSsh", "Value": null } },
+      { "SetItem": { "Name": "CheckResult", "Value": false } },
+      {
+        "Try": {
+          "Do": [
+            {
+              "Connect": {
+                "ConnectionObjectName": "Global:ConnectSsh",
+                "Type": "Ssh",
+                "NetworkAddress": "%Address%",
+                "Port": "%Port%",
+                "Login": "%FuncUserName%",
+                "Password": "%FuncPassword::$%",
+                "UserKey": "%UserKey::$%",
+                "CheckHostKey": "%CheckHostKey%",
+                "HostKey": "%HostKey::$%",
+                "Timeout": "%Timeout%"
+              }
+            },
+            { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "echo ok" } },
+            { "Receive": { "ConnectionObjectName": "ConnectSsh", "BufferName": "CommandOutput", "ExpectRegex": "ok" } },
+            {
+              "Condition": {
+                "If": "Regex.IsMatch(CommandOutput, @\"(^|\\r?\\n)ok(\\r?\\n|$)\")",
+                "Then": {
+                  "Do": [
+                    { "SetItem": { "Name": "CheckResult", "Value": true } }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            { "Comment": { "Text": "Starter template: return false on connection or command errors." } }
+          ]
+        }
+      },
+      {
+        "Try": {
+          "Do": [
+            { "Disconnect": { "ConnectionObjectName": "ConnectSsh" } }
+          ],
+          "Catch": [
+            { "Comment": { "Text": "Ignore disconnect errors in the starter template." } }
+          ]
+        }
+      },
+      { "Return": { "Value": "%CheckResult%" } }
+    ]
+  }
+}

@@ -1,0 +1,853 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/petrsnd/SafeguardCustomPlatform/main/schema/custom-platform-script.schema.json",
+  "title": "Safeguard Custom Platform Script",
+  "description": "JSON Schema for Safeguard Custom Platform scripts. It is intentionally descriptive and permissive so editors can offer autocomplete, hover help, and validation without blocking valid edge-case scripts.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "Optional JSON Schema URI for editor support. This can safely be included in uploaded scripts; SPP ignores unknown top-level properties.",
+      "default": "https://raw.githubusercontent.com/petrsnd/SafeguardCustomPlatform/main/schema/custom-platform-script.schema.json"
+    },
+    "Id": {
+      "type": "string",
+      "description": "Unique platform identifier used by Safeguard. Most existing samples use Id."
+    },
+    "Name": {
+      "type": "string",
+      "description": "Human-friendly platform name. HTTP-style examples often use Name instead of Id."
+    },
+    "BackEnd": {
+      "type": "string",
+      "const": "Scriptable",
+      "description": "Execution backend for custom platform scripts. Safeguard custom platform scripts always use Scriptable."
+    },
+    "Transport": {
+      "type": "string",
+      "enum": [
+        "Http",
+        "Ssh",
+        "Telnet",
+        "None"
+      ],
+      "description": "Optional transport hint for the script. This is useful for documentation and editor autocomplete."
+    },
+    "Meta": {
+      "type": "object",
+      "description": "Optional free-form metadata for humans, such as version, notes, prerequisites, or warnings.",
+      "additionalProperties": true
+    },
+    "Imports": {
+      "type": "array",
+      "description": "Optional list of shared import libraries used by the script.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "CustomParameters": {
+      "$ref": "#/definitions/customParameters"
+    },
+    "Functions": {
+      "$ref": "#/definitions/functionsSection"
+    },
+    "CheckSystem": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional operation that validates connectivity and service account access."
+    },
+    "CheckPassword": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional operation that verifies the current managed account password."
+    },
+    "ChangePassword": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional operation that rotates the managed account password."
+    },
+    "CheckSshKey": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional operation that verifies whether an SSH key is configured."
+    },
+    "ChangeSshKey": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional operation that adds, updates, or removes SSH keys."
+    },
+    "DiscoverAccounts": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional discovery operation that emits discovered accounts."
+    },
+    "DiscoverAttributes": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional discovery operation that emits or gathers asset or account attributes."
+    },
+    "DiscoverServices": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional discovery operation that emits discovered services."
+    },
+    "CheckFile": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional operation that validates a file-based credential or artifact."
+    },
+    "ChangeFile": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional operation that updates a file-based credential or artifact."
+    },
+    "CheckSystem_Elevate": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional JIT-style elevate operation using the CheckSystem_Elevate naming convention."
+    },
+    "CheckSystem_Demote": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional JIT-style demote operation using the CheckSystem_Demote naming convention."
+    },
+    "CheckSystem_EnableAccount": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional JIT-style enable-account operation using the CheckSystem_EnableAccount naming convention."
+    },
+    "CheckSystem_DisableAccount": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional JIT-style disable-account operation using the CheckSystem_DisableAccount naming convention."
+    },
+    "DiscoverSshHostKey": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional legacy operation that discovers SSH host keys during asset onboarding."
+    },
+    "RetrieveSshHostKey": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional legacy operation that retrieves SSH host key details."
+    },
+    "DiscoverAuthorizedKeys": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional legacy operation that discovers authorized SSH keys."
+    },
+    "RemoveAuthorizedKey": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional legacy operation that removes an authorized SSH key."
+    },
+    "EnableAccount": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional legacy JIT operation that enables an account."
+    },
+    "DisableAccount": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional legacy JIT operation that disables an account."
+    },
+    "ElevateAccount": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional legacy JIT operation that elevates an account."
+    },
+    "DemoteAccount": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional legacy JIT operation that demotes an account."
+    },
+    "UpdateDependentSystem": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional operation that updates a dependent system after credential rotation."
+    },
+    "CheckApiKey": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional operation that validates an API key."
+    },
+    "ChangeApiKey": {
+      "$ref": "#/definitions/operationDefinition",
+      "description": "Optional operation that rotates an API key."
+    }
+  },
+  "required": [
+    "BackEnd"
+  ],
+  "anyOf": [
+    {
+      "required": [
+        "Id"
+      ]
+    },
+    {
+      "required": [
+        "Name"
+      ]
+    }
+  ],
+  "additionalProperties": true,
+  "definitions": {
+    "parameterType": {
+      "type": "string",
+      "description": "Parameter scalar type. The schema accepts common casing variants used by existing samples.",
+      "enum": [
+        "String",
+        "Integer",
+        "Secret",
+        "Boolean",
+        "Password",
+        "Float",
+        "Object",
+        "Array",
+        "string",
+        "integer",
+        "secret",
+        "boolean",
+        "password",
+        "float",
+        "object",
+        "array"
+      ]
+    },
+    "parameterDefinition": {
+      "type": "object",
+      "description": "Describes a single parameter including its type, whether it is required, and an optional default value.",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/parameterType"
+        },
+        "Required": {
+          "type": "boolean",
+          "description": "Whether Safeguard must supply a value before the operation can run."
+        },
+        "DefaultValue": {
+          "description": "Optional default value used when no explicit value is provided."
+        },
+        "Description": {
+          "type": "string",
+          "description": "Optional human-readable description for administrators and editor hovers."
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": true
+    },
+    "parameterObject": {
+      "type": "object",
+      "description": "A single-key object where the property name is the parameter name and the value describes that parameter.",
+      "minProperties": 1,
+      "maxProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/definitions/parameterDefinition"
+      }
+    },
+    "parameterArray": {
+      "type": "array",
+      "description": "Ordered list of parameter declarations for an operation or legacy function definition.",
+      "items": {
+        "$ref": "#/definitions/parameterObject"
+      }
+    },
+    "customParameter": {
+      "type": "object",
+      "description": "A custom parameter definition that can be surfaced in the Safeguard UI for per-asset configuration.",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "Internal parameter name referenced by the script."
+        },
+        "DisplayName": {
+          "type": "string",
+          "description": "Friendly name shown in the UI or documentation."
+        },
+        "Description": {
+          "type": "string",
+          "description": "Short help text explaining what the custom parameter is used for."
+        },
+        "Type": {
+          "$ref": "#/definitions/parameterType"
+        },
+        "Required": {
+          "type": "boolean",
+          "description": "Whether the custom parameter must be supplied."
+        },
+        "DefaultValue": {
+          "description": "Optional default value for the custom parameter."
+        },
+        "Sensitive": {
+          "type": "boolean",
+          "description": "Whether the value should be treated as sensitive by tools and UIs."
+        }
+      },
+      "required": [
+        "Name",
+        "Type"
+      ],
+      "additionalProperties": true
+    },
+    "customParameters": {
+      "type": "array",
+      "description": "Optional list of reusable custom parameters for the platform.",
+      "items": {
+        "$ref": "#/definitions/customParameter"
+      }
+    },
+    "functionParameters": {
+      "description": "Function parameters can be declared either as a simple string array or in the older parameter-object form used by existing samples.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "$ref": "#/definitions/parameterArray"
+        }
+      ]
+    },
+    "functionDefinition": {
+      "type": "object",
+      "description": "Reusable function body. Functions can be authored in keyed-object form for autocomplete or in legacy array form for compatibility.",
+      "properties": {
+        "Parameters": {
+          "$ref": "#/definitions/functionParameters"
+        },
+        "Do": {
+          "$ref": "#/definitions/commandArray",
+          "description": "Ordered list of function commands in classic scripts."
+        },
+        "Commands": {
+          "$ref": "#/definitions/commandArray",
+          "description": "Ordered list of function commands in CommandType-style scripts."
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "Do"
+          ]
+        },
+        {
+          "required": [
+            "Commands"
+          ]
+        }
+      ],
+      "additionalProperties": true
+    },
+    "legacyFunctionDefinition": {
+      "type": "object",
+      "description": "Legacy function definition used by the repository's existing sample scripts.",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "Function name used by Function or Call commands."
+        },
+        "Parameters": {
+          "$ref": "#/definitions/functionParameters"
+        },
+        "Do": {
+          "$ref": "#/definitions/commandArray"
+        },
+        "Commands": {
+          "$ref": "#/definitions/commandArray"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "Do"
+          ]
+        },
+        {
+          "required": [
+            "Commands"
+          ]
+        }
+      ],
+      "additionalProperties": true
+    },
+    "functionsSection": {
+      "description": "Top-level function collection. The schema supports both keyed-object functions and the legacy array-of-functions format used by existing samples.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/functionDefinition"
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/legacyFunctionDefinition"
+          }
+        }
+      ]
+    },
+    "operationDefinition": {
+      "type": "object",
+      "description": "An operation entry point. Declare Parameters, then provide either Do or Commands with the steps to execute.",
+      "properties": {
+        "Parameters": {
+          "$ref": "#/definitions/parameterArray",
+          "description": "Parameters consumed by the operation."
+        },
+        "Do": {
+          "$ref": "#/definitions/commandArray",
+          "description": "Classic command list used by most existing scripts."
+        },
+        "Commands": {
+          "$ref": "#/definitions/commandArray",
+          "description": "CommandType-style command list used by newer HTTP-oriented examples."
+        }
+      },
+      "required": [
+        "Parameters"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "Do"
+          ]
+        },
+        {
+          "required": [
+            "Commands"
+          ]
+        }
+      ],
+      "additionalProperties": true
+    },
+    "knownCommandPayload": {
+      "description": "Many commands accept additional transport-specific fields such as ResultVariable, Timeout, Url, Headers, Then, Else, Cases, or nested Do blocks. This schema intentionally stays permissive at the command payload level.",
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": true
+        },
+        {
+          "type": "array"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "knownNestedCommandObject": {
+      "type": "object",
+      "description": "Single-key command object used by classic Do blocks.",
+      "minProperties": 1,
+      "maxProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "HttpGet": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Perform an HTTP GET request."
+        },
+        "HttpPost": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Perform an HTTP POST request."
+        },
+        "HttpPut": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Perform an HTTP PUT request."
+        },
+        "HttpPatch": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Perform an HTTP PATCH request."
+        },
+        "HttpDelete": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Perform an HTTP DELETE request."
+        },
+        "HttpSetup": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Configure shared HTTP request settings such as base address, headers, or sessions."
+        },
+        "HttpAuthentication": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Configure HTTP authentication details."
+        },
+        "HttpCookie": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Read, set, or manage HTTP cookies."
+        },
+        "HttpForm": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Extract, populate, or submit form data."
+        },
+        "HttpJsonBody": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Construct or parse JSON request or response bodies."
+        },
+        "HttpUrlEncode": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "URL-encode text for use in query strings or form submissions."
+        },
+        "HttpBase64": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Encode or decode Base64 content for HTTP workflows."
+        },
+        "SshConnect": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Open an SSH session."
+        },
+        "SshSend": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Send text or commands over an SSH session."
+        },
+        "SshExpect": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Wait for expected SSH output or prompts."
+        },
+        "SshExecuteCommand": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Run a non-interactive command over SSH and capture the result."
+        },
+        "SshHostKey": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Discover or validate SSH host key material."
+        },
+        "Condition": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Branch execution using an If expression with Then and optional Else blocks."
+        },
+        "If": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Alias-style conditional command payload."
+        },
+        "Switch": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Run one of several blocks based on a match value."
+        },
+        "ForEach": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Iterate over each item in a collection."
+        },
+        "While": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Repeat a block while a condition remains true."
+        },
+        "Try": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Run a block with error handling and optional Catch behavior."
+        },
+        "Catch": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Catch block payload used by error handling flows."
+        },
+        "Function": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Call a named reusable function."
+        },
+        "Call": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Alternative function invocation command."
+        },
+        "Return": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Exit the current operation or function and optionally return a value."
+        },
+        "Break": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Stop the current loop or exit early."
+        },
+        "Throw": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Raise an error and stop execution unless it is caught."
+        },
+        "Rethrow": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Re-raise the current error inside a catch flow."
+        },
+        "SetItem": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Create or update a variable in script state."
+        },
+        "Declare": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Alias for SetItem used to declare a variable."
+        },
+        "Comment": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Add an inline note that does not affect runtime behavior."
+        },
+        "Delay": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Pause script execution for a short period of time."
+        },
+        "Log": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Write a diagnostic message to the task log."
+        },
+        "Trace": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Emit detailed trace information for troubleshooting."
+        },
+        "Status": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Report a progress update or user-facing status message."
+        },
+        "SetStatusMessage": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Alternative status-reporting command."
+        },
+        "WriteResponseObject": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Write a structured response object back to the platform task engine."
+        },
+        "WriteResponseProperty": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Write a single response property back to the platform task engine."
+        },
+        "WriteDiscoveredAccount": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Emit a discovered account result."
+        },
+        "ExecuteDependentCommand": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Invoke a dependency-related command exposed to the script."
+        },
+        "Request": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Execute an HTTP request and capture the response object."
+        },
+        "NewHttpRequest": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Create a named HTTP request object for later configuration."
+        },
+        "BaseAddress": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Set the base URL that relative request paths resolve against."
+        },
+        "Headers": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Add or update HTTP headers on a request object."
+        },
+        "HttpAuth": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Apply HTTP authentication such as Basic, Bearer, or NTLM."
+        },
+        "GetCookie": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Read a cookie value from the current HTTP session state."
+        },
+        "SetCookie": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Create or overwrite a cookie value for later requests."
+        },
+        "ClearCookie": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Remove a cookie from the current HTTP session state."
+        },
+        "GetFormValue": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Read a field value from an extracted HTML form object."
+        },
+        "SetFormValue": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Populate a field in a form object before submission."
+        },
+        "ExtractFormData": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Parse HTML response content into a reusable form object."
+        },
+        "ExtractJsonObject": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Parse JSON content into an object the script can inspect."
+        },
+        "UrlEncode": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Encode text for safe use in URLs or form payloads."
+        },
+        "UrlDecode": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Decode previously encoded URL text."
+        },
+        "CryptMd5": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Generate an MD5 hash value from input text."
+        },
+        "CompareShadowHash": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Compare a password against a salted /etc/shadow hash entry."
+        },
+        "ComparePasswordHash": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Compare a password against a salted hash (batch-mode variant)."
+        },
+        "CompareMacOsPasswordHash": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Compare a password against a macOS directory-service hash."
+        },
+        "CompareUnixPasswordHash": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Compare a password against a general Unix password hash."
+        },
+        "Connect": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Open an SSH or Telnet session and create a connection object."
+        },
+        "Disconnect": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Close an existing connection object and end the session."
+        },
+        "Send": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Send interactive text or commands to a terminal session."
+        },
+        "Receive": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Read terminal output into a buffer variable."
+        },
+        "ExecuteCommand": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Run a remote command in batch mode and capture stdout, stderr, and exit status."
+        },
+        "DiscoverSshHostKey": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Retrieve SSH host key data for asset trust workflows."
+        },
+        "For": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Repeat a block a fixed number of times."
+        },
+        "Eval": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Evaluate an expression for side effects or object manipulation."
+        },
+        "Split": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Split text into an array using a delimiter or pattern."
+        },
+        "Wait": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Pause execution for a defined interval."
+        },
+        "WriteDiscoveredService": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Emit a discovered service record from a discovery script."
+        },
+        "WriteDiscoveredSshKey": {
+          "$ref": "#/definitions/knownCommandPayload",
+          "description": "Emit a discovered SSH key record."
+        }
+      }
+    },
+    "knownFlatCommandObject": {
+      "type": "object",
+      "description": "Flat command object used by CommandType-style scripts, especially in Commands arrays.",
+      "properties": {
+        "CommandType": {
+          "type": "string",
+          "description": "Command identifier used by the flat command shape.",
+          "enum": [
+            "BaseAddress",
+            "Break",
+            "Call",
+            "Catch",
+            "ClearCookie",
+            "Comment",
+            "CompareMacOsPasswordHash",
+            "ComparePasswordHash",
+            "CompareShadowHash",
+            "CompareUnixPasswordHash",
+            "Condition",
+            "Connect",
+            "CryptMd5",
+            "Declare",
+            "Delay",
+            "Disconnect",
+            "DiscoverSshHostKey",
+            "Eval",
+            "ExecuteCommand",
+            "ExecuteDependentCommand",
+            "ExtractFormData",
+            "ExtractJsonObject",
+            "For",
+            "ForEach",
+            "Function",
+            "GetCookie",
+            "GetFormValue",
+            "Headers",
+            "HttpAuth",
+            "HttpAuthentication",
+            "HttpBase64",
+            "HttpCookie",
+            "HttpDelete",
+            "HttpForm",
+            "HttpGet",
+            "HttpJsonBody",
+            "HttpPatch",
+            "HttpPost",
+            "HttpPut",
+            "HttpSetup",
+            "HttpUrlEncode",
+            "If",
+            "Log",
+            "NewHttpRequest",
+            "Receive",
+            "Request",
+            "Rethrow",
+            "Return",
+            "Send",
+            "SetCookie",
+            "SetFormValue",
+            "SetItem",
+            "SetStatusMessage",
+            "Split",
+            "SshConnect",
+            "SshExecuteCommand",
+            "SshExpect",
+            "SshHostKey",
+            "SshSend",
+            "Status",
+            "Switch",
+            "Throw",
+            "Trace",
+            "Try",
+            "UrlDecode",
+            "UrlEncode",
+            "Wait",
+            "While",
+            "WriteDiscoveredAccount",
+            "WriteDiscoveredService",
+            "WriteDiscoveredSshKey",
+            "WriteResponseObject",
+            "WriteResponseProperty"
+          ]
+        }
+      },
+      "required": [
+        "CommandType"
+      ],
+      "additionalProperties": true
+    },
+    "genericCommandObject": {
+      "type": "object",
+      "description": "Fallback for valid commands that are not yet explicitly modeled in this schema, including older Connect, Send, Receive, Request, and similar samples.",
+      "additionalProperties": true
+    },
+    "command": {
+      "description": "A command inside Do or Commands. Known command names get autocomplete and hover help, while the schema still permits custom or legacy command shapes.",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/knownNestedCommandObject"
+        },
+        {
+          "$ref": "#/definitions/knownFlatCommandObject"
+        },
+        {
+          "$ref": "#/definitions/genericCommandObject"
+        }
+      ]
+    },
+    "commandArray": {
+      "type": "array",
+      "description": "Ordered list of commands executed by an operation or function.",
+      "items": {
+        "$ref": "#/definitions/command"
+      }
+    }
+  }
+}

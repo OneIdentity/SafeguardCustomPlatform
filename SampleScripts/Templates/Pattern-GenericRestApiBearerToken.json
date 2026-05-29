@@ -1,0 +1,763 @@
+{
+  "Id": "GenericRestApiBearerToken",
+  "BackEnd": "Scriptable",
+  "Meta": {
+    "Author": "GitHub Copilot",
+    "Description": "PATTERN TEMPLATE — Illustrates REST API management using OAuth2 client credentials and bearer tokens. Adapt endpoints to your target API."
+  },
+  "CheckSystem": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "AuthenticateClient",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%",
+                  "%{Timeout}%",
+                  "%FuncUserName%",
+                  "%FuncPassword%"
+                ],
+                "ResultVariable": "AuthenticateClientResult"
+              }
+            },
+            {
+              "NewHttpRequest": {
+                "ObjectName": "SystemRequest"
+              }
+            },
+            {
+              "Headers": {
+                "RequestObjectName": "SystemRequest",
+                "AddHeaders": {
+                  "Accept": "application/json",
+                  "Authorization": "Bearer %AccessToken%"
+                }
+              }
+            },
+            {
+              "Request": {
+                "RequestObjectName": "SystemRequest",
+                "ResponseObjectName": "SystemResponse",
+                "Verb": "GET",
+                "Url": "/api/health"
+              }
+            },
+            {
+              "Condition": {
+                "If": "SystemResponse.StatusCode == 200",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                },
+                "Else": {
+                  "Do": [
+                    {
+                      "Throw": {
+                        "Value": "CheckSystem failed with HTTP %{SystemResponse.StatusCode}%"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Return": {
+                "Value": false
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "CheckPassword": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "AccountUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "AccountPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "AuthenticateUser",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%",
+                  "%{Timeout}%",
+                  "%FuncUserName%",
+                  "%FuncPassword%",
+                  "%AccountUserName%",
+                  "%AccountPassword%"
+                ],
+                "ResultVariable": "AuthenticateUserResult"
+              }
+            },
+            {
+              "NewHttpRequest": {
+                "ObjectName": "CheckPasswordRequest"
+              }
+            },
+            {
+              "Headers": {
+                "RequestObjectName": "CheckPasswordRequest",
+                "AddHeaders": {
+                  "Accept": "application/json",
+                  "Authorization": "Bearer %UserAccessToken%"
+                }
+              }
+            },
+            {
+              "Request": {
+                "RequestObjectName": "CheckPasswordRequest",
+                "ResponseObjectName": "CheckPasswordResponse",
+                "Verb": "GET",
+                "Url": "/api/users/me"
+              }
+            },
+            {
+              "Condition": {
+                "If": "CheckPasswordResponse.StatusCode == 200",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                },
+                "Else": {
+                  "Do": [
+                    {
+                      "Condition": {
+                        "If": "CheckPasswordResponse.StatusCode == 401",
+                        "Then": {
+                          "Do": [
+                            {
+                              "Return": {
+                                "Value": false
+                              }
+                            }
+                          ]
+                        },
+                        "Else": {
+                          "Do": [
+                            {
+                              "Throw": {
+                                "Value": "CheckPassword returned HTTP %{CheckPasswordResponse.StatusCode}%"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Return": {
+                "Value": false
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ChangePassword": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "AccountUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "AccountPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "NewPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Condition": {
+                "If": "AccountPassword.Equals(NewPassword)",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": false
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Function": {
+                "Name": "AuthenticateClient",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%",
+                  "%{Timeout}%",
+                  "%FuncUserName%",
+                  "%FuncPassword%"
+                ],
+                "ResultVariable": "AuthenticateClientResult"
+              }
+            },
+            {
+              "NewHttpRequest": {
+                "ObjectName": "ChangePasswordRequest"
+              }
+            },
+            {
+              "Headers": {
+                "RequestObjectName": "ChangePasswordRequest",
+                "AddHeaders": {
+                  "Accept": "application/json",
+                  "Authorization": "Bearer %AccessToken%"
+                }
+              }
+            },
+            {
+              "SetItem": {
+                "Name": "PasswordChangeBody",
+                "Value": {
+                  "currentPassword": "%AccountPassword%",
+                  "newPassword": "%NewPassword%"
+                },
+                "IsSecret": true
+              }
+            },
+            {
+              "Request": {
+                "RequestObjectName": "ChangePasswordRequest",
+                "ResponseObjectName": "ChangePasswordResponse",
+                "Verb": "POST",
+                "Url": "/api/users/%{Uri.EscapeDataString(AccountUserName)}%/password",
+                "SubstitutionInUrl": true,
+                "Content": {
+                  "ContentObjectName": "PasswordChangeBody",
+                  "ContentType": "application/json"
+                }
+              }
+            },
+            {
+              "Condition": {
+                "If": "ChangePasswordResponse.StatusCode == 200 || ChangePasswordResponse.StatusCode == 204",
+                "Then": {
+                  "Do": [
+                    {
+                      "Function": {
+                        "Name": "AuthenticateUser",
+                        "Parameters": [
+                          "%Address%",
+                          "%{UseSsl}%",
+                          "%{Timeout}%",
+                          "%FuncUserName%",
+                          "%FuncPassword%",
+                          "%AccountUserName%",
+                          "%NewPassword%"
+                        ],
+                        "ResultVariable": "VerifyNewPasswordResult"
+                      }
+                    },
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                },
+                "Else": {
+                  "Do": [
+                    {
+                      "Throw": {
+                        "Value": "ChangePassword failed with HTTP %{ChangePasswordResponse.StatusCode}%"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Throw": {
+                "Value": "%Exception%"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "Functions": [
+    {
+      "Name": "SetBaseAddress",
+      "Parameters": [
+        {
+          "Address": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "UseSsl": {
+            "Type": "boolean",
+            "Required": false,
+            "DefaultValue": true
+          }
+        }
+      ],
+      "Do": [
+        {
+          "Condition": {
+            "If": "UseSsl",
+            "Then": {
+              "Do": [
+                {
+                  "BaseAddress": {
+                    "Address": "https://%Address%"
+                  }
+                }
+              ]
+            },
+            "Else": {
+              "Do": [
+                {
+                  "BaseAddress": {
+                    "Address": "http://%Address%"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Return": {
+            "Value": true
+          }
+        }
+      ]
+    },
+    {
+      "Name": "AuthenticateClient",
+      "Parameters": [
+        {
+          "Address": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "UseSsl": {
+            "Type": "boolean",
+            "Required": false,
+            "DefaultValue": true
+          }
+        },
+        {
+          "Timeout": {
+            "Type": "Integer",
+            "Required": false,
+            "DefaultValue": 30
+          }
+        },
+        {
+          "FuncUserName": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "FuncPassword": {
+            "Type": "Secret",
+            "Required": true
+          }
+        }
+      ],
+      "Do": [
+        {
+          "Function": {
+            "Name": "SetBaseAddress",
+            "Parameters": [
+              "%Address%",
+              "%{UseSsl}%"
+            ],
+            "ResultVariable": "SetBaseAddressResult"
+          }
+        },
+        {
+          "SetItem": {
+            "Name": "TokenBody",
+            "Value": "%{\"grant_type=client_credentials&client_id=\" + Uri.EscapeDataString(FuncUserName) + \"&client_secret=\" + Uri.EscapeDataString(FuncPassword)}%",
+            "IsSecret": true
+          }
+        },
+        {
+          "NewHttpRequest": {
+            "ObjectName": "TokenRequest"
+          }
+        },
+        {
+          "Headers": {
+            "RequestObjectName": "TokenRequest",
+            "AddHeaders": {
+              "Accept": "application/json"
+            }
+          }
+        },
+        {
+          "Request": {
+            "RequestObjectName": "TokenRequest",
+            "ResponseObjectName": "TokenResponse",
+            "Verb": "POST",
+            "Url": "/oauth/token",
+            "Content": {
+              "Value": "%TokenBody%",
+              "ContentType": "application/x-www-form-urlencoded"
+            }
+          }
+        },
+        {
+          "Condition": {
+            "If": "TokenResponse.StatusCode == 200",
+            "Then": {
+              "Do": [
+                {
+                  "ExtractJsonObject": {
+                    "JsonObjectName": "TokenResponse",
+                    "Name": "TokenResponseJson",
+                    "ContainsSecret": true
+                  }
+                },
+                {
+                  "Condition": {
+                    "If": "TokenResponseJson.access_token != null && !string.IsNullOrWhiteSpace(TokenResponseJson.access_token.ToString())",
+                    "Then": {
+                      "Do": [
+                        {
+                          "SetItem": {
+                            "Name": "Global:AccessToken",
+                            "Value": "%{TokenResponseJson.access_token.ToString()}%",
+                            "IsSecret": true
+                          }
+                        },
+                        {
+                          "Return": {
+                            "Value": true
+                          }
+                        }
+                      ]
+                    },
+                    "Else": {
+                      "Do": [
+                        {
+                          "Throw": {
+                            "Value": "OAuth token response did not include an access token."
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            "Else": {
+              "Do": [
+                {
+                  "Throw": {
+                    "Value": "OAuth client authentication failed with HTTP %{TokenResponse.StatusCode}%"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "Name": "AuthenticateUser",
+      "Parameters": [
+        {
+          "Address": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "UseSsl": {
+            "Type": "boolean",
+            "Required": false,
+            "DefaultValue": true
+          }
+        },
+        {
+          "Timeout": {
+            "Type": "Integer",
+            "Required": false,
+            "DefaultValue": 30
+          }
+        },
+        {
+          "FuncUserName": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "FuncPassword": {
+            "Type": "Secret",
+            "Required": true
+          }
+        },
+        {
+          "AccountUserName": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "AccountPassword": {
+            "Type": "Secret",
+            "Required": true
+          }
+        }
+      ],
+      "Do": [
+        {
+          "Function": {
+            "Name": "SetBaseAddress",
+            "Parameters": [
+              "%Address%",
+              "%{UseSsl}%"
+            ],
+            "ResultVariable": "SetBaseAddressResult"
+          }
+        },
+        {
+          "SetItem": {
+            "Name": "PasswordGrantBody",
+            "Value": "%{\"grant_type=password&client_id=\" + Uri.EscapeDataString(FuncUserName) + \"&client_secret=\" + Uri.EscapeDataString(FuncPassword) + \"&username=\" + Uri.EscapeDataString(AccountUserName) + \"&password=\" + Uri.EscapeDataString(AccountPassword)}%",
+            "IsSecret": true
+          }
+        },
+        {
+          "NewHttpRequest": {
+            "ObjectName": "PasswordGrantRequest"
+          }
+        },
+        {
+          "Headers": {
+            "RequestObjectName": "PasswordGrantRequest",
+            "AddHeaders": {
+              "Accept": "application/json"
+            }
+          }
+        },
+        {
+          "Request": {
+            "RequestObjectName": "PasswordGrantRequest",
+            "ResponseObjectName": "PasswordGrantResponse",
+            "Verb": "POST",
+            "Url": "/oauth/token",
+            "Content": {
+              "Value": "%PasswordGrantBody%",
+              "ContentType": "application/x-www-form-urlencoded"
+            }
+          }
+        },
+        {
+          "Condition": {
+            "If": "PasswordGrantResponse.StatusCode == 200",
+            "Then": {
+              "Do": [
+                {
+                  "ExtractJsonObject": {
+                    "JsonObjectName": "PasswordGrantResponse",
+                    "Name": "PasswordGrantResponseJson",
+                    "ContainsSecret": true
+                  }
+                },
+                {
+                  "Condition": {
+                    "If": "PasswordGrantResponseJson.access_token != null && !string.IsNullOrWhiteSpace(PasswordGrantResponseJson.access_token.ToString())",
+                    "Then": {
+                      "Do": [
+                        {
+                          "SetItem": {
+                            "Name": "Global:UserAccessToken",
+                            "Value": "%{PasswordGrantResponseJson.access_token.ToString()}%",
+                            "IsSecret": true
+                          }
+                        },
+                        {
+                          "Return": {
+                            "Value": true
+                          }
+                        }
+                      ]
+                    },
+                    "Else": {
+                      "Do": [
+                        {
+                          "Throw": {
+                            "Value": "Password grant response did not include an access token."
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            "Else": {
+              "Do": [
+                {
+                  "Throw": {
+                    "Value": "Password grant authentication failed with HTTP %{PasswordGrantResponse.StatusCode}%"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

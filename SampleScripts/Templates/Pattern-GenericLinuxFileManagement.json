@@ -1,0 +1,816 @@
+{
+  "Id": "GenericLinuxFileManagement",
+  "BackEnd": "Scriptable",
+  "Meta": {
+    "Filename": "GenericLinuxFileManagement.json",
+    "Description": "PATTERN TEMPLATE — Illustrates CheckFile/ChangeFile over SSH (base64 decode, deploy, verify). Adapt paths and validation to your target."
+  },
+  "CheckSystem": {
+    "Parameters": [
+      {
+        "AssetName": {
+          "Type": "String",
+          "Required": false,
+          "DefaultValue": ""
+        }
+      },
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "Port": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 22
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 20
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": false
+        }
+      },
+      {
+        "UserKey": {
+          "Type": "Secret",
+          "Required": false,
+          "DefaultValue": ""
+        }
+      },
+      {
+        "CheckHostKey": {
+          "Type": "Boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "HostKey": {
+          "Type": "string",
+          "Required": false
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "ConnectToAsset"
+              }
+            },
+            {
+              "Function": {
+                "Name": "RunCommand",
+                "Parameters": [
+                  "/usr/bin/id %FuncUserName%",
+                  [],
+                  false,
+                  false,
+                  false
+                ],
+                "ResultVariable": "Result"
+              }
+            },
+            {
+              "Function": {
+                "Name": "DisconnectFromAsset"
+              }
+            },
+            {
+              "Condition": {
+                "If": "Result.rc == 0",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Return": {
+                "Value": false
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Function": {
+                "Name": "DisconnectFromAsset"
+              }
+            },
+            {
+              "Return": {
+                "Value": "Error"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "CheckFile": {
+    "Parameters": [
+      {
+        "AssetName": {
+          "Type": "String",
+          "Required": false,
+          "DefaultValue": ""
+        }
+      },
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "Port": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 22
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 20
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": false
+        }
+      },
+      {
+        "UserKey": {
+          "Type": "Secret",
+          "Required": false,
+          "DefaultValue": ""
+        }
+      },
+      {
+        "CheckHostKey": {
+          "Type": "Boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "HostKey": {
+          "Type": "string",
+          "Required": false
+        }
+      },
+      {
+        "FileBase64String": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "TargetPath": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "StageDirectory": {
+          "Type": "String",
+          "Required": false,
+          "DefaultValue": "/var/lib/safeguard/file-stage"
+        }
+      },
+      {
+        "DelegationPrefix": {
+          "Type": "String",
+          "Required": false,
+          "DefaultValue": "sudo"
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "ConnectToAsset"
+              }
+            },
+            {
+              "Function": {
+                "Name": "PrepareStageFiles"
+              }
+            },
+            {
+              "Function": {
+                "Name": "DecodeExpectedFile",
+                "ResultVariable": "ExpectedHash"
+              }
+            },
+            {
+              "Function": {
+                "Name": "RunCommand",
+                "Parameters": [
+                  "/bin/sh -lc \"if [ -f '%TargetPath%' ]; then sha256sum '%TargetPath%'; else echo MISSING; fi\"",
+                  [],
+                  false,
+                  false,
+                  false
+                ],
+                "ResultVariable": "TargetHashResult"
+              }
+            },
+            {
+              "Function": {
+                "Name": "RemoveStageFiles"
+              }
+            },
+            {
+              "Function": {
+                "Name": "DisconnectFromAsset"
+              }
+            },
+            {
+              "Condition": {
+                "If": "Regex.IsMatch(TargetHashResult.Stdout, @\"(?m)^(?<hash>[a-fA-F0-9]{64})\\s+\" ) && Regex.Match(TargetHashResult.Stdout, @\"(?m)^(?<hash>[a-fA-F0-9]{64})\\s+\").Groups[\"hash\"].Value == ExpectedHash",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Return": {
+                "Value": false
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Function": {
+                "Name": "RemoveStageFiles"
+              }
+            },
+            {
+              "Function": {
+                "Name": "DisconnectFromAsset"
+              }
+            },
+            {
+              "Throw": {
+                "Value": "%Exception%"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ChangeFile": {
+    "Parameters": [
+      {
+        "AssetName": {
+          "Type": "String",
+          "Required": false,
+          "DefaultValue": ""
+        }
+      },
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "Port": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 22
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 20
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": false
+        }
+      },
+      {
+        "UserKey": {
+          "Type": "Secret",
+          "Required": false,
+          "DefaultValue": ""
+        }
+      },
+      {
+        "CheckHostKey": {
+          "Type": "Boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "HostKey": {
+          "Type": "string",
+          "Required": false
+        }
+      },
+      {
+        "FileBase64String": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "TargetPath": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "TargetOwner": {
+          "Type": "String",
+          "Required": false,
+          "DefaultValue": ""
+        }
+      },
+      {
+        "TargetGroup": {
+          "Type": "String",
+          "Required": false,
+          "DefaultValue": ""
+        }
+      },
+      {
+        "TargetMode": {
+          "Type": "String",
+          "Required": false,
+          "DefaultValue": "600"
+        }
+      },
+      {
+        "StageDirectory": {
+          "Type": "String",
+          "Required": false,
+          "DefaultValue": "/var/lib/safeguard/file-stage"
+        }
+      },
+      {
+        "DelegationPrefix": {
+          "Type": "String",
+          "Required": false,
+          "DefaultValue": "sudo"
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "ConnectToAsset"
+              }
+            },
+            {
+              "Function": {
+                "Name": "PrepareStageFiles"
+              }
+            },
+            {
+              "Function": {
+                "Name": "DecodeExpectedFile",
+                "ResultVariable": "ExpectedHash"
+              }
+            },
+            {
+              "Function": {
+                "Name": "RunCommand",
+                "Parameters": [
+                  "%DelegationPrefix% /usr/bin/install -m %TargetMode% '%StageFilePath%' '%TargetPath%'",
+                  [],
+                  false,
+                  false,
+                  false
+                ],
+                "ResultVariable": "InstallResult"
+              }
+            },
+            {
+              "Condition": {
+                "If": "InstallResult.rc != 0",
+                "Then": {
+                  "Do": [
+                    {
+                      "Throw": {
+                        "Value": "Install command failed"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Condition": {
+                "If": "!string.IsNullOrWhiteSpace(TargetOwner)",
+                "Then": {
+                  "Do": [
+                    {
+                      "SetItem": {
+                        "Name": "OwnershipSpec",
+                        "Value": "%{ string.IsNullOrWhiteSpace(TargetGroup) ? TargetOwner : $\"{TargetOwner}:{TargetGroup}\" }%"
+                      }
+                    },
+                    {
+                      "Function": {
+                        "Name": "RunCommand",
+                        "Parameters": [
+                          "%DelegationPrefix% chown %OwnershipSpec% '%TargetPath%'",
+                          [],
+                          false,
+                          false,
+                          false
+                        ],
+                        "ResultVariable": "ChownResult"
+                      }
+                    },
+                    {
+                      "Condition": {
+                        "If": "ChownResult.rc != 0",
+                        "Then": {
+                          "Do": [
+                            {
+                              "Throw": {
+                                "Value": "chown failed"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Function": {
+                "Name": "RunCommand",
+                "Parameters": [
+                  "%DelegationPrefix% sha256sum '%TargetPath%'",
+                  [],
+                  false,
+                  false,
+                  false
+                ],
+                "ResultVariable": "TargetHashResult"
+              }
+            },
+            {
+              "Function": {
+                "Name": "RemoveStageFiles"
+              }
+            },
+            {
+              "Function": {
+                "Name": "DisconnectFromAsset"
+              }
+            },
+            {
+              "Condition": {
+                "If": "Regex.IsMatch(TargetHashResult.Stdout, @\"(?m)^(?<hash>[a-fA-F0-9]{64})\\s+\") && Regex.Match(TargetHashResult.Stdout, @\"(?m)^(?<hash>[a-fA-F0-9]{64})\\s+\").Groups[\"hash\"].Value == ExpectedHash",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Throw": {
+                "Value": "Checksum verification failed"
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Function": {
+                "Name": "RemoveStageFiles"
+              }
+            },
+            {
+              "Function": {
+                "Name": "DisconnectFromAsset"
+              }
+            },
+            {
+              "Throw": {
+                "Value": "%Exception%"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "Functions": [
+    {
+      "Name": "ConnectToAsset",
+      "Do": [
+        {
+          "SetItem": {
+            "Name": "GLOBAL:ConnectSsh",
+            "Value": null
+          }
+        },
+        {
+          "Connect": {
+            "ConnectionObjectName": "Global:ConnectSsh",
+            "Type": "Ssh",
+            "Port": "%Port%",
+            "NetworkAddress": "%Address%",
+            "Login": "%FuncUserName%",
+            "RequestTerminal": false,
+            "Password": "%FuncPassword::$%",
+            "UserKey": "%UserKey::$%",
+            "CheckHostKey": "%CheckHostKey%",
+            "Hostkey": "%HostKey::$%",
+            "Timeout": "%Timeout%"
+          }
+        }
+      ]
+    },
+    {
+      "Name": "DisconnectFromAsset",
+      "Do": [
+        {
+          "Condition": {
+            "If": "ConnectSsh != null",
+            "Then": {
+              "Do": [
+                {
+                  "Disconnect": {
+                    "ConnectionObjectName": "ConnectSsh"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Return": {
+            "Value": true
+          }
+        }
+      ]
+    },
+    {
+      "Name": "RunCommand",
+      "Parameters": [
+        {
+          "Cmd": {
+            "Type": "String"
+          }
+        },
+        {
+          "StdinArgs": {
+            "Type": "Array"
+          }
+        },
+        {
+          "CommandContainsSecret": {
+            "Type": "Boolean"
+          }
+        },
+        {
+          "InputContainsSecret": {
+            "Type": "Boolean"
+          }
+        },
+        {
+          "OutputContainsSecret": {
+            "Type": "Boolean"
+          }
+        }
+      ],
+      "Do": [
+        {
+          "SetItem": {
+            "Name": "rc",
+            "Value": 1
+          }
+        },
+        {
+          "SetItem": {
+            "Name": "Stdout",
+            "Value": ""
+          }
+        },
+        {
+          "SetItem": {
+            "Name": "Stderr",
+            "Value": ""
+          }
+        },
+        {
+          "ExecuteCommand": {
+            "ConnectionObjectName": "ConnectSsh",
+            "Command": "%{ Cmd }%",
+            "Stdin": "%{ StdinArgs }%",
+            "BufferName": "Stdout",
+            "StderrBufferName": "Stderr",
+            "ExitStatusBufferName": "rc",
+            "CommandContainsSecret": "%{ CommandContainsSecret }%",
+            "InputContainsSecret": "%{ InputContainsSecret }%",
+            "OutputContainsSecret": "%{ OutputContainsSecret }%"
+          }
+        },
+        {
+          "Return": {
+            "Value": {
+              "rc": "%{ rc }%",
+              "Stdout": "%{ Stdout }%",
+              "Stderr": "%{ Stderr }%"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "Name": "PrepareStageFiles",
+      "Do": [
+        {
+          "SetItem": {
+            "Name": "StageFilePath",
+            "Value": "%StageDirectory%/expected.bin"
+          }
+        },
+        {
+          "Function": {
+            "Name": "RunCommand",
+            "Parameters": [
+              "%DelegationPrefix% mkdir -p '%StageDirectory%'",
+              [],
+              false,
+              false,
+              false
+            ],
+            "ResultVariable": "StageDirResult"
+          }
+        },
+        {
+          "Condition": {
+            "If": "StageDirResult.rc != 0",
+            "Then": {
+              "Do": [
+                {
+                  "Throw": {
+                    "Value": "Unable to create stage directory"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "Name": "DecodeExpectedFile",
+      "Do": [
+        {
+          "Function": {
+            "Name": "RunCommand",
+            "Parameters": [
+              "%DelegationPrefix% /bin/sh -lc \"base64 -d > '%StageFilePath%' && sha256sum '%StageFilePath%'\"",
+              [
+                "%FileBase64String%"
+              ],
+              false,
+              true,
+              false
+            ],
+            "ResultVariable": "DecodeResult"
+          }
+        },
+        {
+          "Condition": {
+            "If": "DecodeResult.rc != 0",
+            "Then": {
+              "Do": [
+                {
+                  "Throw": {
+                    "Value": "Failed to decode FileBase64String"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "SetItem": {
+            "Name": "HashMatch",
+            "Value": "%{ Regex.Match(DecodeResult.Stdout, @\"(?m)^(?<hash>[a-fA-F0-9]{64})\\s+\") }%"
+          }
+        },
+        {
+          "Condition": {
+            "If": "!HashMatch.Success",
+            "Then": {
+              "Do": [
+                {
+                  "Throw": {
+                    "Value": "Unable to calculate expected checksum"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Return": {
+            "Value": "%{ HashMatch.Groups[\"hash\"].Value }%"
+          }
+        }
+      ]
+    },
+    {
+      "Name": "RemoveStageFiles",
+      "Do": [
+        {
+          "Condition": {
+            "If": "ConnectSsh != null && !string.IsNullOrWhiteSpace(StageDirectory)",
+            "Then": {
+              "Do": [
+                {
+                  "ExecuteCommand": {
+                    "ConnectionObjectName": "ConnectSsh",
+                    "Command": "%DelegationPrefix% rm -f '%StageDirectory%/expected.bin'",
+                    "ExitStatusBufferName": "CleanupRc",
+                    "BufferName": "CleanupOut",
+                    "StderrBufferName": "CleanupErr"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Return": {
+            "Value": true
+          }
+        }
+      ]
+    }
+  ]
+}

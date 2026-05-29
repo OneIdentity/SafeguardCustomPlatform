@@ -1,0 +1,504 @@
+{
+  "Id": "GenericLinuxServiceDiscovery",
+  "BackEnd": "Scriptable",
+  "Meta": {
+    "Filename": "GenericLinuxServiceDiscovery.json",
+    "Description": "PATTERN TEMPLATE — Illustrates service discovery via systemd over SSH using WriteDiscoveredService. Adapt parsing for your service manager."
+  },
+  "CheckSystem": {
+    "Parameters": [
+      {
+        "AssetName": {
+          "Type": "String",
+          "Required": false,
+          "DefaultValue": ""
+        }
+      },
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "Port": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 22
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 20
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": false
+        }
+      },
+      {
+        "UserKey": {
+          "Type": "Secret",
+          "Required": false,
+          "DefaultValue": ""
+        }
+      },
+      {
+        "CheckHostKey": {
+          "Type": "Boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "HostKey": {
+          "Type": "string",
+          "Required": false
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "ConnectToAsset"
+              }
+            },
+            {
+              "Function": {
+                "Name": "RunCommand",
+                "Parameters": [
+                  "/usr/bin/id %FuncUserName%",
+                  [],
+                  false,
+                  false,
+                  false
+                ],
+                "ResultVariable": "Result"
+              }
+            },
+            {
+              "Function": {
+                "Name": "DisconnectFromAsset"
+              }
+            },
+            {
+              "Condition": {
+                "If": "Result.rc == 0",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Status": {
+                "Type": "Checking",
+                "Percent": 90,
+                "Message": {
+                  "Name": "UnexpectedDataReceived",
+                  "Parameters": [
+                    "Output: %{ Result.Stdout }% Error: %{ Result.Stderr }%"
+                  ]
+                }
+              }
+            },
+            {
+              "Return": {
+                "Value": false
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Function": {
+                "Name": "DisconnectFromAsset"
+              }
+            },
+            {
+              "Return": {
+                "Value": "Error"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "DiscoverServices": {
+    "Parameters": [
+      {
+        "AssetName": {
+          "Type": "String",
+          "Required": false,
+          "DefaultValue": ""
+        }
+      },
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "Port": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 22
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 20
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": false
+        }
+      },
+      {
+        "UserKey": {
+          "Type": "Secret",
+          "Required": false,
+          "DefaultValue": ""
+        }
+      },
+      {
+        "CheckHostKey": {
+          "Type": "Boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "HostKey": {
+          "Type": "string",
+          "Required": false
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "ConnectToAsset"
+              }
+            },
+            {
+              "Status": {
+                "Type": "Checking",
+                "Percent": 50,
+                "Message": {
+                  "Name": "DiscoveringServices"
+                }
+              }
+            },
+            {
+              "Function": {
+                "Name": "RunCommand",
+                "Parameters": [
+                  "/bin/sh -lc \"if command -v systemctl >/dev/null 2>&1; then systemctl list-units --type=service --state=running --no-legend --no-pager --plain | awk '{print $1}' | while read svc; do desc=$(systemctl show \\\"$svc\\\" -p Description --value); user=$(systemctl show \\\"$svc\\\" -p User --value); if [ -z \\\"$user\\\" ]; then user=root; fi; printf 'SERVICE|%s|%s|%s\\n' \\\"$svc\\\" \\\"$desc\\\" \\\"$user\\\"; done; else echo 'systemctl is required for service discovery' >&2; exit 1; fi\"",
+                  [],
+                  false,
+                  false,
+                  false
+                ],
+                "ResultVariable": "ServiceResult"
+              }
+            },
+            {
+              "Condition": {
+                "If": "ServiceResult.rc != 0",
+                "Then": {
+                  "Do": [
+                    {
+                      "Throw": {
+                        "Value": "%{ ServiceResult.Stderr }%"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "SetItem": {
+                "Name": "match",
+                "Value": "%{ Regex.Match(ServiceResult.Stdout, @\"(^SERVICE\\|(?<name>[^|]+)\\|(?<desc>[^|]*)\\|(?<account>[^|]*)\\r?\\n)\", RegexOptions.ExplicitCapture | RegexOptions.Multiline) }%"
+              }
+            },
+            {
+              "For": {
+                "Condition": "match.Success",
+                "Body": {
+                  "Do": [
+                    {
+                      "WriteDiscoveredService": {
+                        "Name": "%{ match.Groups[\"name\"].Value }%",
+                        "Description": "%{ match.Groups[\"desc\"].Value }%",
+                        "AccountName": "%{ match.Groups[\"account\"].Value }%",
+                        "ServiceType": "Systemd"
+                      }
+                    },
+                    {
+                      "SetItem": {
+                        "Name": "match",
+                        "Value": "%{ match.NextMatch() }%"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Function": {
+                "Name": "DisconnectFromAsset"
+              }
+            },
+            {
+              "Return": {
+                "Value": true
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Function": {
+                "Name": "DisconnectFromAsset"
+              }
+            },
+            {
+              "Status": {
+                "Type": "Checking",
+                "Percent": 90,
+                "Message": {
+                  "Name": "UnexpectedDataReceived",
+                  "Parameters": [
+                    "%Exception::$%"
+                  ]
+                }
+              }
+            },
+            {
+              "Throw": {
+                "Value": "%Exception%"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "Functions": [
+    {
+      "Name": "ConnectToAsset",
+      "Do": [
+        {
+          "SetItem": {
+            "Name": "GLOBAL:ConnectSsh",
+            "Value": null
+          }
+        },
+        {
+          "SetItem": {
+            "Name": "GLOBAL:ServerSoftwareName",
+            "Value": ""
+          }
+        },
+        {
+          "Status": {
+            "Type": "Connecting",
+            "Percent": 30,
+            "Message": {
+              "Name": "AssetConnectingWithAddress",
+              "Parameters": [
+                "%AssetName%",
+                "%Address%"
+              ]
+            }
+          }
+        },
+        {
+          "Try": {
+            "Do": [
+              {
+                "Connect": {
+                  "ConnectionObjectName": "Global:ConnectSsh",
+                  "Type": "Ssh",
+                  "Port": "%Port%",
+                  "NetworkAddress": "%Address%",
+                  "Login": "%FuncUserName%",
+                  "RequestTerminal": false,
+                  "Password": "%FuncPassword::$%",
+                  "UserKey": "%UserKey::$%",
+                  "CheckHostKey": "%CheckHostKey%",
+                  "Hostkey": "%HostKey::$%",
+                  "Timeout": "%Timeout%",
+                  "SoftwareVersionVariableName": "GLOBAL:ServerSoftwareName"
+                }
+              }
+            ],
+            "Catch": [
+              {
+                "Status": {
+                  "Type": "Connecting",
+                  "Percent": 95,
+                  "Message": {
+                    "Name": "AssetConnectFailedWithReasonAndAddress",
+                    "Parameters": [
+                      "%AssetName%",
+                      "%Address%",
+                      "%Exception%"
+                    ]
+                  }
+                }
+              },
+              {
+                "Throw": {
+                  "Value": "Failed to connect"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "Name": "DisconnectFromAsset",
+      "Do": [
+        {
+          "Condition": {
+            "If": "ConnectSsh != null",
+            "Then": {
+              "Do": [
+                {
+                  "Disconnect": {
+                    "ConnectionObjectName": "ConnectSsh"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Return": {
+            "Value": true
+          }
+        }
+      ]
+    },
+    {
+      "Name": "RunCommand",
+      "Parameters": [
+        {
+          "Cmd": {
+            "Type": "String"
+          }
+        },
+        {
+          "StdinArgs": {
+            "Type": "Array"
+          }
+        },
+        {
+          "CommandContainsSecret": {
+            "Type": "Boolean"
+          }
+        },
+        {
+          "InputContainsSecret": {
+            "Type": "Boolean"
+          }
+        },
+        {
+          "OutputContainsSecret": {
+            "Type": "Boolean"
+          }
+        }
+      ],
+      "Do": [
+        {
+          "SetItem": {
+            "Name": "rc",
+            "Value": 1
+          }
+        },
+        {
+          "SetItem": {
+            "Name": "Stdout",
+            "Value": ""
+          }
+        },
+        {
+          "SetItem": {
+            "Name": "Stderr",
+            "Value": ""
+          }
+        },
+        {
+          "Try": {
+            "Do": [
+              {
+                "ExecuteCommand": {
+                  "ConnectionObjectName": "ConnectSsh",
+                  "Command": "%{ Cmd }%",
+                  "Stdin": "%{ StdinArgs }%",
+                  "BufferName": "Stdout",
+                  "StderrBufferName": "Stderr",
+                  "ExitStatusBufferName": "rc",
+                  "CommandContainsSecret": "%{ CommandContainsSecret }%",
+                  "InputContainsSecret": "%{ InputContainsSecret }%",
+                  "OutputContainsSecret": "%{ OutputContainsSecret }%"
+                }
+              }
+            ],
+            "Catch": [
+              {
+                "Throw": {
+                  "Value": "Command failed"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "Return": {
+            "Value": {
+              "rc": "%{ rc }%",
+              "Stdout": "%{ Stdout }%",
+              "Stderr": "%{ Stderr }%"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

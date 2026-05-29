@@ -1,0 +1,707 @@
+{
+  "Id": "GenericHttpJitElevation",
+  "BackEnd": "Scriptable",
+  "Meta": {
+    "Author": "GitHub Copilot",
+    "Description": "PATTERN TEMPLATE — Illustrates idempotent JIT elevation via REST API (add/remove group membership). Adapt endpoints and auth to your target system."
+  },
+  "CheckSystem": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "SetBaseAddress",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%"
+                ],
+                "ResultVariable": "SetBaseAddressResult"
+              }
+            },
+            {
+              "NewHttpRequest": {
+                "ObjectName": "SystemRequest"
+              }
+            },
+            {
+              "HttpAuth": {
+                "RequestObjectName": "SystemRequest",
+                "Type": "Basic",
+                "Credentials": {
+                  "Login": "%FuncUserName%",
+                  "Password": "%FuncPassword%"
+                }
+              }
+            },
+            {
+              "Headers": {
+                "RequestObjectName": "SystemRequest",
+                "AddHeaders": {
+                  "Accept": "application/json"
+                }
+              }
+            },
+            {
+              "Request": {
+                "RequestObjectName": "SystemRequest",
+                "ResponseObjectName": "SystemResponse",
+                "Verb": "GET",
+                "Url": "/api/health"
+              }
+            },
+            {
+              "Condition": {
+                "If": "SystemResponse.StatusCode == 200",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                },
+                "Else": {
+                  "Do": [
+                    {
+                      "Throw": {
+                        "Value": "CheckSystem failed with HTTP %{SystemResponse.StatusCode}%"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Return": {
+                "Value": false
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ElevateAccount": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "AccountUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "AdminGroupName": {
+          "Type": "String",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "CheckMembership",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%",
+                  "%{Timeout}%",
+                  "%FuncUserName%",
+                  "%FuncPassword%",
+                  "%AccountUserName%",
+                  "%AdminGroupName%"
+                ],
+                "ResultVariable": "IsMember"
+              }
+            },
+            {
+              "Condition": {
+                "If": "IsMember == true",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                },
+                "Else": {
+                  "Do": [
+                    {
+                      "Function": {
+                        "Name": "SetBaseAddress",
+                        "Parameters": [
+                          "%Address%",
+                          "%{UseSsl}%"
+                        ],
+                        "ResultVariable": "SetBaseAddressResult"
+                      }
+                    },
+                    {
+                      "NewHttpRequest": {
+                        "ObjectName": "ElevateRequest"
+                      }
+                    },
+                    {
+                      "HttpAuth": {
+                        "RequestObjectName": "ElevateRequest",
+                        "Type": "Basic",
+                        "Credentials": {
+                          "Login": "%FuncUserName%",
+                          "Password": "%FuncPassword%"
+                        }
+                      }
+                    },
+                    {
+                      "Headers": {
+                        "RequestObjectName": "ElevateRequest",
+                        "AddHeaders": {
+                          "Accept": "application/json"
+                        }
+                      }
+                    },
+                    {
+                      "SetItem": {
+                        "Name": "ElevateBody",
+                        "Value": {
+                          "userName": "%AccountUserName%"
+                        }
+                      }
+                    },
+                    {
+                      "Request": {
+                        "RequestObjectName": "ElevateRequest",
+                        "ResponseObjectName": "ElevateResponse",
+                        "Verb": "POST",
+                        "Url": "/api/admin/groups/%{Uri.EscapeDataString(AdminGroupName)}%/members",
+                        "SubstitutionInUrl": true,
+                        "Content": {
+                          "ContentObjectName": "ElevateBody",
+                          "ContentType": "application/json"
+                        }
+                      }
+                    },
+                    {
+                      "Condition": {
+                        "If": "ElevateResponse.StatusCode == 200 || ElevateResponse.StatusCode == 201 || ElevateResponse.StatusCode == 204",
+                        "Then": {
+                          "Do": [
+                            {
+                              "Function": {
+                                "Name": "CheckMembership",
+                                "Parameters": [
+                                  "%Address%",
+                                  "%{UseSsl}%",
+                                  "%{Timeout}%",
+                                  "%FuncUserName%",
+                                  "%FuncPassword%",
+                                  "%AccountUserName%",
+                                  "%AdminGroupName%"
+                                ],
+                                "ResultVariable": "IsMemberAfterAdd"
+                              }
+                            },
+                            {
+                              "Condition": {
+                                "If": "IsMemberAfterAdd == true",
+                                "Then": {
+                                  "Do": [
+                                    {
+                                      "Return": {
+                                        "Value": true
+                                      }
+                                    }
+                                  ]
+                                },
+                                "Else": {
+                                  "Do": [
+                                    {
+                                      "Throw": {
+                                        "Value": "User was added but membership verification failed."
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "Else": {
+                          "Do": [
+                            {
+                              "Throw": {
+                                "Value": "ElevateAccount failed with HTTP %{ElevateResponse.StatusCode}%"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Throw": {
+                "Value": "%Exception%"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "DemoteAccount": {
+    "Parameters": [
+      {
+        "Address": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "UseSsl": {
+          "Type": "boolean",
+          "Required": false,
+          "DefaultValue": true
+        }
+      },
+      {
+        "Timeout": {
+          "Type": "Integer",
+          "Required": false,
+          "DefaultValue": 30
+        }
+      },
+      {
+        "FuncUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "FuncPassword": {
+          "Type": "Secret",
+          "Required": true
+        }
+      },
+      {
+        "AccountUserName": {
+          "Type": "String",
+          "Required": true
+        }
+      },
+      {
+        "AdminGroupName": {
+          "Type": "String",
+          "Required": true
+        }
+      }
+    ],
+    "Do": [
+      {
+        "Try": {
+          "Do": [
+            {
+              "Function": {
+                "Name": "CheckMembership",
+                "Parameters": [
+                  "%Address%",
+                  "%{UseSsl}%",
+                  "%{Timeout}%",
+                  "%FuncUserName%",
+                  "%FuncPassword%",
+                  "%AccountUserName%",
+                  "%AdminGroupName%"
+                ],
+                "ResultVariable": "IsMember"
+              }
+            },
+            {
+              "Condition": {
+                "If": "IsMember == false",
+                "Then": {
+                  "Do": [
+                    {
+                      "Return": {
+                        "Value": true
+                      }
+                    }
+                  ]
+                },
+                "Else": {
+                  "Do": [
+                    {
+                      "Function": {
+                        "Name": "SetBaseAddress",
+                        "Parameters": [
+                          "%Address%",
+                          "%{UseSsl}%"
+                        ],
+                        "ResultVariable": "SetBaseAddressResult"
+                      }
+                    },
+                    {
+                      "NewHttpRequest": {
+                        "ObjectName": "DemoteRequest"
+                      }
+                    },
+                    {
+                      "HttpAuth": {
+                        "RequestObjectName": "DemoteRequest",
+                        "Type": "Basic",
+                        "Credentials": {
+                          "Login": "%FuncUserName%",
+                          "Password": "%FuncPassword%"
+                        }
+                      }
+                    },
+                    {
+                      "Headers": {
+                        "RequestObjectName": "DemoteRequest",
+                        "AddHeaders": {
+                          "Accept": "application/json"
+                        }
+                      }
+                    },
+                    {
+                      "Request": {
+                        "RequestObjectName": "DemoteRequest",
+                        "ResponseObjectName": "DemoteResponse",
+                        "Verb": "DELETE",
+                        "Url": "/api/admin/groups/%{Uri.EscapeDataString(AdminGroupName)}%/members/%{Uri.EscapeDataString(AccountUserName)}%",
+                        "SubstitutionInUrl": true
+                      }
+                    },
+                    {
+                      "Condition": {
+                        "If": "DemoteResponse.StatusCode == 200 || DemoteResponse.StatusCode == 204",
+                        "Then": {
+                          "Do": [
+                            {
+                              "Function": {
+                                "Name": "CheckMembership",
+                                "Parameters": [
+                                  "%Address%",
+                                  "%{UseSsl}%",
+                                  "%{Timeout}%",
+                                  "%FuncUserName%",
+                                  "%FuncPassword%",
+                                  "%AccountUserName%",
+                                  "%AdminGroupName%"
+                                ],
+                                "ResultVariable": "IsMemberAfterRemoval"
+                              }
+                            },
+                            {
+                              "Condition": {
+                                "If": "IsMemberAfterRemoval == false",
+                                "Then": {
+                                  "Do": [
+                                    {
+                                      "Return": {
+                                        "Value": true
+                                      }
+                                    }
+                                  ]
+                                },
+                                "Else": {
+                                  "Do": [
+                                    {
+                                      "Throw": {
+                                        "Value": "User was removed but membership verification still reports the admin role."
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "Else": {
+                          "Do": [
+                            {
+                              "Throw": {
+                                "Value": "DemoteAccount failed with HTTP %{DemoteResponse.StatusCode}%"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            {
+              "Throw": {
+                "Value": "%Exception%"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "Functions": [
+    {
+      "Name": "SetBaseAddress",
+      "Parameters": [
+        {
+          "Address": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "UseSsl": {
+            "Type": "boolean",
+            "Required": false,
+            "DefaultValue": true
+          }
+        }
+      ],
+      "Do": [
+        {
+          "Condition": {
+            "If": "UseSsl",
+            "Then": {
+              "Do": [
+                {
+                  "BaseAddress": {
+                    "Address": "https://%Address%"
+                  }
+                }
+              ]
+            },
+            "Else": {
+              "Do": [
+                {
+                  "BaseAddress": {
+                    "Address": "http://%Address%"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Return": {
+            "Value": true
+          }
+        }
+      ]
+    },
+    {
+      "Name": "CheckMembership",
+      "Parameters": [
+        {
+          "Address": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "UseSsl": {
+            "Type": "boolean",
+            "Required": false,
+            "DefaultValue": true
+          }
+        },
+        {
+          "Timeout": {
+            "Type": "Integer",
+            "Required": false,
+            "DefaultValue": 30
+          }
+        },
+        {
+          "FuncUserName": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "FuncPassword": {
+            "Type": "Secret",
+            "Required": true
+          }
+        },
+        {
+          "AccountUserName": {
+            "Type": "String",
+            "Required": true
+          }
+        },
+        {
+          "AdminGroupName": {
+            "Type": "String",
+            "Required": true
+          }
+        }
+      ],
+      "Do": [
+        {
+          "Function": {
+            "Name": "SetBaseAddress",
+            "Parameters": [
+              "%Address%",
+              "%{UseSsl}%"
+            ],
+            "ResultVariable": "SetBaseAddressResult"
+          }
+        },
+        {
+          "NewHttpRequest": {
+            "ObjectName": "MembershipRequest"
+          }
+        },
+        {
+          "HttpAuth": {
+            "RequestObjectName": "MembershipRequest",
+            "Type": "Basic",
+            "Credentials": {
+              "Login": "%FuncUserName%",
+              "Password": "%FuncPassword%"
+            }
+          }
+        },
+        {
+          "Headers": {
+            "RequestObjectName": "MembershipRequest",
+            "AddHeaders": {
+              "Accept": "application/json"
+            }
+          }
+        },
+        {
+          "Request": {
+            "RequestObjectName": "MembershipRequest",
+            "ResponseObjectName": "MembershipResponse",
+            "Verb": "GET",
+            "Url": "/api/admin/groups/%{Uri.EscapeDataString(AdminGroupName)}%/members/%{Uri.EscapeDataString(AccountUserName)}%",
+            "SubstitutionInUrl": true
+          }
+        },
+        {
+          "Condition": {
+            "If": "MembershipResponse.StatusCode == 200",
+            "Then": {
+              "Do": [
+                {
+                  "Return": {
+                    "Value": true
+                  }
+                }
+              ]
+            },
+            "Else": {
+              "Do": [
+                {
+                  "Condition": {
+                    "If": "MembershipResponse.StatusCode == 404",
+                    "Then": {
+                      "Do": [
+                        {
+                          "Return": {
+                            "Value": false
+                          }
+                        }
+                      ]
+                    },
+                    "Else": {
+                      "Do": [
+                        {
+                          "Throw": {
+                            "Value": "Membership lookup failed with HTTP %{MembershipResponse.StatusCode}%"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

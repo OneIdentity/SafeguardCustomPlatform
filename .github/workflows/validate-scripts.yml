@@ -1,0 +1,47 @@
+name: Validate Sample Scripts
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'SampleScripts/**/*.json'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'SampleScripts/**/*.json'
+
+jobs:
+  validate-json:
+    name: JSON Syntax Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON files
+        run: |
+          failed=0
+          found=0
+
+          while IFS= read -r -d '' f; do
+            found=1
+
+            if ! jq empty "$f" >/dev/null 2>&1; then
+              echo "::error file=$f::Invalid JSON syntax"
+              echo "FAILED: $f"
+              jq empty "$f"
+              failed=1
+            fi
+          done < <(find SampleScripts -type f -name '*.json' -print0)
+
+          if [ "$found" -eq 0 ]; then
+            echo "No JSON files found under SampleScripts/."
+            exit 0
+          fi
+
+          if [ "$failed" -ne 0 ]; then
+            echo
+            echo "One or more JSON files failed validation."
+            exit 1
+          fi
+
+          echo "All JSON files are valid."

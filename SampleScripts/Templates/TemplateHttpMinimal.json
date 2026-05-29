@@ -1,0 +1,72 @@
+{
+  "Id": "TemplateHttpMinimal",
+  "BackEnd": "Scriptable",
+  "Meta": {
+    "Description": "Minimal HTTP starter template that calls a health endpoint with a bearer token."
+  },
+  "CheckSystem": {
+    "Parameters": [
+      { "Address": { "Type": "String", "Required": true, "Description": "Target host name, FQDN, or host:port." } },
+      { "UseSsl": { "Type": "Boolean", "Required": false, "DefaultValue": true, "Description": "Use HTTPS when true; otherwise use HTTP." } },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 30, "Description": "Operation timeout in seconds." } },
+      { "ApiToken": { "Type": "Secret", "Required": true, "Description": "Custom API token added to the Authorization header." } }
+    ],
+    "Do": [
+      { "SetItem": { "Name": "CheckResult", "Value": false } },
+      {
+        "Condition": {
+          "If": "UseSsl",
+          "Then": {
+            "Do": [
+              { "BaseAddress": { "Address": "https://%Address%" } }
+            ]
+          },
+          "Else": {
+            "Do": [
+              { "BaseAddress": { "Address": "http://%Address%" } }
+            ]
+          }
+        }
+      },
+      { "NewHttpRequest": { "ObjectName": "SystemRequest" } },
+      {
+        "Headers": {
+          "RequestObjectName": "SystemRequest",
+          "AddHeaders": {
+            "Accept": "application/json",
+            "Authorization": "Bearer %ApiToken%"
+          }
+        }
+      },
+      {
+        "Try": {
+          "Do": [
+            {
+              "Request": {
+                "RequestObjectName": "SystemRequest",
+                "ResponseObjectName": "SystemResponse",
+                "Verb": "GET",
+                "Url": "api/health",
+                "Content": {}
+              }
+            },
+            {
+              "Condition": {
+                "If": "SystemResponse.StatusCode == 200",
+                "Then": {
+                  "Do": [
+                    { "SetItem": { "Name": "CheckResult", "Value": true } }
+                  ]
+                }
+              }
+            }
+          ],
+          "Catch": [
+            { "Comment": { "Text": "Starter template: return false on request errors." } }
+          ]
+        }
+      },
+      { "Return": { "Value": "%CheckResult%" } }
+    ]
+  }
+}
