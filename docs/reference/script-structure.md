@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Script Structure Reference
 
 A custom platform script is a single JSON file that tells SPP how to connect to a target system, verify credentials, and change passwords or keys. This page documents the complete JSON structure.

@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Variables Reference
 
 Variables are the named values the script engine uses to pass data between parameters, commands, functions, and helper logic. Parameters arrive as variables automatically at runtime, and commands such as `SetItem`, `Receive`, `Connect`, and `Function` can create or update additional variables as the task runs.
@@ -254,4 +256,4 @@ That is easier to debug than placing the entire parse pipeline into a single exp
 - [Operations](operations.md) — which operations consume which parameters and results
 - [Reserved Parameters](reserved-parameters.md) — parameter names that SPP auto-populates
 - [Custom Parameters](custom-parameters.md) — defining your own non-reserved names
-- [Utilities Commands](../commands/utilities.md) — utility-style commands such as `SetItem`, `Declare`, `Eval`, and related helpers
+- [Utilities Commands](commands/utilities.md) — utility-style commands such as `SetItem`, `Declare`, `Eval`, and related helpers

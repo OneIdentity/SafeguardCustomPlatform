@@ -1,3 +1,5 @@
+[← Sample Scripts](../README.md)
+
 # Guide to SafeguardCustomPlatform - HTTP Scripts
 
 ## Table of Contents  

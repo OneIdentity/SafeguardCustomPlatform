@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # Request
 
 `Request` sends an HTTP request and optionally stores the response object for later parsing, status checks, header inspection, or follow-up logic.

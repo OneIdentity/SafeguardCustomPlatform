@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # SSH Key Management Guide
 
 Safeguard SSH key management keeps the public key installed on a target account in sync with the key material stored in SPP. For custom platforms, that usually means reading and rewriting one or more `authorized_keys`-style files over SSH.

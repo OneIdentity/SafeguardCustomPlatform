@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # SSH Platforms Guide
 
 This guide covers the SSH patterns you will use most often when building Safeguard custom platforms. It assumes you already understand SSH itself and want to understand how SPP expects an SSH-based script to behave.

@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # Cookies
 
 `GetCookie`, `SetCookie`, and `ClearCookie` let a script inspect or manipulate the HTTP cookie jar directly.

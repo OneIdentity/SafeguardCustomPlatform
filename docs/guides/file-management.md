@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # File Management Guide
 
 This guide shows how to implement file-based credential workflows in Safeguard custom platforms. Use it when the credential you manage is a file rather than a password, SSH key, or API key.

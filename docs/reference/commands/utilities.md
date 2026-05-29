@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # Utility Commands
 
 Set variables, annotate script intent, pause execution, and emit discovered-account records.

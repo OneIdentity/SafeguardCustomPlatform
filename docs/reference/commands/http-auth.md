@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # HTTP Authentication
 
 `HttpAuth` applies built-in HTTP authentication settings to a named request object before `Request` sends it.

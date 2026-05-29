@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # Encoding and Hashing
 
 These commands help with URL-safe string handling and password-hash operations inside the script engine.

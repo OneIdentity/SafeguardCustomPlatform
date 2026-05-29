@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # HTTP/REST API Platforms
 
 HTTP-based custom platforms let Safeguard call a target system's web API instead of opening an SSH session. This guide shows the patterns that work well for REST APIs, token-based authentication, browser-style forms, and discovery operations.

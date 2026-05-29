@@ -50,6 +50,12 @@ This documentation hub helps you learn, build, and maintain Safeguard Custom Pla
 | [guides/feature-flags.md](guides/feature-flags.md) | How script content enables and shapes platform capabilities. |
 | [guides/troubleshooting.md](guides/troubleshooting.md) | Common errors, diagnostics, and recommended fixes. |
 
+## General
+
+| Document | Description |
+| --- | --- |
+| [compatibility.md](compatibility.md) | Compatibility matrix for documented SPP custom platform capabilities and versions. |
+
 ## Additional Resources
 
 | Resource | Description |

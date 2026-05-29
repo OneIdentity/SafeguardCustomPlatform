@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # Error Handling Commands
 
 Handle recoverable failures and re-raise errors when execution should stop.

@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # HTTP Request Setup
 
 `NewHttpRequest`, `BaseAddress`, and `Headers` are the setup commands that shape an HTTP call before `Request` sends it.

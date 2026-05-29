@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Operations Reference
 
 Operations are the named entry points in a custom platform script that SPP invokes when performing specific tasks. Each operation you include in your script tells SPP what your platform can do — SPP automatically derives [feature flags](../guides/feature-flags.md) from the operations present.

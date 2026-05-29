@@ -1,3 +1,5 @@
+[← Sample Scripts](../README.md)
+
 # Pattern Templates
 
 These scripts are **pattern templates** — they illustrate recommended approaches

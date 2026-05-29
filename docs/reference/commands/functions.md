@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # Function Commands
 
 Define reusable blocks and call them from operations or other functions.

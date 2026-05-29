@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Development Workflow
 
 This guide walks through the full development loop for building, validating, uploading, testing, and refining a Safeguard custom platform script. The [`safeguard-ps` PowerShell module](https://github.com/OneIdentity/safeguard-ps) is the primary workflow because it provides purpose-built cmdlets for the standard custom platform tasks.

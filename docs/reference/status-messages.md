@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Status Messages Reference
 
 Status messages are the predefined, operator-visible progress updates that a custom platform script publishes with the `Status` command while an operation runs.

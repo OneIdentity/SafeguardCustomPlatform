@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # DiscoverSshHostKey
 
 `DiscoverSshHostKey` performs the SSH handshake needed to read the remote host key before any login occurs.

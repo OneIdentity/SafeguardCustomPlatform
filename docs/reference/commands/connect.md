@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # Connect and Disconnect
 
 `Connect` opens an SSH or Telnet session and stores it in a named connection object. `Disconnect` closes that object when the script is done with the session.

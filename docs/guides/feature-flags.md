@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Platform Feature Flags
 
 SPP uses platform feature flags to decide what a custom platform advertises. Those flags control which built-in fields appear on Assets and Accounts, which workflows SPP offers, and which profile settings become relevant.

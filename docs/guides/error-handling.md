@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Error Handling Guide
 
 Use this guide when you want Safeguard custom platform scripts to fail predictably, report useful diagnostics, and leave the target system in a clean state.

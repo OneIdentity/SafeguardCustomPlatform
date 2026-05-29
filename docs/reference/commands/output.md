@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # Output Commands
 
 Write the final value that the platform consumes after the script finishes.

@@ -1,3 +1,5 @@
+[← Documentation](README.md)
+
 # SPP Compatibility Matrix
 
 Safeguard custom platform capabilities are derived from the operations, reserved parameter names, and engine features present in your script. Version compatibility matters because a script can be valid JSON and still depend on a capability your SPP appliance does not support yet.

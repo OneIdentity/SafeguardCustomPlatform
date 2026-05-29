@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # Send and Receive
 
 `Send` writes text to an interactive terminal session, and `Receive` reads terminal output into a variable.

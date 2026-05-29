@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # Forms
 
 `ExtractFormData`, `GetFormValue`/`GetFormData`, and `SetFormValue`/`SetFormData` support browser-style HTML form workflows.

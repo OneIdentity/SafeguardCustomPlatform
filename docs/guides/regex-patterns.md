@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Regex Patterns Guide
 
 Regex is a core part of custom platform scripting. You will use it to detect prompts, wait for command completion, extract values from terminal output, and recognize failure text before the script keeps going.

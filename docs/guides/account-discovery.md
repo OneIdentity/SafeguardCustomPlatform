@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Account Discovery Guide
 
 Use this guide when you need a custom platform to enumerate accounts on a target and report them back to Safeguard for Privileged Passwords (SPP).

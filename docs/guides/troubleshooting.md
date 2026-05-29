@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Troubleshooting
 
 When a custom platform operation fails, start here.

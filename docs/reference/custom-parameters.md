@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Custom Parameters Reference
 
 Custom parameters are the **non-reserved** parameter names you define in a custom platform script. They are for target-system values that SPP does not already model as built-in asset, account, or profile fields.

@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # Logging and Status Commands
 
 Write diagnostic messages and update the task status shown to users.

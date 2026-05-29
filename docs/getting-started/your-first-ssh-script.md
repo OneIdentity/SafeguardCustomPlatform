@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Your First SSH Script
 
 By the end of this tutorial, you will have a working custom platform script that connects to a Linux host over SSH, verifies that the service account can log in with `CheckSystem`, and validates a managed account password with `CheckPassword`.

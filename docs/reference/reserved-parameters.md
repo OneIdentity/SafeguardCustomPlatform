@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Reserved Parameters Reference
 
 Reserved parameters are parameter names that SPP recognizes specially. When a custom platform script declares one of these names, SPP understands what value the script is asking for and, in most cases, auto-populates it at runtime from the asset, account, profile, or generated credential context.

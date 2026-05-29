@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Testing and Debugging
 
 Testing a custom platform script is not a purely local workflow. You need a real SPP appliance, a test asset, and a managed account already configured to use your custom platform so SPP can execute the operation in context.

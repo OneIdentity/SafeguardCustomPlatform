@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Your First Form-Based Script
 
 By the end of this tutorial, you will have a working custom platform script that logs in to a generic web portal by submitting HTML forms, verifies managed account credentials with `CheckPassword`, and updates the password with `ChangePassword`.

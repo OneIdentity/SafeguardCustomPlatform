@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # ExecuteCommand
 
 `ExecuteCommand` runs a remote command over SSH batch mode and writes the results into named variables.

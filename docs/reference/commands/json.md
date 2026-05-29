@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # JSON
 
 `ExtractJsonObject` parses JSON text into an object that later commands and expressions can inspect.

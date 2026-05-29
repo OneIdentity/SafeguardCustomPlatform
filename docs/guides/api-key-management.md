@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # API Key Management
 
 Safeguard can manage API keys, bearer tokens, client secrets, and similar application credentials the same way it manages passwords. For a custom platform, that usually means validating the current key with `CheckApiKey` and rotating it with `ChangeApiKey`.

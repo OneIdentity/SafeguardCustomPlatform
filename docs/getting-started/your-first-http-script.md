@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Your First HTTP Script
 
 By the end of this tutorial, you will have a working custom platform script that connects to a REST API over HTTP or HTTPS, verifies API connectivity with `CheckSystem`, and validates managed account credentials with `CheckPassword`.

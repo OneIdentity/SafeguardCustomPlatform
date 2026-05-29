@@ -1,3 +1,5 @@
+[← Command Reference](index.md)
+
 # ExecuteDependentCommand
 
 `ExecuteDependentCommand` runs a configured SSH command during an `UpdateDependentSystem` workflow and captures the resolved command, stdout, stderr, and exit status in variables.

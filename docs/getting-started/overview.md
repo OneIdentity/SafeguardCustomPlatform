@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Architecture Overview
 
 Safeguard custom platform scripts let you teach Safeguard for Privileged Passwords (SPP) how to work with systems that do not fit a built-in platform.
