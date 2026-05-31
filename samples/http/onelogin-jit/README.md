@@ -4,6 +4,8 @@
 
 This sample is a JIT-focused add-on for OneLogin environments already managed through a separate Generic REST connector. It validates OAuth client credentials, enables or disables users, and elevates or demotes users by assigning or removing OneLogin roles.
 
+**Platform Script:** [`OneLogin_GRC_JIT_addon.json`](./OneLogin_GRC_JIT_addon.json)
+
 ## Target System
 
 OneLogin users and role assignments used in Safeguard JIT access workflows.

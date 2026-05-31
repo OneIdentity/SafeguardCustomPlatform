@@ -4,6 +4,8 @@
 
 This sample combines password validation, password reset, account discovery, and group-membership restore/suspend workflows for Okta. It uses an Okta API token for administrative operations and the `/authn` endpoint for end-user password checks.
 
+**Platform Script:** [`Okta_WithDiscoveryAndGroupMembershipRestore.json`](./Okta_WithDiscoveryAndGroupMembershipRestore.json)
+
 ## Target System
 
 Okta users and group memberships in an Okta tenant.

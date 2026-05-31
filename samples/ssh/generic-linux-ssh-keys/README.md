@@ -4,6 +4,8 @@
 
 This sample adds SSH authorized-key management to the generic Linux password-management flow. It can discover existing keys, check whether a specific key is installed, add a new key, optionally test the matching private key, and remove an old key.
 
+**Platform Script:** [`GenericLinuxWithSSHKeySupport.json`](./GenericLinuxWithSSHKeySupport.json)
+
 ## Target System
 
 A Linux or Unix host that uses OpenSSH-style `AuthorizedKeysFile` paths for managed accounts.

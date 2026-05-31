@@ -4,6 +4,8 @@
 
 This sample validates and changes Facebook account passwords by replaying Facebook's browser-based login and security forms. It is a form-scraping example for sites that do not expose a supported administrative API.
 
+**Platform Script:** [`CustomFacebook.json`](./CustomFacebook.json)
+
 ## Target System
 
 Facebook user accounts accessed through the public web interface.

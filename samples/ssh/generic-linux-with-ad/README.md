@@ -4,6 +4,8 @@
 
 This sample is the generic Linux SSH password-management script with an optional Active Directory-style login name for the service account. It appends `@domain` during SSH login, then uses the same local `/etc/passwd` and `/etc/shadow` workflow to validate and change managed-account passwords.
 
+**Platform Script:** [`GenericLinuxWithAD.json`](./GenericLinuxWithAD.json)
+
 ## Target System
 
 A Linux host where the service account may authenticate as `user@domain`, while password management still targets local accounts on the host.

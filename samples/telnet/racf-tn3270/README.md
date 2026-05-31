@@ -4,6 +4,8 @@
 
 This sample manages RACF passwords through a TN3270 session to a z/OS logon screen. It validates logon for both service and managed accounts and changes passwords by issuing a RACF `ALU ... PASSWORD(...) NOEXPIRED` command.
 
+**Platform Script:** [`GenericRacfTn3270.json`](./GenericRacfTn3270.json)
+
 ## Target System
 
 IBM z/OS RACF user IDs exposed through a TN3270 / TSO logon session.

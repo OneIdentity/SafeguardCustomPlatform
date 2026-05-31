@@ -4,6 +4,8 @@
 
 This sample manages local Linux account passwords over SSH using an interactive shell. It verifies service-account access, validates managed-account passwords against `/etc/shadow`, and changes passwords with `passwd`.
 
+**Platform Script:** [`GenericLinux.json`](./GenericLinux.json)
+
 ## Target System
 
 A generic Linux host with local accounts in `/etc/passwd` and password hashes in `/etc/shadow`.

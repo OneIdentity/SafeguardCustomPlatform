@@ -4,6 +4,8 @@
 
 This sample manages ForgeRock AM/OpenAM users through the REST API for a specific realm. It uses header-based authentication to validate credentials and to set a user's `userpassword` attribute.
 
+**Platform Script:** [`Forgerock_OpenAM.json`](./Forgerock_OpenAM.json)
+
 ## Target System
 
 ForgeRock AM / OpenAM user accounts in a target realm.

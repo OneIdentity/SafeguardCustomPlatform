@@ -4,6 +4,8 @@
 
 This sample demonstrates a least-privilege SSH design where the service account authenticates only with a restricted authorized key. It uses non-interactive command execution plus passwordless `sudo` to validate and rotate local Linux account passwords.
 
+**Platform Script:** [`RestrictedAuthorizedKeyExample.json`](./RestrictedAuthorizedKeyExample.json)
+
 ## Target System
 
 A Linux host where the Safeguard service account uses a restricted SSH key and passwordless `sudo` for a tightly limited command set.

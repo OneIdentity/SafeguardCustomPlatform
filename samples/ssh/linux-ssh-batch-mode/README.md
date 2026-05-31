@@ -4,6 +4,8 @@
 
 This sample shows how to manage Linux passwords without an interactive shell by using `ExecuteCommand`. It is a good starting point for targets where non-interactive command execution is more reliable than prompt-driven `Send` and `Receive` flows.
 
+**Platform Script:** [`LinuxSshBatchModeExample.json`](./LinuxSshBatchModeExample.json)
+
 ## Target System
 
 A Linux host where the service account can run the required commands through non-interactive SSH.

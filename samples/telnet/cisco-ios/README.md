@@ -4,6 +4,8 @@
 
 This sample manages local Cisco IOS credentials over Telnet. It can validate accounts, change local user passwords, and rotate the device's enable password while preserving the existing password style and privilege context.
 
+**Platform Script:** [`GenericCiscoIosTelnet.json`](./GenericCiscoIosTelnet.json)
+
 ## Target System
 
 Cisco IOS network devices that expose Telnet and local `username` / `enable` configuration entries.

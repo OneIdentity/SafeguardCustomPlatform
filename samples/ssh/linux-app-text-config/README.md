@@ -4,6 +4,8 @@
 
 This sample changes an application password stored in a plain-text configuration file on Linux over SSH. It is intended for simple legacy applications where password rotation means replacing a single `prefix + password` line in a file.
 
+**Platform Script:** [`LinuxApplicationTextConfig.json`](./LinuxApplicationTextConfig.json)
+
 ## Target System
 
 A Linux host that stores an application password in a text file that can be updated with shell tools such as `sed`.

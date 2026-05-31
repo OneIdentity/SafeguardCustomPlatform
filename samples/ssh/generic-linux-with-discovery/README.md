@@ -4,6 +4,8 @@
 
 This sample extends the generic Linux SSH password-management flow with account discovery. In addition to checking and changing passwords, it enumerates Unix accounts and group memberships and reports them back to Safeguard.
 
+**Platform Script:** [`GenericLinuxWithDiscovery.json`](./GenericLinuxWithDiscovery.json)
+
 ## Target System
 
 A generic Linux host with local accounts in `/etc/passwd`, password hashes in `/etc/shadow`, and standard Unix identity commands such as `id` and `awk`.
