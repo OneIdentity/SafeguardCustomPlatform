@@ -1,3 +1,5 @@
+[← SSH Samples](../README.md)
+
 # Linux Application Password in a Text Configuration File
 
 This sample changes an application password stored in a plain-text configuration file on Linux over SSH. It is intended for simple legacy applications where password rotation means replacing a single `prefix + password` line in a file.

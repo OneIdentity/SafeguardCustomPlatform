@@ -1,3 +1,5 @@
+[← SSH Samples](../README.md)
+
 # Linux with Restricted Authorized Key Service Account
 
 This sample demonstrates a least-privilege SSH design where the service account authenticates only with a restricted authorized key. It uses non-interactive command execution plus passwordless `sudo` to validate and rotate local Linux account passwords.

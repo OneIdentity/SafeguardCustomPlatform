@@ -1,4 +1,4 @@
-[← Documentation](../README.md)
+[← Guides](README.md)
 
 # Account Discovery Guide
 

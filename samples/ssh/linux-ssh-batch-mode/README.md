@@ -1,3 +1,5 @@
+[← SSH Samples](../README.md)
+
 # Linux SSH Batch Mode Example
 
 This sample shows how to manage Linux passwords without an interactive shell by using `ExecuteCommand`. It is a good starting point for targets where non-interactive command execution is more reliable than prompt-driven `Send` and `Receive` flows.

@@ -1,3 +1,5 @@
+[← HTTP Samples](../README.md)
+
 # ForgeRock AM Password Management (HTTP API)
 
 This sample manages ForgeRock AM/OpenAM users through the REST API for a specific realm. It uses header-based authentication to validate credentials and to set a user's `userpassword` attribute.

@@ -1,3 +1,5 @@
+[← Samples](../README.md)
+
 # SSH Samples
 
 Tested custom platform scripts for managing systems over SSH. These samples cover interactive expect-style patterns and batch-mode execution.

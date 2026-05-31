@@ -1,3 +1,5 @@
+[← SSH Samples](../README.md)
+
 # Generic Linux Password Management
 
 This sample manages local Linux account passwords over SSH using an interactive shell. It verifies service-account access, validates managed-account passwords against `/etc/shadow`, and changes passwords with `passwd`.

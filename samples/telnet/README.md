@@ -1,3 +1,5 @@
+[← Samples](../README.md)
+
 # Telnet Samples
 
 Tested custom platform scripts for managing systems over Telnet, including TN3270 for mainframe environments.

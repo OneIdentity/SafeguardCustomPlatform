@@ -1,3 +1,5 @@
+[← Telnet Samples](../README.md)
+
 # Cisco IOS Password Management (Telnet)
 
 This sample manages local Cisco IOS credentials over Telnet. It can validate accounts, change local user passwords, and rotate the device's enable password while preserving the existing password style and privilege context.

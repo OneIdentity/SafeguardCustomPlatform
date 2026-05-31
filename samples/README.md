@@ -1,3 +1,5 @@
+[← Home](../README.md)
+
 # Sample Scripts
 
 Production-tested custom platform scripts you can deploy to SPP or study as reference implementations. Each sample includes a companion README explaining what it does, how to set it up, and how to deploy it.

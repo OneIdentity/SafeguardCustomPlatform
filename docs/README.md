@@ -1,3 +1,5 @@
+[← Home](../README.md)
+
 # Documentation
 
 Everything you need to learn, build, and maintain Safeguard custom platform scripts.

@@ -1,3 +1,5 @@
+[← Samples](../README.md)
+
 # HTTP Samples
 
 Tested custom platform scripts for managing systems over HTTP/REST APIs. These samples cover REST APIs with various authentication methods, browser-form login workflows, and cloud service integrations.

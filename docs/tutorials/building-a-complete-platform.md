@@ -1,3 +1,5 @@
+[← Tutorials](README.md)
+
 # Building a Complete Platform
 
 This tutorial takes you from a minimal custom platform script to a full-featured one with multiple operations. By the end, you'll have a platform that can check connectivity, validate passwords, change passwords, and discover accounts — all over SSH.

@@ -1,3 +1,5 @@
+[← SSH Samples](../README.md)
+
 # Generic Linux with Account Discovery
 
 This sample extends the generic Linux SSH password-management flow with account discovery. In addition to checking and changing passwords, it enumerates Unix accounts and group memberships and reports them back to Safeguard.

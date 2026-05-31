@@ -1,3 +1,5 @@
+[← HTTP Samples](../README.md)
+
 # WordPress Password Management (Basic Auth API)
 
 This sample manages WordPress users through the REST API using HTTP Basic authentication. It is a straightforward API example for environments where the site exposes authenticated REST endpoints for user administration.

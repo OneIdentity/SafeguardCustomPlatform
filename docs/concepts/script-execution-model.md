@@ -1,3 +1,5 @@
+[← Concepts](README.md)
+
 # Script Execution Model
 
 This document explains what happens when SPP runs a custom platform script — from the moment you upload a JSON file to the moment a task executes against a target system.

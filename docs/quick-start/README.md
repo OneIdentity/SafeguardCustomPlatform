@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Quick Start
 
 Pick the path that matches your target system and get a working custom platform in under 5 minutes.

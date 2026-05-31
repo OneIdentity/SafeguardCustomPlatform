@@ -1,4 +1,4 @@
-[← Documentation](../README.md)
+[← Tutorials](README.md)
 
 # Your First SSH Script
 

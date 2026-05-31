@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Reference
 
 Detailed reference documentation for every aspect of custom platform scripts. Use this section when you need to look up a specific command, parameter, operation, or behavior.

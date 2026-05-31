@@ -1,3 +1,5 @@
+[← Quick Start](README.md)
+
 # Quick Start: SSH Password Check
 
 Get a working custom platform that validates a Linux password over SSH in under 5 minutes.

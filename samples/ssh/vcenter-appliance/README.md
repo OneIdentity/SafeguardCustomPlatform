@@ -1,3 +1,5 @@
+[← SSH Samples](../README.md)
+
 # VMware vCenter Server Appliance Password Management
 
 This sample manages privileged accounts on VMware vCenter Server Appliance over SSH. It can validate the appliance configuration, rotate vCenter SSO administrator passwords, keep `root` synchronized when required, and discover members of the `Administrators` group.

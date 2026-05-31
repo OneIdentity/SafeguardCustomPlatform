@@ -1,3 +1,5 @@
+[← Quick Start](README.md)
+
 # Quick Start: HTTP API Check
 
 Get a working custom platform that validates connectivity to a REST API over HTTP in under 5 minutes.

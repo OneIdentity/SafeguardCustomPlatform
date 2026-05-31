@@ -1,3 +1,5 @@
+[← Quick Start](README.md)
+
 # Quick Start: HTTP Form-Fill Password Check
 
 Get a working custom platform that validates credentials against a web login form in under 5 minutes.

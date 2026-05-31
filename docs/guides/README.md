@@ -1,3 +1,5 @@
+[← Documentation](../README.md)
+
 # Guides
 
 Task-focused how-to documentation for building and maintaining custom platforms. Each guide covers a specific topic in depth.

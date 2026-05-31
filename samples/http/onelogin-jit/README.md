@@ -1,3 +1,5 @@
+[← HTTP Samples](../README.md)
+
 # OneLogin JIT Account Lifecycle and Role Elevation
 
 This sample is a JIT-focused add-on for OneLogin environments already managed through a separate Generic REST connector. It validates OAuth client credentials, enables or disables users, and elevates or demotes users by assigning or removing OneLogin roles.
