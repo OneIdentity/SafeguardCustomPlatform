@@ -545,8 +545,8 @@ The user never needs to know whether the target-side change was done with SSH co
 
 The repository already includes a JIT-focused OneLogin sample:
 
-- [`../../SampleScripts/HTTP/OneLogin_GRC_JIT_addon.json`](../../SampleScripts/HTTP/OneLogin_GRC_JIT_addon.json)
-- [`../../SampleScripts/HTTP/README.md`](../../SampleScripts/HTTP/README.md)
+- [`../../samples/http/onelogin-jit/OneLogin_GRC_JIT_addon.json`](../../samples/http/onelogin-jit/OneLogin_GRC_JIT_addon.json)
+- [`../../samples/http/README.md`](../../samples/http/README.md)
 
 That sample is useful because it implements both pairs:
 

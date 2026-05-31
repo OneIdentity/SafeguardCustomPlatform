@@ -28,7 +28,7 @@ Use `WriteResponseObject` to emit a final response value or object.
 
 ### Example
 
-From `SampleScripts/SSH/GenericLinuxWithDiscovery.json`:
+From `samples/ssh/generic-linux-with-discovery/GenericLinuxWithDiscovery.json`:
 
 ```json
 { "WriteResponseObject": { "Value": "%HostKey::$%" } }
@@ -66,7 +66,7 @@ Current scripts and current engine source do not expose a separate `WriteRespons
 
 ### Example
 
-Sample scripts typically return the completed value directly rather than writing individual properties. For example, `SampleScripts/SSH/GenericLinuxWithDiscovery.json` returns the discovered host key in one step:
+Sample scripts typically return the completed value directly rather than writing individual properties. For example, `samples/ssh/generic-linux-with-discovery/GenericLinuxWithDiscovery.json` returns the discovered host key in one step:
 
 ```json
 { "WriteResponseObject": { "Value": "%HostKey::$%" } }

@@ -445,5 +445,5 @@ For the complete development loop and log review, see [Development Workflow](dev
 
 - [Your First HTTP Script](your-first-http-script.md) — learn the API-first pattern for targets that expose REST endpoints.
 - [HTTP Platforms Guide](../guides/http-platforms.md) — broader HTTP scripting patterns and troubleshooting guidance.
-- [`CustomFacebook.json`](../../SampleScripts/HTTP/CustomFacebook.json) — production sample showing login and password-change form submission.
-- [`CustomTwitter.json`](../../SampleScripts/HTTP/CustomTwitter.json) — another form-based sample with different field names and redirects.
+- [`CustomFacebook.json`](../../samples/http/facebook/CustomFacebook.json) — production sample showing login and password-change form submission.
+- [`CustomTwitter.json`](../../samples/http/twitter/CustomTwitter.json) — another form-based sample with different field names and redirects.

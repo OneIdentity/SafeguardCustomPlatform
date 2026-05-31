@@ -112,7 +112,7 @@ For APIs that accept a username and password on every request, use [`HttpAuth`](
 ]
 ```
 
-This is the pattern used by `SampleScripts/HTTP/WordPressHttp.json`.
+This is the pattern used by `samples/http/wordpress/WordPressHttp.json`.
 
 > [!IMPORTANT]
 > [`HttpAuth`](../reference/commands/http-auth.md) currently supports `Basic` and `Digest`. For `Bearer` tokens and most API-key schemes, add the header yourself with [`Headers`](../reference/commands/http-setup.md).
@@ -184,7 +184,7 @@ A common pattern is:
 ]
 ```
 
-This is the same overall shape used in `SampleScripts/HTTP/OneLogin_GRC_JIT_addon.json`, which stores a token and then sends `Authorization: "Bearer %AccessToken%"` on later `Request` commands.
+This is the same overall shape used in `samples/http/onelogin-jit/OneLogin_GRC_JIT_addon.json`, which stores a token and then sends `Authorization: "Bearer %AccessToken%"` on later `Request` commands.
 
 ### API keys in headers
 
@@ -215,7 +215,7 @@ If the API expects an API key instead of a bearer token, add it with [`Headers`]
 ]
 ```
 
-That is the same style used in `SampleScripts/HTTP/Okta_WithDiscoveryAndGroupMembershipRestore.json`.
+That is the same style used in `samples/http/okta-discovery/Okta_WithDiscoveryAndGroupMembershipRestore.json`.
 
 The header name can be anything the API requires:
 
@@ -235,7 +235,7 @@ Some systems do not expose a clean REST login endpoint. Instead, they expect the
 5. `POST` the form.
 6. Reuse the resulting cookies on later requests.
 
-This is the pattern used by `SampleScripts/HTTP/CustomTwitter.json` and `SampleScripts/HTTP/CustomFacebook.json`.
+This is the pattern used by `samples/http/twitter/CustomTwitter.json` and `samples/http/facebook/CustomFacebook.json`.
 
 ## Common end-to-end flow
 
@@ -552,7 +552,7 @@ Practical guidance:
 
 If the page depends on JavaScript to build the real request, inspect the browser traffic and target the underlying HTTP endpoint directly. Safeguard cannot run the page's JavaScript for you.
 
-For a full walkthrough, see [Your First Form Script](../getting-started/your-first-form-script.md).
+For a full walkthrough, see [Your First Form Script](../tutorials/your-first-form-script.md).
 
 ## Cookie management
 
@@ -715,7 +715,7 @@ Build a URL with `limit` and an offset or page number, then loop until the curre
 
 ### Link-header or cursor pagination
 
-Some APIs return a `Link` header or a `next` cursor instead of page numbers. `SampleScripts/HTTP/Okta_WithDiscoveryAndGroupMembershipRestore.json` shows this style: it reads the `Link` header and loops until there is no next link.
+Some APIs return a `Link` header or a `next` cursor instead of page numbers. `samples/http/okta-discovery/Okta_WithDiscoveryAndGroupMembershipRestore.json` shows this style: it reads the `Link` header and loops until there is no next link.
 
 Use this pattern when:
 
@@ -892,7 +892,7 @@ Use this guide together with the command reference pages:
 - [`JSON`](../reference/commands/json.md)
 - [`Flow Control`](../reference/commands/flow-control.md)
 - [`Error Handling`](../reference/commands/error-handling.md)
-- [Your First HTTP Script](../getting-started/your-first-http-script.md)
-- [Your First Form Script](../getting-started/your-first-form-script.md)
+- [Your First HTTP Script](../tutorials/your-first-http-script.md)
+- [Your First Form Script](../tutorials/your-first-form-script.md)
 
 When you are building a new HTTP platform, start simple: verify connectivity with one authenticated `GET`, confirm the response parsing works, and only then add multi-step login, pagination, retries, and cleanup logic.

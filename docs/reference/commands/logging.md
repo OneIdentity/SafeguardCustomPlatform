@@ -30,7 +30,7 @@ Use `Log` to add a message to the task log from script logic.
 
 #### Log a state transition
 
-From `SampleScripts/SSH/vCenterServerAppliance.json`:
+From `samples/ssh/vcenter-appliance/vCenterServerAppliance.json`:
 
 ```json
 { "Log": { "Text": "Entered root shell" } }
@@ -38,7 +38,7 @@ From `SampleScripts/SSH/vCenterServerAppliance.json`:
 
 #### Log a task-specific warning
 
-From `SampleScripts/HTTP/OneLogin_GRC_JIT_addon.json`:
+From `samples/http/onelogin-jit/OneLogin_GRC_JIT_addon.json`:
 
 ```json
 {
@@ -66,7 +66,7 @@ Current scripts and current engine source do not expose a separate `Trace` comma
 
 ### Example
 
-From `SampleScripts/SSH/vCenterServerAppliance.json`:
+From `samples/ssh/vcenter-appliance/vCenterServerAppliance.json`:
 
 ```json
 { "Log": { "Text": "No users discovered" } }
@@ -104,7 +104,7 @@ Use `Status` to publish progress and a localized message while the task is runni
 
 #### Report connection-test progress
 
-From `SampleScripts/SSH/GenericLinux.json`:
+From `samples/ssh/generic-linux/GenericLinux.json`:
 
 ```json
 {
@@ -121,7 +121,7 @@ From `SampleScripts/SSH/GenericLinux.json`:
 
 #### Report discovery progress
 
-From `SampleScripts/SSH/GenericLinuxWithDiscovery.json`:
+From `samples/ssh/generic-linux-with-discovery/GenericLinuxWithDiscovery.json`:
 
 ```json
 {

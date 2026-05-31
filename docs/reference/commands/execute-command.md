@@ -71,7 +71,7 @@ It is the batch-mode alternative to interactive `Send`/`Receive`: one call sends
 
 ### `RunCommand` wrapper from the batch-mode Linux sample
 
-From `SampleScripts/SSH/LinuxSshBatchModeExample.json`:
+From `samples/ssh/linux-ssh-batch-mode/LinuxSshBatchModeExample.json`:
 
 ```json
 {
@@ -91,7 +91,7 @@ From `SampleScripts/SSH/LinuxSshBatchModeExample.json`:
 
 ### Connect for batch mode first
 
-From `SampleScripts/SSH/LinuxSshBatchModeExample.json`:
+From `samples/ssh/linux-ssh-batch-mode/LinuxSshBatchModeExample.json`:
 
 ```json
 {
@@ -113,7 +113,7 @@ From `SampleScripts/SSH/LinuxSshBatchModeExample.json`:
 
 ### Execute a sudo command with SSH key authentication
 
-From `SampleScripts/SSH/RestrictedAuthorizedKeyExample.json`:
+From `samples/ssh/restricted-authorized-key/RestrictedAuthorizedKeyExample.json`:
 
 ```json
 {

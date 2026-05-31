@@ -31,13 +31,13 @@ As a rule:
 
 - Use **interactive SSH** when you must react to prompts one step at a time.
 - Use **batch mode** when the remote system can do the whole job with normal command execution.
-- Prefer **sample-first development**. Start from a close match in [`SampleScripts/SSH`](../../SampleScripts/SSH/) instead of building from scratch.
+- Prefer **sample-first development**. Start from a close match in [`samples/SSH`](../../samples/ssh/) instead of building from scratch.
 
 ## Connection and login patterns
 
 ### Interactive expect-style pattern
 
-This is the classic Linux pattern used in [`GenericLinux.json`](../../SampleScripts/SSH/GenericLinux.json): connect, flush the banner, set up the shell, send a command, receive output, and react to prompts.
+This is the classic Linux pattern used in [`GenericLinux.json`](../../samples/ssh/generic-linux/GenericLinux.json): connect, flush the banner, set up the shell, send a command, receive output, and react to prompts.
 
 ```json
 {
@@ -109,7 +109,7 @@ Use this pattern when:
 - the target behaves like a normal SSH command runner
 - you do not need a PTY
 - you want cleaner stdout, stderr, and exit-code handling
-- you are working from samples such as [`LinuxSshBatchModeExample.json`](../../SampleScripts/SSH/LinuxSshBatchModeExample.json) or [`RestrictedAuthorizedKeyExample.json`](../../SampleScripts/SSH/RestrictedAuthorizedKeyExample.json)
+- you are working from samples such as [`LinuxSshBatchModeExample.json`](../../samples/ssh/linux-ssh-batch-mode/LinuxSshBatchModeExample.json) or [`RestrictedAuthorizedKeyExample.json`](../../samples/ssh/restricted-authorized-key/RestrictedAuthorizedKeyExample.json)
 
 ## Using `Connect`, `Disconnect`, `Send`, `Receive`, and `ExecuteCommand`
 
@@ -474,22 +474,22 @@ The Linux samples set environment variables so prompts are more predictable and 
 - For interactive shells, detect a `sudo` or `su` password prompt with `Receive`.
 - For batch mode, use `ExecuteCommand` and inspect `stderr` and `rc`.
 - If `sudo` requires a password, decide whether to support that path explicitly or require password-less sudo for the service account.
-- If your script uses a restricted authorized key, follow the batch-mode patterns from [`RestrictedAuthorizedKeyExample.json`](../../SampleScripts/SSH/RestrictedAuthorizedKeyExample.json).
+- If your script uses a restricted authorized key, follow the batch-mode patterns from [`RestrictedAuthorizedKeyExample.json`](../../samples/ssh/restricted-authorized-key/RestrictedAuthorizedKeyExample.json).
 
 ## Sample scripts to study
 
 Start with the closest example in this repository:
 
-- [`GenericLinux.json`](../../SampleScripts/SSH/GenericLinux.json) - interactive Linux password workflows
-- [`GenericLinuxWithSSHKeySupport.json`](../../SampleScripts/SSH/GenericLinuxWithSSHKeySupport.json) - interactive Linux plus SSH key management
-- [`GenericLinuxWithDiscovery.json`](../../SampleScripts/SSH/GenericLinuxWithDiscovery.json) - interactive Linux plus discovery helpers
-- [`LinuxSshBatchModeExample.json`](../../SampleScripts/SSH/LinuxSshBatchModeExample.json) - non-interactive `ExecuteCommand` pattern
-- [`RestrictedAuthorizedKeyExample.json`](../../SampleScripts/SSH/RestrictedAuthorizedKeyExample.json) - restricted-key SSH authentication with batch-mode command execution
-- [`vCenterServerAppliance.json`](../../SampleScripts/SSH/vCenterServerAppliance.json) - appliance-specific interactive flow with timing considerations
+- [`GenericLinux.json`](../../samples/ssh/generic-linux/GenericLinux.json) - interactive Linux password workflows
+- [`GenericLinuxWithSSHKeySupport.json`](../../samples/ssh/generic-linux-ssh-keys/GenericLinuxWithSSHKeySupport.json) - interactive Linux plus SSH key management
+- [`GenericLinuxWithDiscovery.json`](../../samples/ssh/generic-linux-with-discovery/GenericLinuxWithDiscovery.json) - interactive Linux plus discovery helpers
+- [`LinuxSshBatchModeExample.json`](../../samples/ssh/linux-ssh-batch-mode/LinuxSshBatchModeExample.json) - non-interactive `ExecuteCommand` pattern
+- [`RestrictedAuthorizedKeyExample.json`](../../samples/ssh/restricted-authorized-key/RestrictedAuthorizedKeyExample.json) - restricted-key SSH authentication with batch-mode command execution
+- [`vCenterServerAppliance.json`](../../samples/ssh/vcenter-appliance/vCenterServerAppliance.json) - appliance-specific interactive flow with timing considerations
 
 ## Related references
 
-- [Your First SSH Script](../getting-started/your-first-ssh-script.md)
+- [Your First SSH Script](../tutorials/your-first-ssh-script.md)
 - [Connect and Disconnect](../reference/commands/connect.md)
 - [Send and Receive](../reference/commands/send-receive.md)
 - [ExecuteCommand](../reference/commands/execute-command.md)

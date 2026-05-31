@@ -38,7 +38,7 @@ In practice, you will repeat this cycle many times while you refine connectivity
 
 Start with a known-good base whenever possible.
 
-- Begin from a template in `SampleScripts/Templates/` or adapt an existing sample script that is close to your target system.
+- Begin from a template in `templates/` or adapt an existing sample script that is close to your target system.
 - Use a JSON-aware editor so syntax errors are caught before upload.
 - Refer to [Script Structure](../reference/script-structure.md) for the required format, top-level keys, operations, and `Do` blocks.
 - Validate early with `Test-SafeguardCustomPlatformScript` before you even create a custom platform on the appliance.

@@ -141,6 +141,6 @@ If you need more than login/logout, you can import multiple libraries in the sam
 
 - [SSH Platforms Guide](../guides/ssh-platforms.md)
 - [Script Structure Reference](script-structure.md)
-- [Your First SSH Script](../getting-started/your-first-ssh-script.md)
+- [Your First SSH Script](../tutorials/your-first-ssh-script.md)
 - [SSH Key Management Guide](../guides/ssh-key-management.md)
 - [Account Discovery Guide](../guides/account-discovery.md)

@@ -51,7 +51,7 @@ Wrap risky work in `Try`. If the `Do` block throws an error, the optional `Catch
 
 #### Wrap a connection attempt
 
-From `SampleScripts/SSH/GenericLinux.json`:
+From `samples/ssh/generic-linux/GenericLinux.json`:
 
 ```json
 {
@@ -82,7 +82,7 @@ From `SampleScripts/SSH/GenericLinux.json`:
 
 #### Clean up before failing
 
-From `SampleScripts/HTTP/CustomFacebook.json`:
+From `samples/http/facebook/CustomFacebook.json`:
 
 ```json
 {
@@ -117,7 +117,7 @@ Use `Throw` inside a `Catch` block to re-raise the current error or to wrap it i
 
 ### Example
 
-From `SampleScripts/SSH/GenericLinux.json`:
+From `samples/ssh/generic-linux/GenericLinux.json`:
 
 ```json
 {

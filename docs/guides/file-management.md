@@ -484,7 +484,7 @@ File-based credentials are often long-lived, high-value secrets. Handle them lik
 - [Reserved Parameters Reference](../reference/reserved-parameters.md#file-management)
 - [SSH Platforms Guide](ssh-platforms.md)
 - [HTTP Platforms Guide](http-platforms.md)
-- [Your First SSH Script](../getting-started/your-first-ssh-script.md)
+- [Your First SSH Script](../tutorials/your-first-ssh-script.md)
 - [Variables Reference](../reference/variables.md)
 - [ExecuteCommand](../reference/commands/execute-command.md)
 - [Request](../reference/commands/request.md)

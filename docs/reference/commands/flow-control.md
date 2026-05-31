@@ -38,7 +38,7 @@ Use `Condition` when a single expression decides whether a block runs. `Else` is
 
 #### Simple conditional return
 
-From `SampleScripts/SSH/GenericLinux.json`:
+From `samples/ssh/generic-linux/GenericLinux.json`:
 
 ```json
 {
@@ -56,7 +56,7 @@ From `SampleScripts/SSH/GenericLinux.json`:
 
 #### `Else` branch inside a default handler
 
-From `SampleScripts/HTTP/WordPressHttp.json`:
+From `samples/http/wordpress/WordPressHttp.json`:
 
 ```json
 {
@@ -122,7 +122,7 @@ Use `Switch` when one value needs to be matched against multiple cases. String `
 
 #### Switch on a returned terminal status
 
-From `SampleScripts/SSH/GenericLinux.json`:
+From `samples/ssh/generic-linux/GenericLinux.json`:
 
 ```json
 {
@@ -154,7 +154,7 @@ From `SampleScripts/SSH/GenericLinux.json`:
 
 #### Default-case fallback logic
 
-From `SampleScripts/HTTP/WordPressHttp.json`:
+From `samples/http/wordpress/WordPressHttp.json`:
 
 ```json
 {
@@ -237,7 +237,7 @@ Use `For` as a while-style loop by supplying `Condition` and `Body` and omitting
 
 ### Example
 
-From `SampleScripts/SSH/GenericLinuxWithDiscovery.json`:
+From `samples/ssh/generic-linux-with-discovery/GenericLinuxWithDiscovery.json`:
 
 ```json
 {
@@ -297,7 +297,7 @@ Use `ForEach` when a variable already contains an enumerable collection and you 
 
 ### Example
 
-From `SampleScripts/HTTP/Okta_WithDiscoveryAndGroupMembershipRestore.json`:
+From `samples/http/okta-discovery/Okta_WithDiscoveryAndGroupMembershipRestore.json`:
 
 ```json
 {
@@ -351,7 +351,7 @@ Use `Return` to exit the current function or operation and optionally pass back 
 
 ### Example
 
-From `SampleScripts/Telnet/GenericCiscoIosTelnet.json`:
+From `samples/telnet/cisco-ios/GenericCiscoIosTelnet.json`:
 
 ```json
 {

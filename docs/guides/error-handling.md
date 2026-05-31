@@ -80,7 +80,7 @@ A few important points:
 - `Try` also supports `Finally`, which always runs after `Do` or `Catch`. This is useful for cleanup.
 - `Finally` cannot `Return` or `Break`. If `Finally` throws, that cleanup error replaces the earlier result.
 
-For syntax details, see [Error Handling Commands](../reference/commands/error-handling.md). For real examples, compare [`GenericLinux.json`](../../SampleScripts/SSH/GenericLinux.json), [`CustomFacebook.json`](../../SampleScripts/HTTP/CustomFacebook.json), and [`OneLogin_GRC_JIT_addon.json`](../../SampleScripts/HTTP/OneLogin_GRC_JIT_addon.json).
+For syntax details, see [Error Handling Commands](../reference/commands/error-handling.md). For real examples, compare [`GenericLinux.json`](../../samples/ssh/generic-linux/GenericLinux.json), [`CustomFacebook.json`](../../samples/http/facebook/CustomFacebook.json), and [`OneLogin_GRC_JIT_addon.json`](../../samples/http/onelogin-jit/OneLogin_GRC_JIT_addon.json).
 
 ## Choosing between `Return true`, `Return false`, and `Throw`
 
@@ -582,7 +582,7 @@ For broader HTTP patterns, see [HTTP/REST API Platforms](http-platforms.md).
 
 ## Using `ExitStatusBufferName` and `Condition`
 
-For SSH batch-mode scripts, [`ExitStatusBufferName`](../reference/commands/execute-command.md) is the standard way to capture a command's numeric exit code. Pair it with [`Condition`](../reference/commands/flow-control.md) so the script can decide whether the result means success, failure, or error. [`LinuxSshBatchModeExample.json`](../../SampleScripts/SSH/LinuxSshBatchModeExample.json) is a good end-to-end sample of this pattern.
+For SSH batch-mode scripts, [`ExitStatusBufferName`](../reference/commands/execute-command.md) is the standard way to capture a command's numeric exit code. Pair it with [`Condition`](../reference/commands/flow-control.md) so the script can decide whether the result means success, failure, or error. [`LinuxSshBatchModeExample.json`](../../samples/ssh/linux-ssh-batch-mode/LinuxSshBatchModeExample.json) is a good end-to-end sample of this pattern.
 
 ```json
 [

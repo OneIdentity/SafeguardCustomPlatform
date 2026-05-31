@@ -33,7 +33,7 @@ Use `SetItem` to create or replace a variable. `Declare` is an alias that uses t
 
 #### Store a value at local scope
 
-From `SampleScripts/SSH/GenericLinuxWithDiscovery.json`:
+From `samples/ssh/generic-linux-with-discovery/GenericLinuxWithDiscovery.json`:
 
 ```json
 { "SetItem": { "Name": "DiscoveryResult", "Value": true } }
@@ -41,7 +41,7 @@ From `SampleScripts/SSH/GenericLinuxWithDiscovery.json`:
 
 #### Update a parsed match object during discovery
 
-From `SampleScripts/SSH/GenericLinuxWithDiscovery.json`:
+From `samples/ssh/generic-linux-with-discovery/GenericLinuxWithDiscovery.json`:
 
 ```json
 { "SetItem": { "Name": "match", "Value": "%{match.NextMatch()}%" } }
@@ -65,7 +65,7 @@ Use `Comment` to leave a note in the JSON without affecting runtime behavior.
 
 ### Example
 
-From `SampleScripts/Telnet/GenericCiscoIosTelnet.json`:
+From `samples/telnet/cisco-ios/GenericCiscoIosTelnet.json`:
 
 ```json
 {
@@ -95,7 +95,7 @@ Use `Wait` when the script must pause before retrying or reading a follow-up res
 
 #### Short fixed delay
 
-From `SampleScripts/SSH/vCenterServerAppliance.json`:
+From `samples/ssh/vcenter-appliance/vCenterServerAppliance.json`:
 
 ```json
 { "Wait": { "Seconds": 1 } }
@@ -103,7 +103,7 @@ From `SampleScripts/SSH/vCenterServerAppliance.json`:
 
 #### Delay driven by a retry variable
 
-From `SampleScripts/HTTP/OneLogin_GRC_JIT_addon.json`:
+From `samples/http/onelogin-jit/OneLogin_GRC_JIT_addon.json`:
 
 ```json
 { "Wait": { "Seconds": "%{RetrySeconds}%" } }
@@ -141,7 +141,7 @@ Use `WriteDiscoveredAccount` during account discovery to emit one discovered-acc
 
 ### Example
 
-From `SampleScripts/SSH/GenericLinuxWithDiscovery.json`:
+From `samples/ssh/generic-linux-with-discovery/GenericLinuxWithDiscovery.json`:
 
 ```json
 {

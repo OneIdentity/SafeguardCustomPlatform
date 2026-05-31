@@ -307,7 +307,7 @@ Use these patterns as starting points. Adjust them to the exact output your targ
 - **Be careful with greedy `.*`.** Use `.*?` when you are matching between start and end markers.
 - **Strip ANSI when needed.** Colored prompts can make a correct prompt regex look broken.
 - **Keep parsing in small steps.** Capture into `match`, inspect `match.Success`, then read named groups.
-- **Use the local test workflow before upload.** See [Testing and Debugging](../getting-started/testing-and-debugging.md) and the repository's `tools\TestTool.ps1`.
+- **Use the local test workflow before upload.** See [Testing and Debugging](../guides/testing-and-debugging.md) and the repository's `tools\TestTool.ps1`.
 
 ## Related references
 
@@ -317,4 +317,4 @@ Use these patterns as starting points. Adjust them to the exact output your targ
 - [Variables Reference](../reference/variables.md)
 - [SSH Platforms Guide](ssh-platforms.md)
 - [Error Handling Guide](error-handling.md)
-- [Testing and Debugging](../getting-started/testing-and-debugging.md)
+- [Testing and Debugging](../guides/testing-and-debugging.md)

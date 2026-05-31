@@ -4,7 +4,7 @@
 
 When a custom platform operation fails, start here.
 
-For the exact PowerShell cmdlets, REST calls, and UI steps for running operations with extended logging, see [Testing and Debugging](../getting-started/testing-and-debugging.md).
+For the exact PowerShell cmdlets, REST calls, and UI steps for running operations with extended logging, see [Testing and Debugging](../guides/testing-and-debugging.md).
 
 ## Quick Triage
 
@@ -18,7 +18,7 @@ Use this table first. It covers the failure modes people usually search for.
 | Parameter type mismatch | A reserved parameter is declared with the wrong `Type`, such as `Port` as `String` instead of `Integer` | Check [Reserved Parameters](../reference/reserved-parameters.md) and correct both the parameter name and type. |
 | Operation timeout | The target system is unreachable or responding too slowly | Check network connectivity, increase the `Timeout` parameter, and verify `Address` and `Port`. |
 | Task failure with no useful error | Default logging is too sparse to show where the script failed | Re-run the same operation with `?extendedLogging=true` or PowerShell `-ExtendedLogging` so the task log includes command-by-command detail. |
-| Feature flags not appearing after upload | The script is missing the required operation and parameter combination for that flag | See [Feature Flags](../guides/feature-flags.md) for the exact operation and reserved parameter each flag requires. |
+| Feature flags not appearing after upload | The script is missing the required operation and parameter combination for that flag | See [Feature Flags](../concepts/feature-flags.md) for the exact operation and reserved parameter each flag requires. |
 | `Function not found` at runtime | A call references a function that is not defined in the script or any imported library | Check the function name spelling and verify the required import library is listed. |
 | Connection refused or timeout on `Connect` | Wrong port, firewall policy, or target service is not running | Verify the `Port` parameter, confirm network reachability, and make sure the target service is listening. |
 | Password change succeeds but `CheckPassword` fails | The new password was not actually applied on the target | Review the `ChangePassword` logic and verify the password-change command returned a successful exit status. |
@@ -28,7 +28,7 @@ Use this table first. It covers the failure modes people usually search for.
 ## Debugging Workflow
 
 1. **Enable extended logging.**
-   Use the same operation that is failing, but run it with extended logging enabled. See [Testing and Debugging](../getting-started/testing-and-debugging.md) for the full workflow.
+   Use the same operation that is failing, but run it with extended logging enabled. See [Testing and Debugging](../guides/testing-and-debugging.md) for the full workflow.
 
    ```powershell
    Test-SafeguardAsset "Test Target" -ExtendedLogging
@@ -131,15 +131,15 @@ If these fail, fix connectivity first. The script cannot recover from a blocked 
 
 If a script behaves as if values are missing, verify that you used the exact reserved parameter names and types documented in [Reserved Parameters](../reference/reserved-parameters.md). Then confirm the expected values actually exist on the asset, account, or profile.
 
-Good examples to verify are `Address`, `Port`, `Timeout`, `AccountUserName`, `FuncUserName`, and `UseSsl`. If a built-in field or workflow is missing, compare the script against [Feature Flags](../guides/feature-flags.md) and [Operations Reference](../reference/operations.md).
+Good examples to verify are `Address`, `Port`, `Timeout`, `AccountUserName`, `FuncUserName`, and `UseSsl`. If a built-in field or workflow is missing, compare the script against [Feature Flags](../concepts/feature-flags.md) and [Operations Reference](../reference/operations.md).
 
 ## Getting Help
 
 - Browse the [SafeguardCustomPlatform repository](https://github.com/OneIdentity/SafeguardCustomPlatform) for sample scripts and existing documentation.
 - Ask questions in the [One Identity Community forums](https://www.oneidentity.com/community/).
 - Keep these references open while debugging:
-  - [Testing and Debugging](../getting-started/testing-and-debugging.md)
+  - [Testing and Debugging](../guides/testing-and-debugging.md)
   - [Reserved Parameters](../reference/reserved-parameters.md)
-  - [Feature Flags](../guides/feature-flags.md)
+  - [Feature Flags](../concepts/feature-flags.md)
   - [Operations Reference](../reference/operations.md)
   - [Commands Reference](../reference/commands/index.md)

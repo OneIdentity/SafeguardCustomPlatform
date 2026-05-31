@@ -445,5 +445,5 @@ Once this minimal script works, you can build on it:
 
 - Add `ChangePassword` by following the HTTP patterns in the [HTTP Platforms Guide](../guides/http-platforms.md).
 - Implement Bearer token authentication for OAuth2-based APIs.
-- Explore the real-world [`WordPressHttp.json`](../../SampleScripts/HTTP/WordPressHttp.json) sample.
+- Explore the real-world [`WordPressHttp.json`](../../samples/http/wordpress/WordPressHttp.json) sample.
 - Read the [Operations Reference](../reference/operations.md).

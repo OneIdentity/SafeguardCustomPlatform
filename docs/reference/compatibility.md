@@ -1,10 +1,10 @@
-[← Documentation](README.md)
+[← Reference](README.md)
 
 # SPP Compatibility Matrix
 
 Safeguard custom platform capabilities are derived from the operations, reserved parameter names, and engine features present in your script. Version compatibility matters because a script can be valid JSON and still depend on a capability your SPP appliance does not support yet.
 
-This matrix is based on the current repository documentation, especially the [Operations Reference](reference/operations.md), [Platform Feature Flags](guides/feature-flags.md), [Script Structure Reference](reference/script-structure.md), and [Architecture Overview](getting-started/overview.md).
+This matrix is based on the current repository documentation, especially the [Operations Reference](operations.md), [Platform Feature Flags](../concepts/feature-flags.md), [Script Structure Reference](script-structure.md), and [Architecture Overview](../concepts/architecture.md).
 
 > [!IMPORTANT]
 > This matrix is intentionally conservative. The repository explicitly documents custom platform development on **SPP 6.0 or later**, and it explicitly documents `ExecuteCommand` as available in **SPP 7.4 and later**. For several older capabilities, the exact introduction release is not called out in this repo, so entries marked `🆕` in the `SPP 6.0-7.3` column mean **available by the documented 6.0 baseline, but verify the exact minimum in the [One Identity documentation site](https://docs.oneidentity.com/)** before depending on the feature in older environments.
@@ -58,8 +58,8 @@ This matrix is based on the current repository documentation, especially the [Op
 
 ## Related References
 
-- [Operations Reference](reference/operations.md)
-- [Platform Feature Flags](guides/feature-flags.md)
-- [Script Structure Reference](reference/script-structure.md)
+- [Operations Reference](operations.md)
+- [Platform Feature Flags](../concepts/feature-flags.md)
+- [Script Structure Reference](script-structure.md)
 - [System Import Libraries Reference](reference/imports.md)
-- [Testing and Debugging](getting-started/testing-and-debugging.md)
+- [Testing and Debugging](../guides/testing-and-debugging.md)

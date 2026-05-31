@@ -72,7 +72,7 @@ When `ResponseObjectName` is set, later expressions can read these commonly used
 
 ### Simple GET request with Basic auth context
 
-From `SampleScripts/HTTP/WordPressHttp.json`:
+From `samples/http/wordpress/WordPressHttp.json`:
 
 ```json
 {
@@ -92,7 +92,7 @@ From `SampleScripts/HTTP/WordPressHttp.json`:
 
 ### POST a JSON body to an API
 
-From `SampleScripts/HTTP/Okta_WithDiscoveryAndGroupMembershipRestore.json`:
+From `samples/http/okta-discovery/Okta_WithDiscoveryAndGroupMembershipRestore.json`:
 
 ```json
 {
@@ -123,7 +123,7 @@ From `SampleScripts/HTTP/Okta_WithDiscoveryAndGroupMembershipRestore.json`:
 
 ### Inspect redirect headers after a login form post
 
-From `SampleScripts/HTTP/CustomTwitter.json`:
+From `samples/http/twitter/CustomTwitter.json`:
 
 ```json
 {

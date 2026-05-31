@@ -162,7 +162,7 @@ You can also check the custom parameters the platform exposes:
 Get-SafeguardCustomPlatformScriptParameter "My Custom Platform"
 ```
 
-If a capability is missing, compare the uploaded script against the rules in [Platform Feature Flags](../guides/feature-flags.md). Many "why does SPP not show this option?" problems are really operation-name or reserved-parameter-name problems.
+If a capability is missing, compare the uploaded script against the rules in [Platform Feature Flags](../concepts/feature-flags.md). Many "why does SPP not show this option?" problems are really operation-name or reserved-parameter-name problems.
 
 ## Tips
 
@@ -176,6 +176,6 @@ If a capability is missing, compare the uploaded script against the rules in [Pl
 ## Next Steps
 
 - [Operations Reference](../reference/operations.md) for the full operation list.
-- [Platform Feature Flags](../guides/feature-flags.md) for verifying derived capabilities after upload.
+- [Platform Feature Flags](../concepts/feature-flags.md) for verifying derived capabilities after upload.
 - [Troubleshooting](../guides/troubleshooting.md) for deeper error-resolution guidance.
 - [Commands Reference](../reference/commands/index.md) for the commands available inside `Do` blocks.

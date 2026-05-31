@@ -249,7 +249,7 @@ Here is the full script with both operations in one file:
 }
 ```
 
-If you compare this with a production-ready sample such as [`GenericLinux.json`](../../SampleScripts/SSH/GenericLinux.json), you will notice that the sample adds reusable functions, richer validation, better error handling, and support for more SSH scenarios. Start with the minimal version here, then grow into those patterns later.
+If you compare this with a production-ready sample such as [`GenericLinux.json`](../../samples/ssh/generic-linux/GenericLinux.json), you will notice that the sample adds reusable functions, richer validation, better error handling, and support for more SSH scenarios. Start with the minimal version here, then grow into those patterns later.
 
 ## Step 6: Validate and Upload
 
@@ -315,5 +315,5 @@ Once this minimal script works, you are ready to extend it:
 
 - Add `ChangePassword` by following the SSH patterns in the [SSH platforms guide](../guides/ssh-platforms.md).
 - Add error handling with `Try` / `Catch` blocks.
-- Explore the full [`GenericLinux.json`](../../SampleScripts/SSH/GenericLinux.json) sample for production-ready patterns such as imports, error handling, and `sudo`-based flows.
+- Explore the full [`GenericLinux.json`](../../samples/ssh/generic-linux/GenericLinux.json) sample for production-ready patterns such as imports, error handling, and `sudo`-based flows.
 - Read the [Operations Reference](../reference/operations.md) to see the other operations you can implement.

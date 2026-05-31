@@ -52,7 +52,7 @@ When a script declares a reserved parameter name, SPP uses that name as a contra
 
 > **You don't configure these — SPP provides them from your Asset/Account/Profile setup.**
 
-A few reserved names also influence UI exposure through [Feature Flags](../guides/feature-flags.md). For example, declaring access-key or instance-related parameters can cause the matching built-in asset fields to appear.
+A few reserved names also influence UI exposure through [Feature Flags](../concepts/feature-flags.md). For example, declaring access-key or instance-related parameters can cause the matching built-in asset fields to appear.
 
 ---
 
@@ -330,4 +330,4 @@ For more on defining non-reserved parameters, see [Custom Parameters](custom-par
 
 - [Operations](operations.md) — which operations use which reserved parameters
 - [Custom Parameters](custom-parameters.md) — defining your own non-reserved names
-- [Feature Flags](../guides/feature-flags.md) — how reserved parameters and operations light up built-in behavior and UI
+- [Feature Flags](../concepts/feature-flags.md) — how reserved parameters and operations light up built-in behavior and UI

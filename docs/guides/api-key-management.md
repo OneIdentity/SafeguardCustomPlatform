@@ -413,5 +413,5 @@ Design your script so these cases produce a clear error message and never report
 - [Operations Reference](../reference/operations.md)
 - [Reserved Parameters](../reference/reserved-parameters.md)
 - [HTTP/REST API Platforms](http-platforms.md)
-- [Your First HTTP Script](../getting-started/your-first-http-script.md)
+- [Your First HTTP Script](../tutorials/your-first-http-script.md)
 - [Output Commands](../reference/commands/output.md)

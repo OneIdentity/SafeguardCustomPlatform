@@ -1,7 +1,7 @@
 {
   "json.schemas": [
     {
-      "fileMatch": ["SampleScripts/**/*.json"],
+      "fileMatch": ["samples/**/*.json", "templates/**/*.json"],
       "url": "./schema/custom-platform-script.schema.json"
     }
   ]
