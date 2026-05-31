@@ -2,14 +2,15 @@
 
 # Your First SSH Script
 
-By the end of this tutorial, you will have a working custom platform script that connects to a Linux host over SSH, verifies that the service account can log in with `CheckSystem`, and validates a managed account password with `CheckPassword`.
+By the end of this tutorial, you will have a working custom platform script that connects to a Linux host over SSH, verifies that the service account can log in with `CheckSystem`, validates a managed account password with `CheckPassword`, and rotates the password with `ChangePassword`.
 
 ## What You'll Build
 
-You will build a minimal custom platform script with two operations:
+You will build a minimal custom platform script with three operations:
 
 - `CheckSystem` — connects over SSH and verifies the service account can log in.
 - `CheckPassword` — connects over SSH and attempts login with the managed account credentials.
+- `ChangePassword` — connects over SSH as the service account and changes the managed account password through an interactive `passwd` flow.
 
 This is intentionally small. It is the quickest way to get from zero to a working SSH platform before you add more advanced features.
 
@@ -168,9 +169,157 @@ Here is what is new:
 
 This is a deliberately simple pattern. Production-ready Linux platforms often use helper functions, imports, delegation logic, and stronger error handling, but this direct-login version is ideal for learning the basics.
 
-## Step 5: The Complete Script
+## Step 5: Add ChangePassword
 
-Here is the full script with both operations in one file:
+`ChangePassword` is the operation SPP calls when it actually rotates the managed account password. `CheckPassword` only proves the current password works. `ChangePassword` is the operation that changes it on the target system.
+
+For this beginner walkthrough, use the service account and an interactive `sudo passwd` session. That keeps the example simple and also teaches an important scripting pattern: `Send` a command, `Receive` a prompt, and continue step by step.
+
+Start by adding the `Parameters` block:
+
+```json
+"ChangePassword": {
+  "Parameters": [
+    { "Address": { "Type": "String", "Required": true } },
+    { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22 } },
+    { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20 } },
+    { "FuncUserName": { "Type": "String", "Required": true } },
+    { "FuncPassword": { "Type": "Secret", "Required": false } },
+    { "AccountUserName": { "Type": "String", "Required": true } },
+    { "NewPassword": { "Type": "Secret", "Required": true } },
+    { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+    { "HostKey": { "Type": "String", "Required": false } },
+    { "RequestTerminal": { "Type": "Boolean", "Required": false, "DefaultValue": true } }
+  ],
+  "Do": []
+}
+```
+
+Most of these parameters are the same as `CheckSystem` because this operation connects as the service account, not as the managed account. The important additions are:
+
+- `AccountUserName` — the account whose password you want to change.
+- `NewPassword` — the new password value that SPP generated and passed into the script.
+- There is no `AccountPassword` in this learning example because the service account does the work through `sudo passwd`. In some platforms you may need the current password too, but not in this tutorial.
+
+Now build the `Do` block a few steps at a time.
+
+First, connect as the service account and start the password change command:
+
+```json
+"Do": [
+  {
+    "Connect": {
+      "ConnectionObjectName": "Global:SshConnection",
+      "Type": "Ssh",
+      "NetworkAddress": "%Address%",
+      "Port": "%Port%",
+      "Login": "%FuncUserName%",
+      "Password": "%FuncPassword::$%",
+      "RequestTerminal": "%RequestTerminal%",
+      "CheckHostKey": "%CheckHostKey%",
+      "Hostkey": "%HostKey::$%",
+      "Timeout": "%Timeout%"
+    }
+  },
+  {
+    "Send": {
+      "ConnectionObjectName": "SshConnection",
+      "Buffer": "sudo passwd %AccountUserName%"
+    }
+  }
+]
+```
+
+This reuses the same SSH connection pattern from `CheckSystem`, but instead of disconnecting immediately, it sends `sudo passwd` for the target account. `RequestTerminal` stays `true` because `passwd` is interactive and expects a terminal.
+
+Next, wait for the first password prompt:
+
+```json
+{
+  "Receive": {
+    "ConnectionObjectName": "SshConnection",
+    "BufferName": "PromptResult",
+    "ExpectRegex": "([Nn]ew.*[Pp]assword:)|([Pp]assword:)"
+  }
+}
+```
+
+`Receive` pauses the script until the remote system writes text that matches the regular expression. This pattern is intentionally flexible:
+
+- `([Nn]ew.*[Pp]assword:)` matches prompts such as `New password:` or `New UNIX password:`.
+- `([Pp]assword:)` is a fallback for systems that use a simpler password prompt.
+
+When the prompt appears, send the new password:
+
+```json
+{
+  "Send": {
+    "ConnectionObjectName": "SshConnection",
+    "Buffer": "%NewPassword%",
+    "ContainsSecret": true
+  }
+}
+```
+
+`ContainsSecret: true` tells the engine that the buffer contains sensitive data. That keeps the password masked in logs instead of echoing it back in plain text.
+
+Then wait for the confirmation prompt and send the password again:
+
+```json
+{
+  "Receive": {
+    "ConnectionObjectName": "SshConnection",
+    "BufferName": "PromptResult",
+    "ExpectRegex": "([Rr]etype|[Rr]e-enter|[Cc]onfirm).*[Pp]assword:"
+  }
+},
+{
+  "Send": {
+    "ConnectionObjectName": "SshConnection",
+    "Buffer": "%NewPassword%",
+    "ContainsSecret": true
+  }
+}
+```
+
+The second `Receive` looks for common confirmation prompts such as `Retype new password:`, `Re-enter new password:`, or `Confirm password:`. After that prompt appears, the script sends the same `NewPassword` value again.
+
+Finally, wait for success, then disconnect and return:
+
+```json
+{
+  "Receive": {
+    "ConnectionObjectName": "SshConnection",
+    "BufferName": "ChangeResult",
+    "ExpectRegex": "(updated successfully)|(\\$\\s*$)"
+  }
+},
+{
+  "Disconnect": { "ConnectionObjectName": "SshConnection" }
+},
+{
+  "Return": { "Value": true }
+}
+```
+
+This last `Receive` checks the result of the password change. The regex allows two common success signals:
+
+- `updated successfully` — many Linux `passwd` implementations print a success message like `password updated successfully`.
+- `(\\$\\s*$)` — some systems return you straight to a shell prompt, so the expression also allows a trailing `$` prompt.
+
+That gives you the full interactive flow:
+
+1. Send the `sudo passwd` command.
+2. Wait for the first prompt.
+3. Send `NewPassword`.
+4. Wait for the confirmation prompt.
+5. Send `NewPassword` again.
+6. Wait for success.
+7. Disconnect and return `true`.
+
+## Step 6: The Complete Script
+
+Here is the full script with all three operations in one file:
 
 ```json
 {
@@ -245,13 +394,90 @@ Here is the full script with both operations in one file:
         "Return": { "Value": true }
       }
     ]
+  },
+  "ChangePassword": {
+    "Parameters": [
+      { "Address": { "Type": "String", "Required": true } },
+      { "Port": { "Type": "Integer", "Required": false, "DefaultValue": 22 } },
+      { "Timeout": { "Type": "Integer", "Required": false, "DefaultValue": 20 } },
+      { "FuncUserName": { "Type": "String", "Required": true } },
+      { "FuncPassword": { "Type": "Secret", "Required": false } },
+      { "AccountUserName": { "Type": "String", "Required": true } },
+      { "NewPassword": { "Type": "Secret", "Required": true } },
+      { "CheckHostKey": { "Type": "Boolean", "Required": false, "DefaultValue": true } },
+      { "HostKey": { "Type": "String", "Required": false } },
+      { "RequestTerminal": { "Type": "Boolean", "Required": false, "DefaultValue": true } }
+    ],
+    "Do": [
+      {
+        "Connect": {
+          "ConnectionObjectName": "Global:SshConnection",
+          "Type": "Ssh",
+          "NetworkAddress": "%Address%",
+          "Port": "%Port%",
+          "Login": "%FuncUserName%",
+          "Password": "%FuncPassword::$%",
+          "RequestTerminal": "%RequestTerminal%",
+          "CheckHostKey": "%CheckHostKey%",
+          "Hostkey": "%HostKey::$%",
+          "Timeout": "%Timeout%"
+        }
+      },
+      {
+        "Send": {
+          "ConnectionObjectName": "SshConnection",
+          "Buffer": "sudo passwd %AccountUserName%"
+        }
+      },
+      {
+        "Receive": {
+          "ConnectionObjectName": "SshConnection",
+          "BufferName": "PromptResult",
+          "ExpectRegex": "([Nn]ew.*[Pp]assword:)|([Pp]assword:)"
+        }
+      },
+      {
+        "Send": {
+          "ConnectionObjectName": "SshConnection",
+          "Buffer": "%NewPassword%",
+          "ContainsSecret": true
+        }
+      },
+      {
+        "Receive": {
+          "ConnectionObjectName": "SshConnection",
+          "BufferName": "PromptResult",
+          "ExpectRegex": "([Rr]etype|[Rr]e-enter|[Cc]onfirm).*[Pp]assword:"
+        }
+      },
+      {
+        "Send": {
+          "ConnectionObjectName": "SshConnection",
+          "Buffer": "%NewPassword%",
+          "ContainsSecret": true
+        }
+      },
+      {
+        "Receive": {
+          "ConnectionObjectName": "SshConnection",
+          "BufferName": "ChangeResult",
+          "ExpectRegex": "(updated successfully)|(\\$\\s*$)"
+        }
+      },
+      {
+        "Disconnect": { "ConnectionObjectName": "SshConnection" }
+      },
+      {
+        "Return": { "Value": true }
+      }
+    ]
   }
 }
 ```
 
 If you compare this with a production-ready sample such as [`GenericLinux.json`](../../samples/ssh/generic-linux/GenericLinux.json), you will notice that the sample adds reusable functions, richer validation, better error handling, and support for more SSH scenarios. Start with the minimal version here, then grow into those patterns later.
 
-## Step 6: Validate and Upload
+## Step 7: Validate and Upload
 
 Validate the script locally first, then create the custom platform in SPP:
 
@@ -265,7 +491,7 @@ New-SafeguardCustomPlatform -Name "My First SSH Platform" -ScriptFile ".\MyFirst
 
 Validation is your first checkpoint. If `Test-SafeguardCustomPlatformScript` fails, fix the JSON before you upload anything.
 
-## Step 7: Create a Test Asset and Account
+## Step 8: Create a Test Asset and Account
 
 Once the platform exists, create a test asset and a test account:
 
@@ -277,13 +503,15 @@ Set-SafeguardAssetAccountPassword -AssetToUse "10.0.0.1" -AccountToUse "testuser
 
 In this example:
 
-- The asset uses `root` as the service account for `CheckSystem`.
-- `testuser` is the managed account you will verify with `CheckPassword`.
+- The asset uses `root` as the service account for `CheckSystem` and `ChangePassword`.
+- `testuser` is the managed account you will verify with `CheckPassword` and rotate with `ChangePassword`.
 - `Set-SafeguardAssetAccountPassword` securely prompts you for the managed account password.
 
-## Step 8: Test It
+Because `ChangePassword` uses `sudo passwd`, make sure the service account is allowed to change the target account's password. For a first lab, using `root` as the service account is the simplest setup.
 
-Now run both tests and inspect the task log output:
+## Step 9: Test It
+
+Now run all three operations and inspect the task log output:
 
 ```powershell
 # Test connectivity (CheckSystem)
@@ -292,11 +520,17 @@ Test-SafeguardAsset "10.0.0.1" -ExtendedLogging
 # Test password verification (CheckPassword)
 Test-SafeguardAssetAccountPassword "10.0.0.1" "testuser" -ExtendedLogging
 
+# Test password rotation (ChangePassword)
+Invoke-SafeguardAssetAccountPasswordChange "10.0.0.1" "testuser"
+
+# Verify the new password now works
+Test-SafeguardAssetAccountPassword "10.0.0.1" "testuser" -ExtendedLogging
+
 # Review the logs
 Get-SafeguardTaskLog
 ```
 
-Start with `CheckSystem`. If that fails, fix connectivity or service-account issues before you test `CheckPassword`.
+Start with `CheckSystem`. If that fails, fix connectivity or service-account issues first. Then confirm `CheckPassword` works before you test `ChangePassword`, because rotation depends on the same SSH path plus the interactive prompt handling.
 
 ## What Happens When It Fails
 
@@ -305,6 +539,7 @@ When your first script does not work, start with the simplest explanation:
 - Connection timeout — verify network access to the host and confirm the SSH port is open.
 - Host key mismatch — accept the correct host key or temporarily set `CheckHostKey` to `false` while testing.
 - Authentication failure — verify the service account credentials on the asset and the managed account password on the account.
+- Prompt mismatch during `ChangePassword` — review the `Receive` regex values and compare them with the exact `passwd` prompts on your target Linux system.
 - Script validation error — check your JSON syntax, parameter names, and commas carefully.
 
 During development, always run tests with `-ExtendedLogging` and review `Get-SafeguardTaskLog` so you can see exactly where the operation failed.
@@ -313,7 +548,8 @@ During development, always run tests with `-ExtendedLogging` and review `Get-Saf
 
 Once this minimal script works, you are ready to extend it:
 
-- Add `ChangePassword` by following the SSH patterns in the [SSH platforms guide](../guides/ssh-platforms.md).
-- Add error handling with `Try` / `Catch` blocks.
-- Explore the full [`GenericLinux.json`](../../samples/ssh/generic-linux/GenericLinux.json) sample for production-ready patterns such as imports, error handling, and `sudo`-based flows.
+- Add error handling with `Try` / `Catch` blocks and clearer failure messages.
+- Add `DiscoverAccounts` so SPP can find local accounts automatically.
+- Explore the full [`GenericLinux.json`](../../samples/ssh/generic-linux/GenericLinux.json) sample for production-ready patterns such as imports, helper functions, stronger error handling, and more flexible `sudo` flows.
+- Read the [SSH platforms guide](../guides/ssh-platforms.md) for more SSH patterns beyond this beginner exercise.
 - Read the [Operations Reference](../reference/operations.md) to see the other operations you can implement.
