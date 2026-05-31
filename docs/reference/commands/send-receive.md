@@ -68,7 +68,7 @@ Reads output from an open interactive connection and stores it in a buffer varia
 
 ### Set up the shell and flush the banner
 
-From `SampleScripts/SSH/GenericLinux.json`:
+From `samples/ssh/generic-linux/GenericLinux.json`:
 
 ```json
 {
@@ -82,7 +82,7 @@ From `SampleScripts/SSH/GenericLinux.json`:
 
 ### Use `%DelegationPrefix%` and answer a sudo prompt
 
-From `SampleScripts/SSH/GenericLinux.json`:
+From `samples/ssh/generic-linux/GenericLinux.json`:
 
 ```json
 {
@@ -107,7 +107,7 @@ From `SampleScripts/SSH/GenericLinux.json`:
 
 ### Interactive password-change loop
 
-From `SampleScripts/SSH/GenericLinux.json`:
+From `samples/ssh/generic-linux/GenericLinux.json`:
 
 ```json
 { "Send": { "ConnectionObjectName": "ConnectSsh", "Buffer": "%NewPassword%", "ContainsSecret": true } }

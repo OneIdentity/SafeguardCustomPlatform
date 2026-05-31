@@ -1,4 +1,4 @@
-[← Documentation](../README.md)
+[← Reference](README.md)
 
 # Script Structure Reference
 

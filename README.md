@@ -1,56 +1,66 @@
 # Safeguard Custom Platform Scripts
 
-Build and adapt custom platform scripts for Safeguard when built-in platforms do not fit your target system.
+Build custom platform scripts for [Safeguard for Privileged Passwords (SPP)](https://www.oneidentity.com/products/safeguard-for-privileged-passwords/) when built-in platforms don't cover your target system.
 
-## What is this?
+Custom platform scripts are JSON definitions that teach SPP how to connect to any target — Linux hosts, network appliances, REST APIs, web portals, cloud services — and manage credentials (passwords, SSH keys, API keys) through SSH, HTTP, or Telnet.
 
-Safeguard custom platform scripts are JSON-based definitions that tell Safeguard for Privileged Passwords (SPP) how to connect to a target, navigate its interface, and perform credential operations such as password changes, key updates, and account validation.
+## Where Do I Start?
 
-This repository is for asset administrators and automation teams who need to manage passwords or SSH keys on operating systems, appliances, network devices, web applications, or vendor-specific workflows not covered by built-in platforms. It includes practical guidance and examples for both SSH- and HTTP-based integrations, plus historical Telnet-related content.
+| I want to... | Go here |
+| --- | --- |
+| **Get something working in 5 minutes** | [Quick Start](docs/quick-start/) |
+| **Understand how custom platforms work** | [Concepts](docs/concepts/) |
+| **Learn step by step with a tutorial** | [Tutorials](docs/tutorials/) |
+| **Look up a specific command or parameter** | [Reference](docs/reference/) |
+| **Deploy a tested sample script** | [Samples](samples/) |
+| **Start a new script from a template** | [Templates](templates/) |
+| **Solve a specific problem** | [Guides](docs/guides/) |
+
+## Repository Layout
+
+```
+docs/
+  quick-start/     5-minute guides to get a working platform fast
+  concepts/        Architecture, execution model, feature flags
+  tutorials/       Step-by-step walkthroughs for building scripts
+  guides/          Task-focused how-to content (SSH patterns, HTTP patterns, etc.)
+  reference/       Commands, operations, parameters, variables
+samples/           Production-tested scripts with companion documentation
+  ssh/             Linux, Unix, appliance samples
+  http/            REST API, OAuth2, form-based samples
+  telnet/          Cisco IOS, IBM RACF TN3270 samples
+templates/         Pattern templates and minimal starters (not tested against live targets)
+schema/            JSON Schema for IDE autocomplete
+tools/             TestTool.ps1 for local validation
+```
 
 ## Quick Start
 
-If you want the docs and samples locally while you work, clone the repository first:
-
 ```powershell
+# Clone the repo
 git clone https://github.com/OneIdentity/SafeguardCustomPlatform.git
 cd SafeguardCustomPlatform
+
+# Pick a template and customize it
+code templates/TemplateSshMinimal.json
+
+# Upload to SPP
+Import-SafeguardCustomPlatformScript -FilePath .\MyPlatform.json
+
+# Test
+Test-SafeguardAssetAccountPassword -AssetToUse "MyHost" -AccountToUse "admin" -ExtendedLogging
 ```
 
-1. **Write.** Start with the closest template in `SampleScripts/Templates/`, then customize commands, prompts, parameters, and validation flow for your target.
-2. **Upload.** Use `Import-SafeguardCustomPlatformScript` from `safeguard-ps` to upload the script to SPP.
-3. **Test.** Validate against a safe test asset with `Test-SafeguardAssetAccountPassword -ExtendedLogging` before rolling into production.
-
-## Documentation
-
-Start with [`docs/`](docs/) to find the right level of detail for your task:
-
-- [`docs/getting-started/`](docs/getting-started/) - Tutorials and first-script walkthroughs for new custom platform authors.
-- [`docs/reference/`](docs/reference/) - Script structure, supported operations, parameters, and command behavior.
-- [`docs/guides/`](docs/guides/) - SSH patterns, HTTP patterns, regex guidance, and advanced implementation topics.
-- [`docs/guides/regex-patterns.md`](docs/guides/regex-patterns.md) - Practical .NET regex patterns for prompts, parsing, and error detection.
-- [`docs/guides/feature-flags.md`](docs/guides/feature-flags.md) - Understand which operations and capabilities your platform advertises.
-- [`docs/guides/troubleshooting.md`](docs/guides/troubleshooting.md) - Common errors, diagnostic tips, and fixes.
-
-## Sample Scripts
-
-Browse [`SampleScripts/`](SampleScripts/) for working examples you can study or adapt. Samples are organized by protocol so you can quickly focus on the right category:
-
-- SSH
-- HTTP
-- Telnet
+For detailed quick-start paths, see [docs/quick-start/](docs/quick-start/).
 
 ## Tools
 
-Use [`tools/TestTool.ps1`](tools/TestTool.ps1) to test custom platform scripts locally before uploading them to SPP.
-
-## Telnet / Pattern Files
-
-Telnet pattern files have moved to [SafeguardAutomation](https://github.com/OneIdentity/SafeguardAutomation/tree/master/Terminal%20Pattern%20Files).
+- [`tools/TestTool.ps1`](tools/TestTool.ps1) — Validate script JSON locally before uploading to SPP
+- [`schema/custom-platform-script.schema.json`](schema/custom-platform-script.schema.json) — JSON Schema for IDE autocomplete (VS Code configured automatically)
 
 ## Contributing
 
-Contributions are welcome, including new sample scripts, fixes, and documentation improvements. See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, and feel free to share community-tested samples that others can adapt.
+Contributions are welcome — new sample scripts, documentation improvements, and bug fixes. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Support
 
@@ -59,20 +69,3 @@ One Identity open source projects are supported through [GitHub issues](https://
 ## License
 
 See [LICENSE](LICENSE).
-
-## Compatibility Matrix
-
-> Approximate only — check your SPP release notes for exact availability in your build.
-
-| SPP Version | Custom Platform Feature Added |
-| --- | --- |
-| 6.0 | Custom platforms introduced (SSH, Telnet) |
-| 6.7 | HTTP/REST custom platforms added |
-| 7.0 | `DiscoverAccounts` |
-| 7.0 | `DiscoverServices` |
-| 7.0 | `DiscoverSshHostKey` |
-| 7.4 | `ExecuteCommand` (SSH batch mode) |
-| 7.4 | `ExecuteDependentCommand` (dependent system workflows) |
-| 7.5 | `ElevateAccount` / `DemoteAccount` |
-| 7.5 | `EnableAccount` / `DisableAccount` |
-| 7.6 | `CheckFile` / `ChangeFile` |

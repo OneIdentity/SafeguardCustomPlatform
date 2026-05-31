@@ -4,7 +4,7 @@ This schema adds editor-friendly **autocomplete**, **validation**, and **hover d
 
 ## Automatic setup in VS Code
 
-This repository includes `.vscode/settings.json`, so anyone who clones the repo in VS Code gets automatic schema association for `SampleScripts/**/*.json`.
+This repository includes `.vscode/settings.json`, so anyone who clones the repo in VS Code gets automatic schema association for `samples/**/*.json` and `templates/**/*.json`.
 
 ## Manual setup for other editors
 

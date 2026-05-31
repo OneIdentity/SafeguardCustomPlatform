@@ -129,7 +129,7 @@ From the built-in `System/Imports/CheckpointSshFunctions.json` definition:
 
 ### Compare against a Linux shadow entry
 
-From `SampleScripts/SSH/GenericLinux.json`:
+From `samples/ssh/generic-linux/GenericLinux.json`:
 
 ```json
 {
@@ -143,7 +143,7 @@ From `SampleScripts/SSH/GenericLinux.json`:
 
 ### Compare against a general salted hash
 
-From `SampleScripts/SSH/LinuxSshBatchModeExample.json`:
+From `samples/ssh/linux-ssh-batch-mode/LinuxSshBatchModeExample.json`:
 
 ```json
 {

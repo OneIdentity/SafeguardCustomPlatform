@@ -1,8 +1,8 @@
-[← Documentation](../README.md)
+[← Reference](README.md)
 
 # Operations Reference
 
-Operations are the named entry points in a custom platform script that SPP invokes when performing specific tasks. Each operation you include in your script tells SPP what your platform can do — SPP automatically derives [feature flags](../guides/feature-flags.md) from the operations present.
+Operations are the named entry points in a custom platform script that SPP invokes when performing specific tasks. Each operation you include in your script tells SPP what your platform can do — SPP automatically derives [feature flags](../concepts/feature-flags.md) from the operations present.
 
 This page documents all 19 available operations across 8 categories.
 
@@ -807,7 +807,7 @@ SPP automatically derives these feature flags when you upload a script. You neve
 | `TimeoutFl` | Any operation with `Timeout` parameter |
 | `CheckHostKeyFl` | Any operation with `CheckHostKey` parameter |
 
-For a detailed guide on how feature flags affect platform behavior in the SPP UI, see [Feature Flags Guide](../guides/feature-flags.md).
+For a detailed guide on how feature flags affect platform behavior in the SPP UI, see [Feature Flags Guide](../concepts/feature-flags.md).
 
 ---
 
@@ -864,7 +864,7 @@ A comprehensive platform might implement all relevant operations:
 
 - [Script Structure](script-structure.md) — JSON structure overview
 - [Reserved Parameters](reserved-parameters.md) — complete auto-populated parameter reference
-- [Feature Flags Guide](../guides/feature-flags.md) — how operations determine platform capabilities
+- [Feature Flags Guide](../concepts/feature-flags.md) — how operations determine platform capabilities
 - [Commands Index](commands/index.md) — all available commands for implementing operations
 - [SSH Platforms Guide](../guides/ssh-platforms.md) — patterns for SSH-based implementations
 - [HTTP Platforms Guide](../guides/http-platforms.md) — patterns for HTTP-based implementations

@@ -95,7 +95,7 @@ The usual pattern is: request the page, extract the form, inspect or modify fiel
 
 ### Extract the login form from a page
 
-From `SampleScripts/HTTP/CustomTwitter.json`:
+From `samples/http/twitter/CustomTwitter.json`:
 
 ```json
 {
@@ -118,7 +118,7 @@ From `SampleScripts/HTTP/CustomTwitter.json`:
 
 ### Populate fields before posting the form
 
-From `SampleScripts/HTTP/CustomTwitter.json`:
+From `samples/http/twitter/CustomTwitter.json`:
 
 ```json
 {
@@ -157,7 +157,7 @@ From the built-in `System/Twitter.json` platform definition:
 
 ### Submit the extracted form
 
-From `SampleScripts/HTTP/CustomTwitter.json`:
+From `samples/http/twitter/CustomTwitter.json`:
 
 ```json
 {

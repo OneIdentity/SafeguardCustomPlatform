@@ -2,13 +2,15 @@ name: Validate Sample Scripts
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths:
-      - 'SampleScripts/**/*.json'
+      - 'samples/**/*.json'
+      - 'templates/**/*.json'
   pull_request:
-    branches: [master]
+    branches: [main]
     paths:
-      - 'SampleScripts/**/*.json'
+      - 'samples/**/*.json'
+      - 'templates/**/*.json'
 
 jobs:
   validate-json:
@@ -22,19 +24,21 @@ jobs:
           failed=0
           found=0
 
-          while IFS= read -r -d '' f; do
-            found=1
+          for dir in samples templates; do
+            while IFS= read -r -d '' f; do
+              found=1
 
-            if ! jq empty "$f" >/dev/null 2>&1; then
-              echo "::error file=$f::Invalid JSON syntax"
-              echo "FAILED: $f"
-              jq empty "$f"
-              failed=1
-            fi
-          done < <(find SampleScripts -type f -name '*.json' -print0)
+              if ! jq empty "$f" >/dev/null 2>&1; then
+                echo "::error file=$f::Invalid JSON syntax"
+                echo "FAILED: $f"
+                jq empty "$f"
+                failed=1
+              fi
+            done < <(find "$dir" -type f -name '*.json' -print0)
+          done
 
           if [ "$found" -eq 0 ]; then
-            echo "No JSON files found under SampleScripts/."
+            echo "No JSON files found under samples/ or templates/."
             exit 0
           fi
 

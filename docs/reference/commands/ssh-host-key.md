@@ -49,7 +49,7 @@ Use it inside the `DiscoverSshHostKey` or `RetrieveSshHostKey` operations to cap
 
 ### Asset host-key discovery with software version capture
 
-From `SampleScripts/SSH/GenericLinuxWithSSHKeySupport.json`:
+From `samples/ssh/generic-linux-ssh-keys/GenericLinuxWithSSHKeySupport.json`:
 
 ```json
 {
@@ -66,7 +66,7 @@ From `SampleScripts/SSH/GenericLinuxWithSSHKeySupport.json`:
 
 ### Minimal host-key discovery
 
-From `SampleScripts/SSH/LinuxSshBatchModeExample.json`:
+From `samples/ssh/linux-ssh-batch-mode/LinuxSshBatchModeExample.json`:
 
 ```json
 {

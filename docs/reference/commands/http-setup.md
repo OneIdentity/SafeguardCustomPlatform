@@ -98,7 +98,7 @@ Adds one or more headers to a named request object.
 
 ### Build a WordPress request object after selecting HTTP or HTTPS
 
-From `SampleScripts/HTTP/WordPressHttp.json`:
+From `samples/http/wordpress/WordPressHttp.json`:
 
 ```json
 {
@@ -123,7 +123,7 @@ From `SampleScripts/HTTP/WordPressHttp.json`:
 
 ### Add token-style authorization before an API request
 
-From `SampleScripts/HTTP/Okta_WithDiscoveryAndGroupMembershipRestore.json`:
+From `samples/http/okta-discovery/Okta_WithDiscoveryAndGroupMembershipRestore.json`:
 
 ```json
 {
@@ -138,7 +138,7 @@ From `SampleScripts/HTTP/Okta_WithDiscoveryAndGroupMembershipRestore.json`:
 
 ### Set multiple custom headers for an authentication endpoint
 
-From `SampleScripts/HTTP/Forgerock_OpenAM.json`:
+From `samples/http/forgerock-openam/Forgerock_OpenAM.json`:
 
 ```json
 {

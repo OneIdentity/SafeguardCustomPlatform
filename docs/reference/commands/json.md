@@ -40,7 +40,7 @@ After parsing, expressions can inspect the object directly.
 
 ### Parse a WordPress users response into a collection
 
-From `SampleScripts/HTTP/WordPressHttp.json`:
+From `samples/http/wordpress/WordPressHttp.json`:
 
 ```json
 {
@@ -71,7 +71,7 @@ From `SampleScripts/HTTP/WordPressHttp.json`:
 
 ### Parse an Okta API response and return a property
 
-From `SampleScripts/HTTP/Okta_WithDiscoveryAndGroupMembershipRestore.json`:
+From `samples/http/okta-discovery/Okta_WithDiscoveryAndGroupMembershipRestore.json`:
 
 ```json
 {
@@ -94,7 +94,7 @@ From `SampleScripts/HTTP/Okta_WithDiscoveryAndGroupMembershipRestore.json`:
 
 ### Parse ForgeRock authentication output
 
-From `SampleScripts/HTTP/Forgerock_OpenAM.json`:
+From `samples/http/forgerock-openam/Forgerock_OpenAM.json`:
 
 ```json
 {

@@ -1,4 +1,4 @@
-[← Documentation](../README.md)
+[← Reference](README.md)
 
 # Custom Parameters Reference
 

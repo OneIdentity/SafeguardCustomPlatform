@@ -61,7 +61,7 @@ Use the top-level `Functions` array to define reusable blocks that can be called
 
 ### Example
 
-From `SampleScripts/HTTP/WordPressHttp.json`:
+From `samples/http/wordpress/WordPressHttp.json`:
 
 ```json
 {
@@ -124,7 +124,7 @@ Use the `Function` command inside a `Do` block to invoke a named function. In cu
 
 #### Call a helper and capture its result
 
-From `SampleScripts/Telnet/GenericCiscoIosTelnet.json`:
+From `samples/telnet/cisco-ios/GenericCiscoIosTelnet.json`:
 
 ```json
 {
@@ -138,7 +138,7 @@ From `SampleScripts/Telnet/GenericCiscoIosTelnet.json`:
 
 #### Call a function with a secret argument
 
-From `SampleScripts/SSH/GenericLinuxWithSSHKeySupport.json`:
+From `samples/ssh/generic-linux-ssh-keys/GenericLinuxWithSSHKeySupport.json`:
 
 ```json
 {

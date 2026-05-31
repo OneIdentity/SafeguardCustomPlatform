@@ -1,4 +1,4 @@
-[← Documentation](../README.md)
+[← Guides](README.md)
 
 # SSH Key Management Guide
 
@@ -103,7 +103,7 @@ Do not assume only one path exists. A practical Unix pattern is to check multipl
 - `%h/.ssh/authorized_keys`
 - `%h/.ssh/authorized_keys2`
 
-[`GenericLinuxWithSSHKeySupport.json`](../../SampleScripts/SSH/GenericLinuxWithSSHKeySupport.json) follows exactly that pattern and resolves the final paths before check, change, or discovery.
+[`GenericLinuxWithSSHKeySupport.json`](../../samples/ssh/generic-linux-ssh-keys/GenericLinuxWithSSHKeySupport.json) follows exactly that pattern and resolves the final paths before check, change, or discovery.
 
 ### 2. Check for a key with exact matching
 
@@ -154,7 +154,7 @@ A simplified append step looks like this:
 }
 ```
 
-The sample [`GenericLinuxWithSSHKeySupport.json`](../../SampleScripts/SSH/GenericLinuxWithSSHKeySupport.json) uses the same overall approach, including backup and rollback.
+The sample [`GenericLinuxWithSSHKeySupport.json`](../../samples/ssh/generic-linux-ssh-keys/GenericLinuxWithSSHKeySupport.json) uses the same overall approach, including backup and rollback.
 
 ### 4. Remove the old key by rewriting the file
 
@@ -288,7 +288,7 @@ Restricted keys are keys with option prefixes such as:
 - `no-port-forwarding`
 - `restrict`
 
-The repository's [`RestrictedAuthorizedKeyExample.json`](../../SampleScripts/SSH/RestrictedAuthorizedKeyExample.json) shows the broader pattern of using a restricted key for service-account authentication. For target-account key management, the important lesson is the same: do not assume a key line starts with `ssh-rsa` or `ssh-ed25519`.
+The repository's [`RestrictedAuthorizedKeyExample.json`](../../samples/ssh/restricted-authorized-key/RestrictedAuthorizedKeyExample.json) shows the broader pattern of using a restricted key for service-account authentication. For target-account key management, the important lesson is the same: do not assume a key line starts with `ssh-rsa` or `ssh-ed25519`.
 
 A good parser anchors on the key type but allows an optional prefix before it:
 
@@ -390,6 +390,6 @@ During `DiscoverAuthorizedKeys`, it is fine to skip blank or malformed lines. Bu
 - [Reserved Parameters](../reference/reserved-parameters.md)
 - [SSH Platforms Guide](ssh-platforms.md)
 - [Imports](../reference/imports.md)
-- [Your First SSH Script](../getting-started/your-first-ssh-script.md)
+- [Your First SSH Script](../tutorials/your-first-ssh-script.md)
 - [Account Discovery](account-discovery.md)
 - [Output Commands](../reference/commands/output.md)

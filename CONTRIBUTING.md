@@ -18,10 +18,10 @@ git checkout -b my-change
 
 ## Contributing Sample Scripts
 
-- Add new scripts under `SampleScripts/` in the correct protocol folder:
-  - `SampleScripts/SSH/`
-  - `SampleScripts/HTTP/`
-  - `SampleScripts/Telnet/`
+- Add new scripts under `samples/` in the correct protocol folder:
+  - `samples/ssh/`
+  - `samples/http/`
+  - `samples/telnet/`
 - Follow the JSON structure in [docs/reference/script-structure.md](docs/reference/script-structure.md).
 - Include the standard operations your target supports whenever possible. At minimum, include `CheckSystem` (the operation behind **Test Connection**) and `CheckPassword`, unless accounts change their own passwords on that platform (in which case `CheckSystem` may not apply).
 - Use meaningful parameter names and sensible defaults.

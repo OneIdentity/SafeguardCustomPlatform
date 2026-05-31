@@ -1,4 +1,4 @@
-[← Documentation](../README.md)
+[← Reference](README.md)
 
 # Status Messages Reference
 
@@ -66,7 +66,7 @@ The command shape is the same for both transports. What changes is **where** you
 
 SSH and Telnet samples usually publish status immediately before or after `Connect`, `Send`, `Receive`, or `ExecuteCommand` steps.
 
-From `SampleScripts/SSH/GenericLinux.json`:
+From `samples/ssh/generic-linux/GenericLinux.json`:
 
 ```json
 {
@@ -92,7 +92,7 @@ Typical SSH pattern:
 
 HTTP samples usually publish status around authentication requests, account lookups, and change requests.
 
-From `SampleScripts/HTTP/CustomTwitter.json`:
+From `samples/http/twitter/CustomTwitter.json`:
 
 ```json
 {
@@ -307,7 +307,7 @@ Use this when the operation could not complete normally and the task should end 
 - **Keep `Percent` meaningful.** Current samples commonly use milestone values such as `10`, `20`, `50`, `80`, `90`, and `95`.
 - **Match the phase with `Type`.** The same message family can appear under different operation phases, but `Type` should still describe the current step (`Connecting`, `Checking`, `Changing`, or `Discovering`).
 - **Follow existing parameter order.** For example, `AssetConnectFailedWithReasonAndAddress` is passed as `[ "%AssetName%", "%Address%", "%Exception%" ]` in the current samples.
-- **Use extended logging when debugging.** `Status` shows the operator-friendly summary, while `extendedLogging=true` gives command-by-command trace detail. See [Testing and Debugging](../getting-started/testing-and-debugging.md).
+- **Use extended logging when debugging.** `Status` shows the operator-friendly summary, while `extendedLogging=true` gives command-by-command trace detail. See [Testing and Debugging](../guides/testing-and-debugging.md).
 
 ---
 
@@ -317,4 +317,4 @@ Use this when the operation could not complete normally and the task should end 
 - [Error Handling Commands](commands/error-handling.md)
 - [Operations Reference](operations.md)
 - [Script Structure Reference](script-structure.md)
-- [Testing and Debugging](../getting-started/testing-and-debugging.md)
+- [Testing and Debugging](../guides/testing-and-debugging.md)

@@ -73,7 +73,7 @@ Closes an existing connection object.
 
 ### SSH connection with password authentication
 
-From `SampleScripts/SSH/GenericLinux.json`:
+From `samples/ssh/generic-linux/GenericLinux.json`:
 
 ```json
 {
@@ -95,7 +95,7 @@ From `SampleScripts/SSH/GenericLinux.json`:
 
 ### SSH connection with key authentication
 
-From `SampleScripts/SSH/RestrictedAuthorizedKeyExample.json`:
+From `samples/ssh/restricted-authorized-key/RestrictedAuthorizedKeyExample.json`:
 
 ```json
 {
@@ -117,7 +117,7 @@ From `SampleScripts/SSH/RestrictedAuthorizedKeyExample.json`:
 
 ### Telnet connection
 
-From `SampleScripts/Telnet/GenericCiscoIosTelnet.json`:
+From `samples/telnet/cisco-ios/GenericCiscoIosTelnet.json`:
 
 ```json
 {

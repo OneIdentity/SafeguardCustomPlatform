@@ -62,7 +62,7 @@ Current script-engine support is focused on `Basic` and `Digest` authentication.
 
 ### Basic auth against a WordPress REST API
 
-From `SampleScripts/HTTP/WordPressHttp.json`:
+From `samples/http/wordpress/WordPressHttp.json`:
 
 ```json
 {
@@ -82,7 +82,7 @@ From `SampleScripts/HTTP/WordPressHttp.json`:
 
 ### Basic auth with managed-account credentials
 
-From `SampleScripts/HTTP/WordPressHttp.json`:
+From `samples/http/wordpress/WordPressHttp.json`:
 
 ```json
 {
@@ -99,7 +99,7 @@ From `SampleScripts/HTTP/WordPressHttp.json`:
 
 ### Token-style authorization via `Headers`
 
-From `SampleScripts/HTTP/Okta_WithDiscoveryAndGroupMembershipRestore.json`:
+From `samples/http/okta-discovery/Okta_WithDiscoveryAndGroupMembershipRestore.json`:
 
 ```json
 {

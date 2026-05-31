@@ -10,7 +10,7 @@ Most browser-style login flows do not need these commands on every step because 
 
 A typical login flow simply relies on `Request` with the default `PersistCookies: true`.
 
-From `SampleScripts/HTTP/CustomTwitter.json`:
+From `samples/http/twitter/CustomTwitter.json`:
 
 ```json
 {

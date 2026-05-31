@@ -1,4 +1,4 @@
-[← Documentation](../README.md)
+[← Guides](README.md)
 
 # Account Discovery Guide
 
@@ -523,7 +523,7 @@ If that restriction changes in the future, the related pattern would be similar 
 - [Operations Reference](../reference/operations.md)
 - [Output Commands](../reference/commands/output.md)
 - [Command Index](../reference/commands/index.md)
-- [Your First SSH Script](../getting-started/your-first-ssh-script.md)
-- [Your First HTTP Script](../getting-started/your-first-http-script.md)
+- [Your First SSH Script](../tutorials/your-first-ssh-script.md)
+- [Your First HTTP Script](../tutorials/your-first-http-script.md)
 - [SSH Platforms Guide](ssh-platforms.md)
 - [HTTP Platforms Guide](http-platforms.md)
