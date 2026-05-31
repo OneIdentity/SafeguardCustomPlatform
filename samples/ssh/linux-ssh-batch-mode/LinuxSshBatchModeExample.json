@@ -71,7 +71,7 @@
           "Then": { "Do": [ { "Return" : { "Value": true }} ] }
         }
       },
-      { "Status": { "Type": "Checking", "Percent": "90", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "Output: %{ Result.Stdout }%  Error: %{ Result.Stderr }%" ] }, } },
+      { "Status": { "Type": "Checking", "Percent": "90", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "Output: %{ Result.Stdout }%  Error: %{ Result.Stderr }%" ] } } },
       { "Return" : { "Value" : false } }
     ]
   },
@@ -136,7 +136,7 @@
         }
       },
       { "Log": { "Text": "Failed to change password : output:%{ Result.Stdout }% , err: %{ Result.Stderr }%" } },
-      { "Status": { "Type": "Checking", "Percent": "90", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "Output: %{ Result.Stdout }%  Error: %{ Result.Stderr }%" ] }, } },
+      { "Status": { "Type": "Checking", "Percent": "90", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "Output: %{ Result.Stdout }%  Error: %{ Result.Stderr }%" ] } } },
       {
         "Return": { "Value": false }
       }
@@ -169,7 +169,7 @@
                 }
               },
               { "Log": { "Text": "Successfully connected to the asset using key authentication" } },
-              { "Status": { "Type": "Checking", "Percent": 40, "Message": { "Name": "SystemLoginCheck", "Parameters": [ "%Address%" ] } } },
+              { "Status": { "Type": "Checking", "Percent": 40, "Message": { "Name": "SystemLoginCheck", "Parameters": [ "%Address%" ] } } }
             ],
             "Catch": [
               { "Status": { "Type": "Connecting", "Percent": 95, "Message": { "Name": "AssetConnectFailedWithReasonAndAddress", "Parameters": [ "%AssetName%", "%Address%", "%Exception%" ] } } },
@@ -187,7 +187,7 @@
         { "StdinArgs": { "Type": "Array" } },
         { "CommandContainsSecret": { "Type": "Boolean" } },
         { "InputContainsSecret": { "Type": "Boolean" } },
-        { "OutputContainsSecret": { "Type": "Boolean" } },
+        { "OutputContainsSecret": { "Type": "Boolean" } }
       ],
       "Do": [
         { "SetItem" : { "Name": "rc", "Value": 1 }},
@@ -199,7 +199,7 @@
               { "SetItem": { "Name": "runcmd", "Value": "%{ Cmd }%" }},
               { "Condition": { 
                  "If" : "UseSudo && !string.IsNullOrEmpty(DelegationPrefix)", 
-                 "Then": { "Do": [ { "SetItem": { "Name": "runcmd", "Value": "%DelegationPrefix% %{ Cmd }%" }}, ]}}
+                 "Then": { "Do": [ { "SetItem": { "Name": "runcmd", "Value": "%DelegationPrefix% %{ Cmd }%" }} ]}}
               },
               {
                 "ExecuteCommand": {
@@ -260,7 +260,7 @@
             "If": "rc == 0",
             "Then": {
               "Do": [
-                { "Return": { "Value": { "rc": "%{ rc }%", "Stdout": "%{ Stdout }%", "Stderr": "%{ Stderr }%", } } }
+                { "Return": { "Value": { "rc": "%{ rc }%", "Stdout": "%{ Stdout }%", "Stderr": "%{ Stderr }%" } } }
               ]
             }
           }
@@ -276,7 +276,7 @@
             }
           }
         },
-        { "Return": { "Value": { "rc": "%{ rc }%", "Stdout": "%{ Stdout }%", "Stderr": "%{ Stderr }%", } } }
+        { "Return": { "Value": { "rc": "%{ rc }%", "Stdout": "%{ Stdout }%", "Stderr": "%{ Stderr }%" } } }
       ]
     },
     {
@@ -316,20 +316,20 @@
             "If": "Result.rc != 0",
             "Then": {
               "Do": [
-                { "Status": { "Type": "Checking", "Percent": "90", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "rc : ${ rc }%  Error: %{ Result.Stderr }%" ] }, } },
+                { "Status": { "Type": "Checking", "Percent": "90", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "rc : ${ rc }%  Error: %{ Result.Stderr }%" ] } } },
                 { "Throw" : { "Value" : "Failed to check password" } }
               ]
             }
           }
         },
                  
-        { "SetItem": { "Name": "MatchLine", "Value": "%{ Regex.Match(Result.Stdout, $\"^{AccountUserName}:([^:]+)\", RegexOptions.MultiLine) }%", } },
+        { "SetItem": { "Name": "MatchLine", "Value": "%{ Regex.Match(Result.Stdout, $\"^{AccountUserName}:([^:]+)\", RegexOptions.MultiLine) }%" } },
         { "Condition": {
             "If": "!MatchLine.Success",
             "Then": {
               "Do": [
                 { "Log" : { "Text": "Failed to retrieve password hash for account" }}, 
-                { "Status": { "Type": "Checking", "Percent": "90", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "Failed to retrieve password hash for account" ] }, } },
+                { "Status": { "Type": "Checking", "Percent": "90", "Message": { "Name": "UnexpectedDataReceived", "Parameters": [ "Failed to retrieve password hash for account" ] } } },
                 { "Throw" : { "Value" : "Failed to check password" } }
               ] 
             } 

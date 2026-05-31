@@ -830,7 +830,7 @@
                                                                 }
                                                               }
                                                             },
-                                                            ,
+                                                            
                                                             {
                                                                 "Function": {
                                                                     "Name": "DeleteUserFromRole",
@@ -2163,7 +2163,7 @@
                                     "ProxyPort": "%HttpProxyPort%",
                                     "ProxyUser": "%HttpProxyUserName%",
                                     "ProxyPassword": "%HttpProxyPassword%"
-                                },
+                                }
                                 
                             },
                             {

@@ -1171,7 +1171,7 @@
                                                         "Name": "GetGroupsOfUser",
                                                         "Parameters": ["%Address%", "%{user.id}%", "%FuncPassword%", "%{SkipServerCertValidation}%", "%{UseSsl}%"],
                                                         "ResultVariable": "GetGroupsOfUserResult"
-                                                    },
+                                                    }
                                                 }, {
                                                     "ForEach": {
                                                         "CollectionName": "GetGroupsOfUserResult",
