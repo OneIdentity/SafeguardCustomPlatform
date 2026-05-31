@@ -6,10 +6,10 @@ Step-by-step walkthroughs that teach you how to build custom platform scripts fr
 
 | Tutorial | Description |
 | --- | --- |
-| [Your First SSH Script](your-first-ssh-script.md) | Build a minimal SSH platform with `CheckSystem` and `CheckPassword`. |
-| [Your First HTTP Script](your-first-http-script.md) | Build a minimal REST API platform with Basic Auth. |
+| [Your First SSH Script](your-first-ssh-script.md) | Build a complete SSH platform with `CheckSystem`, `CheckPassword`, and `ChangePassword`. |
+| [Your First HTTP Script](your-first-http-script.md) | Build a complete REST API platform with Basic Auth including password rotation. |
 | [Your First Form Script](your-first-form-script.md) | Manage passwords on a web portal using HTML form submission. |
-| [Building a Complete Platform](building-a-complete-platform.md) | Go from a minimal script to a full-featured platform with multiple operations. |
+| [Building a Complete Platform](building-a-complete-platform.md) | Add discovery, reusable functions, error handling, and status messages to a working platform. |
 
 ## Before You Start
 
