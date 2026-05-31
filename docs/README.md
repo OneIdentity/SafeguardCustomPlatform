@@ -1,65 +1,78 @@
-# Safeguard Custom Platform Documentation
+# Documentation
 
-This documentation hub helps you learn, build, and maintain Safeguard Custom Platform scripts. Start here for onboarding material, detailed references, and task-focused guides.
+Everything you need to learn, build, and maintain Safeguard custom platform scripts.
 
-## Suggested Reading Order
+## Reading Paths
 
-1. [Overview](getting-started/overview.md) — Learn the architecture, execution model, and when a custom platform is the right fit.
-2. [First Tutorial](getting-started/your-first-ssh-script.md) — Build your first SSH-based script step by step.
-3. [Script Structure](reference/script-structure.md) — Understand the JSON layout, operations, and `Do` blocks used by every script.
-4. [Operations Reference](reference/operations.md) — Review the supported operations available when implementing a platform.
+Choose based on what you need right now:
 
-## Getting Started
+### 🚀 I want something working fast
+→ [Quick Start](quick-start/) — 5-minute paths to a working platform.
 
-| Document | Description |
-| --- | --- |
-| [getting-started/overview.md](getting-started/overview.md) | Architecture, script execution flow, and guidance on whether you need a custom platform. |
-| [getting-started/your-first-ssh-script.md](getting-started/your-first-ssh-script.md) | Step-by-step tutorial for creating your first SSH custom platform script. |
-| [getting-started/your-first-http-script.md](getting-started/your-first-http-script.md) | Step-by-step tutorial for creating your first HTTP custom platform script (REST API). |
-| [getting-started/your-first-form-script.md](getting-started/your-first-form-script.md) | Step-by-step tutorial for managing passwords on web portals with HTML form submission. |
-| [getting-started/development-workflow.md](getting-started/development-workflow.md) | End-to-end workflow from upload through testing and iteration. |
-| [getting-started/testing-and-debugging.md](getting-started/testing-and-debugging.md) | Test tools, logs, and `extendedLogging` techniques for troubleshooting. |
+### 🧠 I want to understand how this works
+→ [Concepts](concepts/) — Architecture, execution model, feature flags, lifecycle.
 
-## Reference
+### 📖 I want to learn step by step
+→ [Tutorials](tutorials/) — Build your first SSH, HTTP, or form-based script from scratch.
 
-| Document | Description |
-| --- | --- |
-| [reference/script-structure.md](reference/script-structure.md) | JSON structure, top-level keys, operations, and `Do` blocks. |
-| [reference/operations.md](reference/operations.md) | Reference for all supported operations. |
-| [reference/reserved-parameters.md](reference/reserved-parameters.md) | Complete reference for reserved platform parameters. |
-| [reference/custom-parameters.md](reference/custom-parameters.md) | How to define and use your own custom parameters. |
-| [reference/variables.md](reference/variables.md) | Variable system reference for reading, setting, and reusing values. |
-| [reference/commands/](reference/commands/) | Command reference organized by category. |
-| [reference/imports.md](reference/imports.md) | Reusable SSH function libraries and import patterns. |
-| [reference/status-messages.md](reference/status-messages.md) | Predefined status messages available to scripts. |
+### 🔧 I need to solve a specific problem
+→ [Guides](guides/) — Task-focused how-to content: SSH patterns, HTTP patterns, discovery, error handling, testing.
 
-## Guides
+### 📋 I need to look up a detail
+→ [Reference](reference/) — Commands, operations, parameters, variables, imports.
 
-| Document | Description |
-| --- | --- |
-| [guides/ssh-platforms.md](guides/ssh-platforms.md) | SSH design patterns and session integration guidance. |
-| [guides/http-platforms.md](guides/http-platforms.md) | REST, OAuth2, and Bearer token implementation patterns. |
-| [guides/account-discovery.md](guides/account-discovery.md) | Guidance for discovering accounts through custom platforms. |
-| [guides/ssh-key-management.md](guides/ssh-key-management.md) | Patterns for checking, changing, and discovering SSH keys. |
-| [guides/api-key-management.md](guides/api-key-management.md) | Approaches for API key rotation workflows. |
-| [guides/file-management.md](guides/file-management.md) | Working with file-based credentials and related operations. |
-| [guides/jit-elevation.md](guides/jit-elevation.md) | Implementing JIT elevation and demotion scenarios. |
-| [guides/dependent-systems.md](guides/dependent-systems.md) | Updating dependent systems as part of platform workflows. |
-| [guides/error-handling.md](guides/error-handling.md) | Try/Catch patterns for reliable error handling. |
-| [guides/regex-patterns.md](guides/regex-patterns.md) | Practical .NET regex patterns for prompts, parsing, and error detection. |
-| [guides/feature-flags.md](guides/feature-flags.md) | How script content enables and shapes platform capabilities. |
-| [guides/troubleshooting.md](guides/troubleshooting.md) | Common errors, diagnostics, and recommended fixes. |
+---
 
-## General
+## Full Table of Contents
 
-| Document | Description |
-| --- | --- |
-| [compatibility.md](compatibility.md) | Compatibility matrix for documented SPP custom platform capabilities and versions. |
+### Quick Start
+- [SSH Password Change in 5 Minutes](quick-start/ssh-password-change.md)
+- [HTTP API Check in 5 Minutes](quick-start/http-api-check.md)
+
+### Concepts
+- [Architecture](concepts/architecture.md) — What custom platforms are and when you need one
+- [Script Execution Model](concepts/script-execution-model.md) — How SPP loads and runs scripts
+- [Feature Flags](concepts/feature-flags.md) — Automatic capability derivation from script content
+- [Platform Lifecycle](concepts/platform-lifecycle.md) — From authoring to production and updates
+
+### Tutorials
+- [Your First SSH Script](tutorials/your-first-ssh-script.md)
+- [Your First HTTP Script](tutorials/your-first-http-script.md)
+- [Your First Form Script](tutorials/your-first-form-script.md)
+- [Building a Complete Platform](tutorials/building-a-complete-platform.md)
+
+### Guides
+- [Development Workflow](guides/development-workflow.md)
+- [Testing and Debugging](guides/testing-and-debugging.md)
+- [SSH Platforms](guides/ssh-platforms.md)
+- [HTTP Platforms](guides/http-platforms.md)
+- [Account Discovery](guides/account-discovery.md)
+- [SSH Key Management](guides/ssh-key-management.md)
+- [API Key Management](guides/api-key-management.md)
+- [File Management](guides/file-management.md)
+- [JIT Elevation](guides/jit-elevation.md)
+- [Dependent Systems](guides/dependent-systems.md)
+- [Error Handling](guides/error-handling.md)
+- [Regex Patterns](guides/regex-patterns.md)
+- [Troubleshooting](guides/troubleshooting.md)
+
+### Reference
+- [Script Structure](reference/script-structure.md)
+- [Operations](reference/operations.md) (19 operations)
+- [Reserved Parameters](reference/reserved-parameters.md) (72 parameters)
+- [Custom Parameters](reference/custom-parameters.md)
+- [Variables](reference/variables.md)
+- [Commands](reference/commands/) (60+ commands)
+- [Imports](reference/imports.md)
+- [Status Messages](reference/status-messages.md)
+- [Compatibility Matrix](reference/compatibility.md)
 
 ## Additional Resources
 
 | Resource | Description |
 | --- | --- |
-| [SampleScripts](../SampleScripts/) | Working examples you can use as references when building scripts. |
-| [TestTool.ps1](../tools/TestTool.ps1) | Local test tool for validating and iterating on platform scripts. |
-| [One Identity Support](https://support.oneidentity.com/) | General Safeguard product documentation, downloads, and support resources. |
+| [Samples](../samples/) | Production-tested scripts with companion documentation |
+| [Templates](../templates/) | Pattern templates and minimal starters |
+| [TestTool.ps1](../tools/TestTool.ps1) | Local script validation tool |
+| [JSON Schema](../schema/custom-platform-script.schema.json) | IDE autocomplete schema |
+| [One Identity Support](https://support.oneidentity.com/) | Official product support |
