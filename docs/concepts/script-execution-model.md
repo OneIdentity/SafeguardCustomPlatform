@@ -38,7 +38,7 @@ Custom parameters retain their configured default values unless overridden at th
 
 ### 3. Script Engine Execution
 
-The Hercules script engine processes the operation's `Do` array sequentially:
+The scripting engine processes the operation's `Do` array sequentially:
 
 1. Each command in the `Do` array is executed in order.
 2. Variable interpolation (`%VariableName%`) is resolved at execution time.
