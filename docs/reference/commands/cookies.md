@@ -121,7 +121,7 @@ Expires one or more cookies in the shared cookie jar.
 
 ### Seed cookies before a console login flow
 
-From the built-in `System/Aws.json` platform definition:
+From the (now-deprecated) built-in `System/Aws.json` platform definition. The AWS built-in platform is deprecated — this is shown only to illustrate the `SetCookie` syntax:
 
 ```json
 {

@@ -112,11 +112,14 @@ These reserved names extend the service-account connection context beyond userna
 | `FuncAccountDn` | String | `Asset.ServiceAccount.DistinguishedName` | Service account directory identity |
 | `FuncUserDomain` | String | `Asset.ServiceAccount.Domain` | Domain-backed service account |
 | `FuncUserNetBiosName` | String | `Asset.ServiceAccount.NetBiosName` | NetBIOS domain for the service account |
-| `FuncUserAccessKeyId` | String | `Asset.AccessKeyId` | Access Key ID field that appears when the script declares it |
-| `FuncUserAccessKey` | Secret | `Asset.SecretKey` | Access Key Secret field that appears alongside the ID |
+| `FuncUserAccessKeyId` | String | `Asset.AccessKeyId` | Access Key ID field that appears when the script declares it. **Deprecated** — see note below. |
+| `FuncUserAccessKey` | Secret | `Asset.SecretKey` | Access Key Secret field that appears alongside the ID. **Deprecated** — see note below. |
 | `UserKey` | Secret | Service-account private SSH key | Service account SSH key assigned in SPP |
 | `Instance` | String | `Asset.Instance` | Instance field that appears when the script declares it |
 | `SshPort` | Integer | `Platform.SessionSshPort` | Platform-level SSH session port or script default |
+
+> [!NOTE]
+> `FuncUserAccessKeyId` / `FuncUserAccessKey` surface the asset's `AccessKeyId` and `SecretKey` connection properties, which back the **AccessKey** service-account credential type. Those properties are **deprecated** and retained only for backward compatibility — new platforms should not rely on them. Use a managed-account credential type appropriate to the target instead.
 
 ### Connection, TLS, and Proxy Settings
 

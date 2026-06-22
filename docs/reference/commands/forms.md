@@ -142,7 +142,7 @@ From `samples/http/twitter/CustomTwitter.json`:
 
 ### The alias form shown in older scripts
 
-From the built-in `System/Twitter.json` platform definition:
+From the (now-deprecated) built-in `System/Twitter.json` platform definition. The Twitter built-in platform is deprecated — this is shown only to illustrate the `SetFormData` alias syntax:
 
 ```json
 {
