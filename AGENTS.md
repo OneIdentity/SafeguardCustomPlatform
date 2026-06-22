@@ -22,6 +22,19 @@ SPP runs the script against an asset and an account: the asset supplies network 
 
 Authoring a custom platform is iterative: draft the JSON, validate it against the schema, import it into a test appliance, trigger an operation with extended logging, read the task log, fix the script, repeat. The agent skill system is built around making this loop fast and grounded in real evidence.
 
+## Cross-repo: the Rsms execution engine
+
+The scripts authored here do not run in this repo. They are parsed, validated, and executed by the **Rsms** scriptable engine that ships inside the appliance, whose source lives in a separate repository: [`Kevin-Andrew/PangaeaAppliance`](https://github.com/Kevin-Andrew/PangaeaAppliance). Several contracts this repo depends on — the task-log shape, the status enum, the log-name constants, and the secret-redaction sentinel — are *defined there*, not here.
+
+Two consequences shape how an agent should reason about compatibility:
+
+- **The engine is authoritative; this repo's `schema/custom-platform-script.schema.json` is a convenience mirror that can drift.** When the local schema and the engine disagree, the engine wins. A clean local schema validation does not prove the engine will accept the script (see "`SchemaOnly` is not a correctness signal" below). The usual fix for a disagreement is to correct this repo's schema or sample, not the script under test.
+- **A "compatibility bug" is almost always drift between the two repos** — the engine added, moved, renamed, or tightened a construct, and this repo's schema, samples, docs, or citations lagged. Resolving one means checking what the engine *actually* does at the relevant source location.
+
+When a compatibility question arises — "is this verb real?", "does the engine accept this parameter type?", "why does the appliance reject a script that passes local schema validation?" — consult [`docs/agent-reference/rsms-engine-map.md`](docs/agent-reference/rsms-engine-map.md). It maps every authored construct (operations, `Do`-block verbs, parameter types, reserved variables, task-log/status contracts, the validation entry points) to the authoritative PangaeaAppliance source file and line. Its "Script validation" section is the highest-yield place to look for "schema accepts / engine rejects" classes of bug. Note that engine source paths move (the `Hercules\Source\*` tree was relocated under `src\`); the engine-map records the current paths and re-confirming against the live PangaeaAppliance tree before a high-stakes change is expected.
+
+If a change in PangaeaAppliance is what broke the contract, the fix belongs in both places: update the engine-map citation here, and — when reachable — leave a note in the PangaeaAppliance Rsms project pointing back at this repo so the next engine change prompts a heads-up.
+
 ## Operating modes
 
 The agent declares the active mode at the start of every session. Each skill declares the modes it supports and **fails closed** when invoked outside them.

@@ -249,7 +249,10 @@ constants:
 * `SshCommunication` — raw SSH transport-level frames (when applicable)
 
 Both are defined in
-`Hercules\Source\Rsms.Public\Constants\Logging.cs:14-15`.
+`PangaeaAppliance\src\Common\Common.Rsms\Rsms.Public\Constants\Logging.cs:14-15`
+(see [`docs/agent-reference/rsms-engine-map.md`](../docs/agent-reference/rsms-engine-map.md)
+for the full cross-repo contract map — these constants moved out of the old
+`Hercules\Source\Rsms.Public\…` path).
 
 Real entry shapes:
 
@@ -269,8 +272,10 @@ Real entry shapes:
 **Secret handling.** SPP server-side redacts known credential parameters as
 the literal string `**secret**` before returning the log. The redaction
 constant is defined in
-`Hercules\Source\Hercules.DevKit\Constants\ParameterConstants.cs:5`
-(`public const string Secret = "**secret**"`).
+`PangaeaAppliance\src\Platform\Platform.Rsms\Constants\ParameterConstants.cs:5`
+(`public const string Secret = "**secret**"`; moved out of the old
+`Hercules\Source\Hercules.DevKit\…` path — see
+[`docs/agent-reference/rsms-engine-map.md`](../docs/agent-reference/rsms-engine-map.md)).
 Agents should NOT attempt to recover real values from these markers.
 Custom-script authors who introduce new secret parameters should declare
 them with `Type: "Secret"` so SPP applies the same redaction.
