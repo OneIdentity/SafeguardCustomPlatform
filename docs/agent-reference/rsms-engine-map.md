@@ -239,7 +239,10 @@ and the `phases[2]/phases[3]` payloads documented in
   SshKeyMismatch=18, Discovering=19, Submitted=20, Cancelled=21,
   ApiKeyMismatch=22, Skipped=23, FileMismatch=24`.
 - **Log-name constants** — `Hercules.Common.Constants.Logging`,
-  `src\Common\Common.Rsms\Rsms.Public\Constants\Logging.cs`: `Operation =
+  `src\Common\Common.Rsms\Rsms.Public\Constants\Logging.cs` (the **single
+  canonical definition** — other `Logging.cs` / `class Logging` files in
+  PangaeaAppliance, e.g. `src\Service\Rsts\HttpService\Logging.cs`, are unrelated
+  and do not define these members): `Operation =
   "Operation"` `:14`, `SshCommunication = "SshCommunication"` `:15` (plus derived
   `Operation.log` `:21`, `SshCommunication.log` `:23`, `PlatformTasks` `:32`,
   `Failure.log` `:34`, default log path `:12`; Tn3270/Telnet/Odbc/Open3270 names
@@ -330,6 +333,10 @@ PangaeaAppliance-relative.
 | Validation entry | `…\Scriptable\Validation\ScriptableModuleStaticAnalyzer.cs`, `ScriptableModuleCustomPlatformDefinitionValidator.cs` |
 | Public validate endpoints | `src\Service\Core\Controllers\V3\Partitions\PlatformsController.cs:235,271` |
 
-> **Snapshot ref:** analyzed against PangaeaAppliance commit `9be615a13d`
+> **Snapshot ref:** analyzed against PangaeaAppliance commit
+> `fb5ae4e0fe1bc438c8035dbe9b7086b77b40115b` (branch
+> `features/f_696160_ISO_InitialSetupWebsite`; tip dated 2026-06-22). The last
+> commit touching the Scriptable engine dir
+> (`src\Service\Rsms\Modules\Modules\Scriptable`) specifically was `9be615a13d`
 > ("TFS 709205 … net10 upgrade"). Confirm the current ref before relying on
 > line numbers; symbol names are more stable than lines.
