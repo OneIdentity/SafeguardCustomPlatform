@@ -135,7 +135,11 @@ All component files are under
 `VmwareSdkDisconnect` / `VmwareSdkDiscoverAssets`
 (`VmwareSdkFunction\VmwareSdkComponent.cs:21-23`); `ComparePasswordHash` /
 `CompareShadowHash` / `CompareMacOsPasswordHash` / `CompareUnixPasswordHash`
-(one component, `ComparePasswordHash\ComparePasswordHashComponent.cs:12-15`);
+(one component, `ComparePasswordHash\ComparePasswordHashComponent.cs:12-15`; for
+`CompareShadowHash` it delegates to the `IPasswordHash` helper
+`src\Service\Rsms\Common\Crypt\PasswordHash.cs:96` `CheckPasswordAgainstShadowEntry`,
+which splits the `/etc/shadow` line on `:` itself at `:98` — pass the whole line,
+do not pre-split);
 `CryptMd5` (`Encrypt\EncryptComponent.cs:11`); `UrlEncode` / `UrlDecode`
 (`EncodeDecode\EncodeDecodeComponent.cs:11-12`). Useful aliases:
 `Declare`==`SetItem`, `Break`==`Return`, `GetFormData`==`GetFormValue`,
