@@ -6,7 +6,7 @@ Operations are the named entry points in a custom platform script that SPP invok
 
 This page documents the operations available for custom platform scripts.
 
-> **Note:** Some operations defined in the operation type system (`DiscoverApiKeys`, `CheckHostKey`, `CreateAdminUser`) are not yet available for custom platforms. See the [GitHub issues](https://github.com/OneIdentity/SafeguardCustomPlatform/issues) for tracking.
+> **Note:** Some operations defined in the operation type system (`DiscoverApiKeys`, `CheckHostKey`) are not yet available for custom platforms. See the [GitHub issues](https://github.com/OneIdentity/SafeguardCustomPlatform/issues) for tracking.
 
 ## Quick Reference
 

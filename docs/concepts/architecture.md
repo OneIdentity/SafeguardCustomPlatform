@@ -54,7 +54,6 @@ The following operation categories are available for custom platforms. Detailed 
 | Dependencies | `UpdateDependentSystem` |
 | API Keys | `CheckApiKey`, `ChangeApiKey` |
 | Files | `CheckFile`, `ChangeFile` |
-| Admin | `CreateAdminUser` |
 
 > [!NOTE]
 > `RetrieveSshHostKey` and `CheckHostKey` are not supported for custom platforms.

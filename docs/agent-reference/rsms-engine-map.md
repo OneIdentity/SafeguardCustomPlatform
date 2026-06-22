@@ -161,7 +161,7 @@ Public operation names are the `Rsms.Public.Definitions.OperationType` enum —
 UpdateDependentSystem, DiscoverAccounts, DiscoverServices, DiscoverSshHostKey,
 EnableAccount, DisableAccount, DiscoverAuthorizedKeys, CheckSshKey, CheckHostKey,
 DiscoverAssets, RemoveAuthorizedKey, RetrieveSshHostKey, CheckApiKey,
-ChangeApiKey, DiscoverApiKeys, CreateAdminUser, ElevateAccount, DemoteAccount,
+ChangeApiKey, DiscoverApiKeys, ElevateAccount, DemoteAccount,
 CheckFile, ChangeFile`
 
 A script "supports" an operation iff its `Functions` contains a function whose
@@ -173,7 +173,7 @@ feature flags** toggling operations — support is per-platform-definition.
 
 Operations the engine actually **implements** (`[ScriptableOperation]` methods in
 `ScriptableModule.cs`): `CheckSystem:112`, `CheckPassword:181`,
-`ChangePassword:227`, `CreateAdminUser:264`, `ChangeSshKey:303`,
+`ChangePassword:227`, `ChangeSshKey:303`,
 `CheckApiKey:326`, `ChangeApiKey:349`, `UpdateDependentSystem:372`,
 `DiscoverAccounts:520`, `DiscoverServices:558`, `DiscoverSshHostKey:602`,
 `EnableAccount:634`, `DisableAccount:672`, `DemoteAccount:710`,

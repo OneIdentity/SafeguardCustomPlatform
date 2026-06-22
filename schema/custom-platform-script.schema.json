@@ -140,10 +140,6 @@
     "RemoveAuthorizedKey": {
       "$ref": "#/definitions/operationDefinition",
       "description": "Removes an authorized SSH key from the target."
-    },
-    "CreateAdminUser": {
-      "$ref": "#/definitions/operationDefinition",
-      "description": "Creates an administrative user on the target."
     }
   },
   "required": [
