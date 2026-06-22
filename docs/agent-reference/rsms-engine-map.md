@@ -173,13 +173,13 @@ feature flags** toggling operations — support is per-platform-definition.
 
 Operations the engine actually **implements** (`[ScriptableOperation]` methods in
 `ScriptableModule.cs`): `CheckSystem:112`, `CheckPassword:181`,
-`ChangePassword:227`, `ChangeSshKey:303`,
-`CheckApiKey:326`, `ChangeApiKey:349`, `UpdateDependentSystem:372`,
-`DiscoverAccounts:520`, `DiscoverServices:558`, `DiscoverSshHostKey:602`,
-`EnableAccount:634`, `DisableAccount:672`, `DemoteAccount:710`,
-`ElevateAccount:737`, `DiscoverAuthorizedKeys:764`, `CheckSshKey:810`,
-`DiscoverAssets:861`, `RemoveAuthorizedKey:924`, `CheckFile:971`,
-`ChangeFile:1022`, `RetrieveSshHostKey:1080`.
+`ChangePassword:227`, `ChangeSshKey:264`,
+`CheckApiKey:287`, `ChangeApiKey:310`, `UpdateDependentSystem:333`,
+`DiscoverAccounts:481`, `DiscoverServices:519`, `DiscoverSshHostKey:563`,
+`EnableAccount:595`, `DisableAccount:633`, `DemoteAccount:671`,
+`ElevateAccount:698`, `DiscoverAuthorizedKeys:725`, `CheckSshKey:771`,
+`DiscoverAssets:822`, `RemoveAuthorizedKey:885`, `CheckFile:932`,
+`ChangeFile:983`, `RetrieveSshHostKey:1041`.
 
 > **Compatibility gap:** `OperationType` defines `DiscoverApiKeys` and
 > `CheckHostKey`, but neither has a `[ScriptableOperation]` method in
