@@ -245,7 +245,7 @@ The dev-loop wrapper distinguishes three failure shapes:
 ## Secret handling
 
 - Do not write secret parameter values into evidence, status messages, or operator-visible output.
-- SPP server-side already redacts known credential parameters as the literal string `**secret**` in returned task logs (constant `Hercules\Source\Hercules.DevKit\Constants\ParameterConstants.cs:5`, cited in [`tools/README.md`](../../../tools/README.md), "Secret handling"). Do not attempt to recover real values from these markers.
+- SPP server-side already redacts known credential parameters as the literal string `**secret**` in returned task logs (constant `PangaeaAppliance\src\Platform\Platform.Rsms\Constants\ParameterConstants.cs:5`, cited in [`tools/README.md`](../../../tools/README.md), "Secret handling"; cross-repo map in [`docs/agent-reference/rsms-engine-map.md`](../../../docs/agent-reference/rsms-engine-map.md)). Do not attempt to recover real values from these markers.
 - Custom-script authors who add new secret parameters must declare them with `Type: "Secret"` so the same redaction applies — see [`script-authoring`](../script-authoring/SKILL.md).
 
 ## Failing closed

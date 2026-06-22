@@ -15,6 +15,7 @@ Human-facing documentation lives in `docs/concepts/`, `docs/guides/`, `docs/tuto
 | [`failure-patterns.md`](failure-patterns.md) | Error-signature → likely cause → fix catalog used by `task-log-analysis`. | **Initially empty.** Rows are populated from real extended task logs as failures are encountered. Invented rows are not acceptable. |
 | [`script-authoring-deep-dives.md`](script-authoring-deep-dives.md) | Long-form reference for topics extracted out of the `script-authoring` skill (diagnostics rules, sample-mining loop, function-call signatures, Linux `CheckPassword` pattern, `Catch`-block logging). | Hand-maintained. |
 | [`vendor-doc-search-recipes.md`](vendor-doc-search-recipes.md) | Query templates for fetching vendor docs and a normalization recipe for pasted vendor-doc excerpts. | Hand-maintained. |
+| [`rsms-engine-map.md`](rsms-engine-map.md) | Cross-repo map: each authored construct (operations, `Do`-block verbs, parameter types, reserved variables, task-log/status contracts, validation entry points) → the authoritative source `file:line` in the `Kevin-Andrew/PangaeaAppliance` repo, where the Rsms engine that executes these scripts lives. Backs cross-repo compatibility-bug work. | Hand-maintained from a source-cited analysis of the PangaeaAppliance tree. Re-verify citations against the current engine ref; paths move. |
 
 ## Related contracts
 

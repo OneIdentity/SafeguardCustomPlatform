@@ -40,7 +40,7 @@ The skill consumes the JSON document produced by [`tools/Invoke-PlatformDevLoop.
 Two layers of evidence matter:
 
 - **`phases[2].data.taskLog`** — the structured array (`Timestamp`, `Status`, `Message`) that `safeguard-ps` attaches to `Ex.SafeguardLongRunningTaskException` on a trigger failure. The first non-`Queued`/`Running` `Status` value usually pins the failure phase; the last entry is the user-visible summary.
-- **`phases[3].data.log`** — the per-named-log entries (`Recorded`, `Level`, `Event`) from `Get-SafeguardTaskLog`. Sections are separated by synthetic `--- <logName> ---` entries inserted by safeguard-ps. The two log names produced by SPP for platform tasks are stable string constants `Operation` and `SshCommunication` (cited in [`tools/README.md`](../../../tools/README.md) "phases[3] data"; defined in `Hercules\Source\Rsms.Public\Constants\Logging.cs:14-15`).
+- **`phases[3].data.log`** — the per-named-log entries (`Recorded`, `Level`, `Event`) from `Get-SafeguardTaskLog`. Sections are separated by synthetic `--- <logName> ---` entries inserted by safeguard-ps. The two log names produced by SPP for platform tasks are stable string constants `Operation` and `SshCommunication` (cited in [`tools/README.md`](../../../tools/README.md) "phases[3] data"; defined in `PangaeaAppliance\src\Common\Common.Rsms\Rsms.Public\Constants\Logging.cs:14-15`, mapped in [`docs/agent-reference/rsms-engine-map.md`](../../../docs/agent-reference/rsms-engine-map.md)).
 
 Read both. The `Operation` log shows what the platform script intended; `SshCommunication` (when present) shows the raw frames so a `Send`/`Receive` mismatch becomes diagnosable.
 
